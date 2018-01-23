@@ -1,0 +1,45 @@
+﻿.joystick {
+    text-align: center;
+    position: relative;
+}
+
+.moveJoystick {
+    background-color: lightblue;
+}
+
+.rotationJoystick {
+    background-color: lightcoral;
+}
+
+.telemetricsDisplay {
+    background-color: lightgreen;
+    text-align: center;
+    height: 4%;
+    width: 100%
+} 
+
+@media screen and (orientation:landscape) {    
+    .moveJoystick {
+        float: left;
+        width: 50%;
+        height: 96%;
+    }
+
+    .rotationJoystick {
+        float: right;
+        width: 50%;
+        height: 96%;
+    }
+}
+
+@media screen and (orientation:portrait) {
+    .moveJoystick {
+        width: 100%;
+        height: 48%;
+    }
+
+    .rotationJoystick {
+        width: 100%;
+        height: 48%;
+    }
+}

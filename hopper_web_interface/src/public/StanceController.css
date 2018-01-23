@@ -1,0 +1,60 @@
+﻿.joystick {
+    text-align: center;
+    position: relative;
+}
+
+.translationJoystick {
+    background-color: lightblue;
+}
+
+.heightJoystick {
+    background-color: lightpink;
+}
+
+.rotationJoystick {
+    background-color: lightcoral;
+}
+
+.telemetricsDisplay {
+    background-color: lightgreen;
+    text-align: center;
+    height: 4%;
+    width: 100%
+}
+
+@media screen and (orientation:landscape) {
+    .translationJoystick {
+        float: left;
+        width: 33%;
+        height: 96%;
+    }
+
+    .heightJoystick {
+        float: left;
+        width: 34%;
+        height: 96%;
+    }
+
+    .rotationJoystick {
+        float: right;
+        width: 33%;
+        height: 96%;
+    }
+}
+
+@media screen and (orientation:portrait) {
+    .translationJoystick {
+        width: 100%;
+        height: 32%;
+    }
+
+    .heightJoystick {
+        width: 100%;
+        height: 32%;
+    }
+
+    .rotationJoystick {
+        width: 100%;
+        height: 32%;
+    }
+}

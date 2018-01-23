@@ -1,5 +1,5 @@
 {
-  "name": "quadruped_web_interface",
+  "name": "hopper_web_interface",
   "version": "1.0.0",
   "description": "A simple node web server for remote control of Hopper",
   "main": "app.js",

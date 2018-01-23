@@ -1,1 +1,0 @@
-# quadruped_ros

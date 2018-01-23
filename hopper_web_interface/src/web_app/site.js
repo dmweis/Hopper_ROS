@@ -4,6 +4,9 @@
         data: {
             angle: 0,
             distance: 0,
+            x: 0,
+            y: 0,
+            deadZone: 0.2,
             color: data.color,
             name: data.name,
             touchDown: false
@@ -22,40 +25,45 @@
                             context.angle = 0;
                             context.distance = 0;
                             context.touchDown = true;
-                            if (data.startCallback) {
-                                data.startCallback();
-                            }
                         });
                     nipple.on('end',
                         function () {
                             context.angle = 0;
                             context.distance = 0;
                             context.touchDown = false;
-                            if (data.endCallback) {
-                                data.endCallback();
-                            }
                         });
                 });
         },
         watch: {
-            touchDown: function() {
-                data.socket.emit('joystickUpdate',{
+            touchDown: function () {
+                data.socket.emit('joystickUpdate', {
                     joystickType: this.name,
                     MessageType: this.touchDown ? 'start' : 'stop'
                 });
             }
         }
     });
+
     vm.$watch(function () {
         return this.angle + this.distance;
-    },
-        function (newValue, oldValue) {
-            data.socket.emit('joystickUpdate', {
-                joystickType: this.name,
-                angle: this.angle,
-                MessageType: 'movement',
-                distance: this.distance
-            });
+    }, function (newValue, oldValue) {
+        const size = this.distance / 50;
+        if (size < this.deadZone) {
+            this.x = 0;
+            this.y = 0;
+            return;
+        }
+        this.y = -Math.cos(this.angle) * size;
+        this.x = Math.sin(this.angle) * size;
+    });
+    vm.$watch(function () {
+        return this.x + this.y;
+    }, function (newValue, oldValue) {
+        data.socket.emit(this.name, {
+            x: this.x,
+            y: this.y
         });
+    });
+
     return vm;
 }

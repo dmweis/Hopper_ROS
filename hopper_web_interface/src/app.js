@@ -6,7 +6,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var rosnodejs = require('rosnodejs')
 
-app.use(express.static(__dirname + '/src'));
+app.use(express.static(__dirname + '/web_app'));
 app.use(express.static(__dirname + '/pages'));
 app.use(express.static(__dirname + '/public'));
 app.use('/vue', express.static(__dirname + '/node_modules/vue/dist'));

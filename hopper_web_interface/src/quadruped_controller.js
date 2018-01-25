@@ -1,4 +1,4 @@
-const isLinux = process.platform == "Linux";
+const isLinux = process.platform.toLowerCase() === "linux";
 
 var publisher;
 

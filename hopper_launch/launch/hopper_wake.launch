@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Regular web launch file -->
+<launch>
+    <node name="quadruped_controller" pkg="hopper_controller" type="quadruped_controller.py" />
+    <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />
+</launch>
+

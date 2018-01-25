@@ -4,7 +4,7 @@ var publisher;
 
 if (isLinux) {
     var rosnodejs = require('rosnodejs')
-    rosnodejs.initNode('node_server')
+    rosnodejs.initNode('hopper_web_interface')
         .then((node) => {
             publisher = node.advertise('/quadruped_command', 'geometry_msgs/Twist');
         });

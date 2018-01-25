@@ -15,6 +15,7 @@ class QuadrupedController(object):
 
     def update_direction(self, twist):
         self.controller.direction = Vector2(twist.linear.x, twist.linear.y)
+        self.controller.rotation = twist.angular.x
 
     def listener(self):
         rospy.init_node('quadruped_controller', anonymous=True)

@@ -8,6 +8,7 @@ from numbers import Number
 FEMUR_OFFSET = 13
 TIBIA_OFFSET = 35
 
+
 class Vector3(object):
     def __init__(self, x, y, z):
         self.x = x
@@ -76,7 +77,8 @@ class Vector3(object):
         return Vector3(self.x, self.y, self.z)
 
     def __str__(self):
-        return '<{:.3f} {:.3f} {:.3f}>'.format(self.x, self.y, self.z)
+        return '<{:.2f} {:.2f} {:.2f}>'.format(self.x, self.y, self.z)
+
 
 class Vector2(object):
     def __init__(self, x, y, ):
@@ -95,6 +97,9 @@ class Vector2(object):
                    self.y == other.y
         return False
 
+    def length(self):
+        return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2))
+
     def is_zero(self):
         return self.x == 0 and self.y == 0
 
@@ -102,7 +107,8 @@ class Vector2(object):
         return Vector2(self.x, self.y)
 
     def __str__(self):
-        return '<{:.3f} {:.3f}>'.format(self.x, self.y)
+        return '<{:.2f} {:.2f}>'.format(self.x, self.y)
+
 
 class LegConfiguration(object):
     def __init__(self, coxa_id, femur_id, tibia_id, angle_offset, coxa_position, femur_correction, tibia_correction):
@@ -114,11 +120,13 @@ class LegConfiguration(object):
         self.femur_correction = femur_correction
         self.tibia_correction = tibia_correction
 
+
 class MotorGoalPositions(object):
     def __init__(self, coxa, femur, tibia):
         self.coxa = coxa
         self.femur = femur
         self.tibia = tibia
+
 
 class LegFlags(IntEnum):
     LEFT_FRONT = 1
@@ -132,6 +140,20 @@ class LegFlags(IntEnum):
     LEFT = LEFT_FRONT | LEFT_REAR
     RF_LR_CROSS = RIGHT_FRONT | LEFT_REAR
     LF_RR_CROSS = LEFT_FRONT | RIGHT_REAR
+
+    @staticmethod
+    def get_legs_as_list(legs):
+        selected_legs = []
+        if (legs & LegFlags.LEFT_FRONT) != 0:
+            selected_legs.append(LegFlags.LEFT_FRONT)
+        if (legs & LegFlags.RIGHT_FRONT) != 0:
+            selected_legs.append(LegFlags.RIGHT_FRONT)
+        if (legs & LegFlags.LEFT_REAR) != 0:
+            selected_legs.append(LegFlags.LEFT_REAR)
+        if (legs & LegFlags.RIGHT_REAR) != 0:
+            selected_legs.append(LegFlags.RIGHT_REAR)
+        return selected_legs
+
 
 class LegPositions(object):
     def __init__(self, left_front, right_front, left_rear, right_rear):
@@ -152,6 +174,35 @@ class LegPositions(object):
         if isinstance(self, other.__class__):
             return self.__dict__ == other.__dict__
         return False
+
+    def __sub__(self, other):
+        if isinstance(other, LegPositions):
+            return LegPositions(self.left_front - other.left_front,
+                                self.right_front - other.right_front,
+                                self.left_rear - other.left_rear,
+                                self.right_rear - other.right_rear)
+
+    def __add__(self, other):
+        if isinstance(other, LegPositions):
+            return LegPositions(self.left_front + other.left_front,
+                                self.right_front + other.right_front,
+                                self.left_rear + other.left_rear,
+                                self.right_rear + other.right_rear)
+
+    def __truediv__(self, other):
+        if isinstance(other, Number):
+            return LegPositions(self.left_front / other,
+                                self.right_front / other,
+                                self.left_rear / other,
+                                self.right_rear / other)
+
+    def __mul__(self, other):
+        if isinstance(other, Number):
+            return LegPositions(self.left_front * other,
+                                self.right_front * other,
+                                self.left_rear * other,
+                                self.right_rear * other)
+
 
     def move_towards(self, target, distance):
         LF = self.left_front.move_towards(target.left_front, distance)
@@ -183,6 +234,36 @@ class LegPositions(object):
         if (legs & LegFlags.RIGHT_REAR) != 0:
             new_position.right_rear.rotate_around_z(angle)
         return new_position
+
+    def change(self, new_position, legs = LegFlags.ALL):
+        new_position = self.clone()
+        if (legs & LegFlags.LEFT_FRONT) != 0:
+            new_position.left_front = new_position
+        if (legs & LegFlags.RIGHT_FRONT) != 0:
+            new_position.right_front = new_position
+        if (legs & LegFlags.LEFT_REAR) != 0:
+            new_position.left_rear = new_position
+        if (legs & LegFlags.RIGHT_REAR) != 0:
+            new_position.right_rear = new_position
+        return new_position
+
+    def get_legs_as_list(self, legs):
+        selected_legs = []
+        if (legs & LegFlags.LEFT_FRONT) != 0:
+            selected_legs.append(self.left_front)
+        if (legs & LegFlags.RIGHT_FRONT) != 0:
+            selected_legs.append(self.right_front)
+        if (legs & LegFlags.LEFT_REAR) != 0:
+            selected_legs.append(self.left_rear)
+        if (legs & LegFlags.RIGHT_REAR) != 0:
+            selected_legs.append(self.right_rear)
+        return selected_legs
+
+    def normalize_vectors(self):
+        self.left_front = self.left_front / self.left_front.length()
+        self.right_front = self.right_front / self.right_front.length()
+        self.left_rear = self.left_rear / self.left_rear.length()
+        self.right_rear = self.right_rear / self.right_rear.length()
 
     def __str__(self):
         return 'LF: {} RF: {} LR: {} RR: {}'.format(self.left_front, self.right_front, self.left_rear, self.right_rear)

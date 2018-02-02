@@ -236,16 +236,16 @@ class LegPositions(object):
         return new_position
 
     def change(self, new_position, legs = LegFlags.ALL):
-        new_position = self.clone()
+        position_copy = self.clone()
         if (legs & LegFlags.LEFT_FRONT) != 0:
-            new_position.left_front = new_position
+            position_copy.left_front = new_position
         if (legs & LegFlags.RIGHT_FRONT) != 0:
-            new_position.right_front = new_position
+            position_copy.right_front = new_position
         if (legs & LegFlags.LEFT_REAR) != 0:
-            new_position.left_rear = new_position
+            position_copy.left_rear = new_position
         if (legs & LegFlags.RIGHT_REAR) != 0:
-            new_position.right_rear = new_position
-        return new_position
+            position_copy.right_rear = new_position
+        return position_copy
 
     def get_legs_as_list(self, legs):
         selected_legs = []

@@ -286,6 +286,22 @@ class LegPositions(object):
             position_copy.right_rear = new_position
         return position_copy
 
+    def update_from_other(self, other, legs = LegFlags.ALL):
+        position_copy = self.clone()
+        if (legs & LegFlags.LEFT_FRONT) != 0:
+            position_copy.left_front = other.left_front
+        if (legs & LegFlags.RIGHT_FRONT) != 0:
+            position_copy.right_front = other.right_front
+        if (legs & LegFlags.LEFT_MIDDLE) != 0:
+            position_copy.left_middle = other.left_middle
+        if (legs & LegFlags.RIGHT_MIDDLE) != 0:
+            position_copy.right_middle = other.right_middle
+        if (legs & LegFlags.LEFT_REAR) != 0:
+            position_copy.left_rear = other.left_rear
+        if (legs & LegFlags.RIGHT_REAR) != 0:
+            position_copy.right_rear = other.right_rear
+        return position_copy
+
     def get_legs_as_list(self, legs):
         selected_legs = []
         if (legs & LegFlags.LEFT_FRONT) != 0:
@@ -309,6 +325,15 @@ class LegPositions(object):
         self.right_middle = self.right_middle.normalize()
         self.left_rear = self.left_rear.normalize()
         self.right_rear = self.right_rear.normalize()
+
+    def longest_length(self):
+        LF = self.left_front.length()
+        RF = self.right_front.length()
+        LM = self.left_middle.length()
+        RM = self.right_middle.length()
+        LR = self.left_rear.length()
+        RR = self.right_rear.length()
+        return max(map(abs, [LF, RF, LM, RM, LR, RR]))
 
     def __str__(self):
         return 'LF: {} RF: {} LM: {} RM: {} LR: {} RR: {}'.format(self.left_front, self.right_front, self.left_middle, self.right_middle, self.left_rear, self.right_rear)

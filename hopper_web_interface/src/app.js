@@ -26,7 +26,7 @@ io.on('connection', function (socket) {
         robot.sendCommandToRobot(lastCommand.x, lastCommand.y, lastCommand.rot);
     });
     socket.on('rotation', function (msg) {
-        lastCommand.rot = msg.y * 10;
+        lastCommand.rot = msg.y * -10;
         robot.sendCommandToRobot(lastCommand.x, lastCommand.y, lastCommand.rot);
     });
     socket.on('disconnected', function () {

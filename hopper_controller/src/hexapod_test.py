@@ -9,13 +9,15 @@ servo_driver = DynamixelDriver("COM8")
 ik_driver = IkDriver(servo_driver)
 controller = GaitController(ik_driver)
 print("Starting move")
-controller.direction = Vector2(6, 0)
+controller.direction = Vector2(-6, 0)
 # controller.rotation = -10
-sleep(5)
+sleep(2)
 controller.rotation = 0
 controller.direction = Vector2(0, 0)
+sleep(5)
+
 print("Finished")
 
-controller.stop()
+controller.stop(False)
 raw_input("Press enter to exit")
 print("Exiting")

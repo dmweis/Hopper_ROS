@@ -78,6 +78,13 @@ class GaitController(threading.Thread):
             self.ik_driver.move_legs_synced(self.__last_written_position)
             sleep(self.__update_delay * 0.001)
 
+    def __execute_move(self, target_position):
+        while self.__last_written_position.move_towards(target_position, self.__speed * 0.001 * self.__update_delay):
+            self.ik_driver.move_legs_synced(self.__last_written_position)
+            sleep(self.__update_delay * 0.001)
+        self.ik_driver.move_legs_synced(self.__last_written_position)
+        sleep(self.__update_delay * 0.001)
+
     def __get_next_leg_combo(self):
         self.__last_used_forward_legs = LegFlags.RIGHT_TRIPOD if self.__last_used_forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
         return self.__last_used_forward_legs

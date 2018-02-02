@@ -55,7 +55,7 @@ class GaitController(threading.Thread):
             self.ik_driver.disable_motors()
         self.ik_driver.close()
 
-    def __execute_step(self, direction, angle, forward_legs, leg_lift_height = 2):
+    def __execute_step(self, direction, angle, forward_legs, leg_lift_height=2):
         backwards_legs = LegFlags.RIGHT_TRIPOD if forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
         start_position = self.__last_written_position.clone()
         target_position = RELAXED_POSITION.clone() \
@@ -68,12 +68,6 @@ class GaitController(threading.Thread):
         normalized_transformation_vectors.normalize_vectors()
         total_distance = transformation_vectors.left_front.length()
         distance_traveled = 0
-        # print "Starting step " + str(forward_legs)
-        # print "Start pos " + str(start_position)
-        # print "Target pos " + str(target_position)
-        # print "Transform pos " + str(transformation_vectors)
-        # print "Distance " + str(direction.length())
-        # print "Total Distance " + str(total_distance)
         while distance_traveled <= total_distance:
             distance_traveled += self.__speed / self.__update_delay
             new_position = start_position + normalized_transformation_vectors * distance_traveled
@@ -82,9 +76,7 @@ class GaitController(threading.Thread):
                 new_leg_pos.z = start_leg_pos.z + current_leg_height
             self.__last_written_position = new_position
             self.ik_driver.move_legs_synced(self.__last_written_position)
-            # print RELAXED_POSITION - self.__last_written_position
             sleep(self.__update_delay * 0.001)
-        # print "Finished step"
 
     def __get_next_leg_combo(self):
         self.__last_used_forward_legs = LegFlags.RIGHT_TRIPOD if self.__last_used_forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD

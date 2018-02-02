@@ -48,10 +48,11 @@ class GaitController(threading.Thread):
             else:
                 sleep(self.__update_delay * 0.001)
 
-    def stop(self):
+    def stop(self, disable_motors=True):
         self.__keep_running = False
         self.join()
-        self.ik_driver.disable_motors()
+        if  disable_motors:
+            self.ik_driver.disable_motors()
         self.ik_driver.close()
 
     def __execute_step(self, direction, angle, forward_legs, leg_lift_height = 2):
@@ -59,7 +60,9 @@ class GaitController(threading.Thread):
         start_position = self.__last_written_position.clone()
         target_position = RELAXED_POSITION.clone() \
             .transform(Vector3(direction.x / 2, direction.y / 2, 0), forward_legs) \
-            .transform(Vector3(-direction.x / 2, -direction.y / 2, 0), backwards_legs)
+            .rotate(-angle / 2, forward_legs) \
+            .transform(Vector3(-direction.x / 2, -direction.y / 2, 0), backwards_legs) \
+            .rotate(angle / 2, backwards_legs)
         transformation_vectors = target_position - start_position
         normalized_transformation_vectors = transformation_vectors.clone()
         normalized_transformation_vectors.normalize_vectors()

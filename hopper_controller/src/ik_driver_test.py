@@ -11,6 +11,4 @@ RELAXED_POSITION = LegPositions(
     Vector3(-LEG_DISTANCE_LATERAL, -LEG_DISTANCE_LONGITUDAL, LEG_HEIGHT),
 )
 
-
-
 calculate_ik_for_leg(RELAXED_POSITION.right_rear, RIGHT_REAR)

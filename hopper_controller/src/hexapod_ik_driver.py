@@ -238,7 +238,7 @@ class LegPositions(object):
         RR = self.right_rear.move_towards(target.right_rear, distance)
         return LF or RF or LM or RM or LR or RR
 
-    def transform(self, transform, legs = LegFlags.ALL):
+    def transform(self, transform, legs=LegFlags.ALL):
         new_position = self.clone()
         if (legs & LegFlags.LEFT_FRONT) != 0:
             new_position.left_front += transform
@@ -254,7 +254,7 @@ class LegPositions(object):
             new_position.right_rear += transform
         return  new_position
 
-    def rotate(self, angle, legs = LegFlags.ALL):
+    def rotate(self, angle, legs=LegFlags.ALL):
         new_position = self.clone()
         if (legs & LegFlags.LEFT_FRONT) != 0:
             new_position.left_front.rotate_around_z(angle)
@@ -270,7 +270,7 @@ class LegPositions(object):
             new_position.right_rear.rotate_around_z(angle)
         return new_position
 
-    def change(self, new_position, legs = LegFlags.ALL):
+    def change(self, new_position, legs=LegFlags.ALL):
         position_copy = self.clone()
         if (legs & LegFlags.LEFT_FRONT) != 0:
             position_copy.left_front = new_position
@@ -286,7 +286,7 @@ class LegPositions(object):
             position_copy.right_rear = new_position
         return position_copy
 
-    def update_from_other(self, other, legs = LegFlags.ALL):
+    def update_from_other(self, other, legs=LegFlags.ALL):
         position_copy = self.clone()
         if (legs & LegFlags.LEFT_FRONT) != 0:
             position_copy.left_front = other.left_front
@@ -356,6 +356,7 @@ COXA_LENGTH = 5.3
 FEMUR_LENGTH = 6.5
 TIBIA_LENGTH = 13
 
+
 class IkDriver(object):
     def __init__(self, servo_driver):
         self.__servo_driver = servo_driver
@@ -381,7 +382,7 @@ class IkDriver(object):
             (RIGHT_FRONT.coxa_id, right_front_goal.coxa),
             (RIGHT_FRONT.femur_id, right_front_goal.femur),
             (RIGHT_FRONT.tibia_id, right_front_goal.tibia),
-            #right rear
+            # right rear
             (RIGHT_REAR.coxa_id, right_rear_goal.coxa),
             (RIGHT_REAR.femur_id, right_rear_goal.femur),
             (RIGHT_REAR.tibia_id, right_rear_goal.tibia),
@@ -450,7 +451,7 @@ def calculate_fk_for_leg(motor_positions, leg_config):
     # to calculate tibia we need angle between tibia and a vertical line
     # we get this by calculating the angles formed by a horizontal line from femur
     # femur and part of fibia by knowing that the sum of angles is 180
-    # than we just remove this from teh tibia andgle and done
+    # than we just remove this from teh tibia angle and done
     angle_for_tibia_vector = tibia_angle - (180 - 90 - (femur_angle - 90))
     tibia_x = math.sin(math.radians(angle_for_tibia_vector)) * TIBIA_LENGTH
     tibia_y = math.cos(math.radians(angle_for_tibia_vector)) * TIBIA_LENGTH

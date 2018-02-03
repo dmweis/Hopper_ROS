@@ -407,6 +407,7 @@ class IkDriver(object):
     def close(self):
         self.__servo_driver.close()
 
+
 def calculate_ik_for_leg(target, leg_config):
     relative_vector = target - leg_config.coxa_position
     target_angle = math.degrees(math.atan2(relative_vector.y, relative_vector.x)) + leg_config.angle_offset
@@ -429,7 +430,29 @@ def calculate_ik_for_leg(target, leg_config):
     corrected_coxa = 150 + target_angle
     return MotorGoalPositions(corrected_coxa, corrected_femur, corrected_tibia)
 
+
 def get_angle_by_a(a, b, c):
     upper = math.pow(b, 2) + math.pow(c, 2) - math.pow(a, 2)
     bottom = 2 * b * c
     return math.degrees(math.acos(upper / bottom))
+
+
+def calculate_fk_for_leg(motor_positions, leg_config):
+    femur_angle = abs(motor_positions.femur - abs(leg_config.femur_correction))
+    tibia_angle = abs(motor_positions.tibia - abs(leg_config.tibia_correction))
+    coxa_angle = 150 - motor_positions.coxa - leg_config.angle_offset
+    base_x = math.cos(math.radians(coxa_angle))
+    base_y = math.sin(math.radians(coxa_angle))
+    coxa_vector = Vector3(base_x, base_y, 0) * COXA_LENGTH
+    femur_x = math.sin(math.radians(femur_angle - 90)) * FEMUR_LENGTH
+    femur_y = math.cos(math.radians(femur_angle - 90)) * FEMUR_LENGTH
+    femur_vector = Vector3(base_x * femur_y, base_y * femur_y, femur_x)
+    # to calculate tibia we need angle between tibia and a vertical line
+    # we get this by calculating the angles formed by a horizontal line from femur
+    # femur and part of fibia by knowing that the sum of angles is 180
+    # than we just remove this from teh tibia andgle and done
+    angle_for_tibia_vector = tibia_angle - (180 - 90 - (femur_angle - 90))
+    tibia_x = math.sin(math.radians(angle_for_tibia_vector)) * TIBIA_LENGTH
+    tibia_y = math.cos(math.radians(angle_for_tibia_vector)) * TIBIA_LENGTH
+    tibia_vector = Vector3(base_x * tibia_x, base_y * tibia_x, -tibia_y)
+    return leg_config.coxa_position + coxa_vector + femur_vector + tibia_vector

@@ -25,22 +25,28 @@ PRESENT_MOVING = 46
 
 PROTOCOL = 1
 
+
 def search_usb_2_ax_port():
     ports = list(serial.tools.list_ports.comports())
     dynamixel_port = next(port for port in ports if "USB2AX" in port.description)
     return dynamixel_port.device
 
+
 def map_linear(value, in_min, in_max, out_min, out_max):
     return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
 
 def clamp(value, min_value, max_value):
     return max(min(max_value, value), min_value)
 
+
 def degrees_to_dynamixel_units(degrees):
     return round(clamp(map_linear(degrees, 0, 300, 0, 1023), 0, 1023))
 
+
 def dynamixel_units_to_degrees(units):
     return round(clamp(map_linear(units, 0, 1023, 0, 300), 0, 300))
+
 
 class DynamixelDriver(object):
     def __init__(self, port_name):
@@ -60,8 +66,8 @@ class DynamixelDriver(object):
     def read_current_position(self, servo_id):
         return self.__read_uint_16(servo_id, PRESENT_POSITION)
 
-    def set_moving_speed(self, servo_id, moving_speed, cw = False):
-        if  cw:
+    def set_moving_speed(self, servo_id, moving_speed, cw=False):
+        if cw:
             moving_speed |= 1 >> 10
         self.__write_uint_16(servo_id, MOVING_SPEED, moving_speed)
 
@@ -89,7 +95,7 @@ class DynamixelDriver(object):
                 raise IOError("failed writing to group sync write")
         dynamixel.groupSyncWriteTxPacket(sync_group_num)
         dxl_comm_result = dynamixel.getLastTxRxResult(self.__port_num, PROTOCOL)
-        if  dxl_comm_result != 0:
+        if dxl_comm_result != 0:
             dynamixel.printTxRxResult(PROTOCOL, dxl_comm_result)
             raise IOError()
         dynamixel.groupSyncWriteClearParam(sync_group_num)

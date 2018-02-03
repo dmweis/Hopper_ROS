@@ -7,6 +7,7 @@ from hexapod_gait_engine import GaitController
 from hexapod_ik_driver import IkDriver, Vector2
 from dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 
+
 class HexapodController(object):
     def __init__(self):
         servo_driver = DynamixelDriver(search_usb_2_ax_port())
@@ -22,6 +23,7 @@ class HexapodController(object):
         rospy.Subscriber("quadruped_command", Twist, self.update_direction)
         rospy.spin()
         self.controller.stop()
+
 
 if __name__ == '__main__':
     HexapodController().listener()

@@ -73,7 +73,7 @@ class GaitController(threading.Thread):
     def stop(self, disable_motors=True):
         self.__keep_running = False
         self.join()
-        if  disable_motors:
+        if disable_motors:
             self.ik_driver.disable_motors()
         self.ik_driver.close()
 

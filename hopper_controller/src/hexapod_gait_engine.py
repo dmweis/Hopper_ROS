@@ -91,6 +91,7 @@ class GaitController(threading.Thread):
         normalized_transformation_vectors = transformation_vectors.clone()
         normalized_transformation_vectors.normalize_vectors()
         total_distance = transformation_vectors.longest_length()
+        speed = total_distance * 2
         distance_traveled = 0
         while distance_traveled <= total_distance:
             distance_traveled += speed / self.__update_delay

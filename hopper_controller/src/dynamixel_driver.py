@@ -66,6 +66,9 @@ class DynamixelDriver(object):
     def read_current_position(self, servo_id):
         return self.__read_uint_16(servo_id, PRESENT_POSITION)
 
+    def read_current_position_degrees(self, servo_id):
+        return dynamixel_units_to_degrees(self.read_current_position(servo_id))
+
     def set_moving_speed(self, servo_id, moving_speed, cw=False):
         if cw:
             moving_speed |= 1 >> 10

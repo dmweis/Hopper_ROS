@@ -158,14 +158,14 @@ class LegFlags(IntEnum):
             selected_legs.append(LegFlags.LEFT_FRONT)
         if (legs & LegFlags.RIGHT_FRONT) != 0:
             selected_legs.append(LegFlags.RIGHT_FRONT)
-        if (legs & LegFlags.LEFT_REAR) != 0:
-            selected_legs.append(LegFlags.LEFT_REAR)
-        if (legs & LegFlags.RIGHT_REAR) != 0:
-            selected_legs.append(LegFlags.RIGHT_REAR)
         if (legs & LegFlags.LEFT_MIDDLE) != 0:
             selected_legs.append(LegFlags.LEFT_MIDDLE)
         if (legs & LegFlags.RIGHT_MIDDLE) != 0:
             selected_legs.append(LegFlags.RIGHT_MIDDLE)
+        if (legs & LegFlags.LEFT_REAR) != 0:
+            selected_legs.append(LegFlags.LEFT_REAR)
+        if (legs & LegFlags.RIGHT_REAR) != 0:
+            selected_legs.append(LegFlags.RIGHT_REAR)
         return selected_legs
 
 
@@ -273,33 +273,33 @@ class LegPositions(object):
     def change(self, new_position, legs=LegFlags.ALL):
         position_copy = self.clone()
         if (legs & LegFlags.LEFT_FRONT) != 0:
-            position_copy.left_front = new_position
+            position_copy.left_front = new_position.clone()
         if (legs & LegFlags.RIGHT_FRONT) != 0:
-            position_copy.right_front = new_position
+            position_copy.right_front = new_position.clone()
         if (legs & LegFlags.LEFT_MIDDLE) != 0:
-            position_copy.left_middle = new_position
+            position_copy.left_middle = new_position.clone()
         if (legs & LegFlags.RIGHT_MIDDLE) != 0:
-            position_copy.right_middle = new_position
+            position_copy.right_middle = new_position.clone()
         if (legs & LegFlags.LEFT_REAR) != 0:
-            position_copy.left_rear = new_position
+            position_copy.left_rear = new_position.clone()
         if (legs & LegFlags.RIGHT_REAR) != 0:
-            position_copy.right_rear = new_position
+            position_copy.right_rear = new_position.clone()
         return position_copy
 
     def update_from_other(self, other, legs=LegFlags.ALL):
         position_copy = self.clone()
         if (legs & LegFlags.LEFT_FRONT) != 0:
-            position_copy.left_front = other.left_front
+            position_copy.left_front = other.left_front.clone()
         if (legs & LegFlags.RIGHT_FRONT) != 0:
-            position_copy.right_front = other.right_front
+            position_copy.right_front = other.right_front.clone()
         if (legs & LegFlags.LEFT_MIDDLE) != 0:
-            position_copy.left_middle = other.left_middle
+            position_copy.left_middle = other.left_middle.clone()
         if (legs & LegFlags.RIGHT_MIDDLE) != 0:
-            position_copy.right_middle = other.right_middle
+            position_copy.right_middle = other.right_middle.clone()
         if (legs & LegFlags.LEFT_REAR) != 0:
-            position_copy.left_rear = other.left_rear
+            position_copy.left_rear = other.left_rear.clone()
         if (legs & LegFlags.RIGHT_REAR) != 0:
-            position_copy.right_rear = other.right_rear
+            position_copy.right_rear = other.right_rear.clone()
         return position_copy
 
     def get_legs_as_list(self, legs):
@@ -365,6 +365,7 @@ class IkDriver(object):
         for servo_id in ALL_SERVOS_IDS:
             self.__servo_driver.set_compliance_slope(servo_id, 64)
             self.__servo_driver.set_moving_speed(servo_id, 1023)
+            self.__servo_driver.set_torque(servo_id, False)
 
     def disable_motors(self):
         for servo_id in ALL_SERVOS_IDS:
@@ -405,6 +406,26 @@ class IkDriver(object):
         ]
         self.__servo_driver.group_sync_write_goal_degrees(commands)
 
+    def read_current_leg_positions(self):
+        left_front = self.__read_single_current_leg_position(LEFT_FRONT)
+        right_front = self.__read_single_current_leg_position(RIGHT_FRONT)
+        left_middle = self.__read_single_current_leg_position(LEFT_MIDDLE)
+        right_middle = self.__read_single_current_leg_position(RIGHT_MIDDLE)
+        left_rear = self.__read_single_current_leg_position(LEFT_REAR)
+        right_rear = self.__read_single_current_leg_position(RIGHT_REAR)
+        return LegPositions(left_front,
+                            right_front,
+                            left_middle,
+                            right_middle,
+                            left_rear,
+                            right_rear)
+
+    def __read_single_current_leg_position(self, leg_configuration):
+        motor_positions = MotorGoalPositions(self.__servo_driver.read_current_position_degrees(leg_configuration.coxa_id),
+                                  self.__servo_driver.read_current_position_degrees(leg_configuration.femur_id),
+                                  self.__servo_driver.read_current_position_degrees(leg_configuration.tibia_id))
+        return calculate_fk_for_leg(motor_positions, leg_configuration)
+
     def close(self):
         self.__servo_driver.close()
 
@@ -441,7 +462,7 @@ def get_angle_by_a(a, b, c):
 def calculate_fk_for_leg(motor_positions, leg_config):
     femur_angle = abs(motor_positions.femur - abs(leg_config.femur_correction))
     tibia_angle = abs(motor_positions.tibia - abs(leg_config.tibia_correction))
-    coxa_angle = 150 - motor_positions.coxa - leg_config.angle_offset
+    coxa_angle = motor_positions.coxa - 150 - leg_config.angle_offset
     base_x = math.cos(math.radians(coxa_angle))
     base_y = math.sin(math.radians(coxa_angle))
     coxa_vector = Vector3(base_x, base_y, 0) * COXA_LENGTH

@@ -72,7 +72,7 @@ class GaitController(threading.Thread):
         self.ready = True
         while self.__keep_running:
             if not self.direction.is_zero() or self.rotation != 0:
-                if self.direction.is_zero():
+                if self.direction.is_zero() and abs(self.rotation) > 8:
                     self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=6)
                 elif self.direction.length() > 5.5:
                     self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=5)

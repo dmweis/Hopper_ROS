@@ -29,9 +29,18 @@ GROUND_LEVEL_RELAXED_POSITION = LegPositions(
     Vector3(-LEG_DISTANCE_LATERAL - 5, -LEG_DISTANCE_LONGITUDAL - 5, -3),
 )
 
+WIDER_RELAXED_POSITION = LegPositions(
+    Vector3(LEG_DISTANCE_LATERAL + 5, LEG_DISTANCE_LONGITUDAL + 5, LEG_HEIGHT),
+    Vector3(LEG_DISTANCE_LATERAL + 5, -LEG_DISTANCE_LONGITUDAL - 5, LEG_HEIGHT),
+    Vector3(0, LEG_DISTANCE_LONGITUDAL + 10, -3),
+    Vector3(0, -LEG_DISTANCE_LONGITUDAL - 10, -3),
+    Vector3(-LEG_DISTANCE_LATERAL - 5, LEG_DISTANCE_LONGITUDAL + 5, LEG_HEIGHT),
+    Vector3(-LEG_DISTANCE_LATERAL - 5, -LEG_DISTANCE_LONGITUDAL - 5, LEG_HEIGHT),
+)
 
-def get_height_for_step(distance, full_step_lenght, height):
-    distance = distance / full_step_lenght
+
+def get_height_for_step(distance, full_step_length, height):
+    distance = distance / full_step_length
     return math.sin(distance * math.pi) * height
 
 
@@ -55,22 +64,28 @@ class GaitController(threading.Thread):
         for leg in LegFlags.get_legs_as_list(LegFlags.ALL):
             new_position = self.__last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
             self.__execute_move(new_position, 6)
-        self.__execute_move(RELAXED_POSITION.clone(), 6)
+        self.__execute_move(WIDER_RELAXED_POSITION.clone(), 6)
+        self.__go_to_relaxed(self.__get_next_leg_combo(), RELAXED_POSITION, distance_speed_multiplier=2)
+        self.__go_to_relaxed(self.__get_next_leg_combo(), RELAXED_POSITION, distance_speed_multiplier=2)
         self.ready = True
         while self.__keep_running:
             if not self.direction.is_zero() or self.rotation != 0:
-                if self.direction.length() > 5.5:
+                if self.direction.is_zero():
+                    self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=6)
+                elif self.direction.length() > 5.5:
                     self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=5)
                 else:
                     self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=3)
                 self.__relaxed = False
             elif not self.__relaxed:
-                self.__go_to_relaxed(self.__get_next_leg_combo(), distance_speed_multiplier=2)
-                self.__go_to_relaxed(self.__get_next_leg_combo(), distance_speed_multiplier=2)
+                self.__go_to_relaxed(self.__get_next_leg_combo(), RELAXED_POSITION, distance_speed_multiplier=2)
+                self.__go_to_relaxed(self.__get_next_leg_combo(), RELAXED_POSITION, distance_speed_multiplier=2)
                 self.__relaxed = True
             else:
                 sleep(self.__update_delay * 0.001)
         self.ready = False
+        self.__go_to_relaxed(self.__get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
+        self.__go_to_relaxed(self.__get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
         self.__execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
 
     def stop(self, disable_motors=True):
@@ -108,9 +123,9 @@ class GaitController(threading.Thread):
             self.ik_driver.move_legs_synced(self.__last_written_position)
             sleep(self.__update_delay * 0.001)
 
-    def __go_to_relaxed(self, forward_legs, speed_override=None, distance_speed_multiplier=None, leg_lift_height=2):
+    def __go_to_relaxed(self, forward_legs, target_stance, speed_override=None, distance_speed_multiplier=None, leg_lift_height=2):
         start_position = self.__last_written_position.clone()
-        target_position = start_position.update_from_other(RELAXED_POSITION, forward_legs)
+        target_position = start_position.update_from_other(target_stance, forward_legs)
         transformation_vectors = target_position - start_position
         normalized_transformation_vectors = transformation_vectors.clone()
         normalized_transformation_vectors.normalize_vectors()

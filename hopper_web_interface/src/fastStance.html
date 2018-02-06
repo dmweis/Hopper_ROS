@@ -29,17 +29,15 @@
     </nav>
     <div class="pageContainer" id="app">
         <div class="translationDisplay">
-            <strong>Transform X:</strong>{{transform.x.toFixed(2)}}
+            <!-- <strong>Transform X:</strong>{{transform.x.toFixed(2)}}
             <strong>Y:</strong>{{transform.y.toFixed(2)}}
             <strong>Z:</strong>{{transform.z.toFixed(2)}}
             <strong>Rotation X:</strong>{{rotation.x.toFixed(2)}}
             <strong>Y:</strong>{{rotation.y.toFixed(2)}}
             <strong>Z:</strong>{{rotation.z.toFixed(2)}}
-            <br>
+            <br> -->
             <strong v-if="connected">CONNECTED</strong>
             <strong v-else>DISCONNECTED</strong>
-            <br>
-            <button v-on:click="reset">Reset</button>
         </div>
         <div class="joystickContainer">
             <div class="joystick translationJoystick" id="translation_joystick_zone">
@@ -57,7 +55,7 @@
         </div>
     </div>
     <script src="nipplejs/nipplejs.js"></script>
-    <script src="StanceController.js"></script>
+    <script src="FastStanceController.js"></script>
 </body>
 
 </html>

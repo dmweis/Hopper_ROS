@@ -20,6 +20,10 @@ app.get('/stance', function (req, res) {
     res.sendFile(__dirname + "/stance.html");
 });
 
+app.get('/fastStance', function (req, res) {
+    res.sendFile(__dirname + "/fastStance.html");
+});
+
 io.on('connection', function (socket) {
     robot.log(`User connected from ${socket.request.connection.remoteAddress}`);
     var lastCommand = { x: 0, y: 0, rot: 0 };

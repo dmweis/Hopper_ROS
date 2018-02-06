@@ -82,6 +82,6 @@ setInterval(function () {
     translationViewModel.transform.x += translationViewModel.translationJoystick.x * multiplier;
     translationViewModel.transform.y += translationViewModel.translationJoystick.y * multiplier;
     translationViewModel.transform.z += translationViewModel.heightJoystick.x * multiplier;
-    translationViewModel.rotation.x += translationViewModel.rotationJoystick.x * multiplier;
-    translationViewModel.rotation.y += translationViewModel.rotationJoystick.y * multiplier;
+    translationViewModel.rotation.y += translationViewModel.rotationJoystick.x * multiplier;
+    translationViewModel.rotation.x += translationViewModel.rotationJoystick.y * multiplier;
 }, 20);

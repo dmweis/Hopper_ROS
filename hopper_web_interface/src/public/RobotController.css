@@ -14,32 +14,39 @@
 .telemetricsDisplay {
     background-color: lightgreen;
     text-align: center;
-    height: 4%;
+    height: 30px;
     width: 100%
 } 
+
+.joystickContainer {
+    position: absolute;
+    width: 100%;
+    top: 30px;
+    bottom: 0;
+}
 
 @media screen and (orientation:landscape) {    
     .moveJoystick {
         float: left;
         width: 50%;
-        height: 96%;
+        height: 100%;
     }
 
     .rotationJoystick {
         float: right;
         width: 50%;
-        height: 96%;
+        height: 100%;
     }
 }
 
 @media screen and (orientation:portrait) {
     .moveJoystick {
         width: 100%;
-        height: 48%;
+        height: 50%;
     }
 
     .rotationJoystick {
         width: 100%;
-        height: 48%;
+        height: 50%;
     }
 }

@@ -25,7 +25,7 @@
         </ul>
     </nav>
     <div class="pageContainer" id="app">
-        <div class="telemetricsDisplay">
+        <div class="translationDisplay">
             <strong>Transform X:</strong>{{transform.x.toFixed(2)}}
             <strong>Y:</strong>{{transform.y.toFixed(2)}}
             <strong>Z:</strong>{{transform.z.toFixed(2)}}
@@ -34,17 +34,19 @@
             <strong>Z:</strong>{{rotation.z.toFixed(2)}}<br>
             <button v-on:click="reset">Reset</button>
         </div>
-        <div class="joystick translationJoystick" id="translation_joystick_zone">
-            <strong>Move joystick</strong>
-            <div>X: {{ translationJoystick.x.toFixed(2) }} Y: {{ translationJoystick.y.toFixed(2) }}</div>
-        </div>
-        <div class="joystick heightJoystick" id="height_joystick_zone">
-            <strong>Height joystick</strong>
-            <div>X: {{ heightJoystick.x.toFixed(2) }} Y: {{ heightJoystick.y.toFixed(2) }}</div>
-        </div>
-        <div class="joystick rotationJoystick" id="rotate_joystick_zone">
-            <strong>Rotation joystick</strong>
-            <div>X: {{ rotationJoystick.x.toFixed(2) }} Y: {{ rotationJoystick.y.toFixed(2) }}</div>
+        <div class="joystickContainer">
+            <div class="joystick translationJoystick" id="translation_joystick_zone">
+                <strong>Move joystick</strong>
+                <div>X: {{ translationJoystick.x.toFixed(2) }} Y: {{ translationJoystick.y.toFixed(2) }}</div>
+            </div>
+            <div class="joystick heightJoystick" id="height_joystick_zone">
+                <strong>Height joystick</strong>
+                <div>X: {{ heightJoystick.x.toFixed(2) }} Y: {{ heightJoystick.y.toFixed(2) }}</div>
+            </div>
+            <div class="joystick rotationJoystick" id="rotate_joystick_zone">
+                <strong>Rotation joystick</strong>
+                <div>X: {{ rotationJoystick.x.toFixed(2) }} Y: {{ rotationJoystick.y.toFixed(2) }}</div>
+            </div>
         </div>
     </div>
     <script src="nipplejs/nipplejs.js"></script>

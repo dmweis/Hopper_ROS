@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hopper Controller</title>
+    <link rel="stylesheet" href="site.css" />
+    <link rel="stylesheet" href="StanceController.css" />
+    <script src="vue/vue.js"></script>
+    <script src="site.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <nav>
+        <ul class="navbar">
+            <li>
+                <a href="/">Basic</a>
+            </li>
+            <li>
+                <a href="/stance">Stance</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="pageContainer" id="app">
+        <div class="telemetricsDisplay">
+            <strong>Transform X:</strong>{{transform.x.toFixed(2)}}
+            <strong>Y:</strong>{{transform.y.toFixed(2)}}
+            <strong>Z:</strong>{{transform.z.toFixed(2)}}
+            <strong>Rotation X:</strong>{{rotation.x.toFixed(2)}}
+            <strong>Y:</strong>{{rotation.y.toFixed(2)}}
+            <strong>Z:</strong>{{rotation.z.toFixed(2)}}<br>
+            <button v-on:click="reset">Reset</button>
+        </div>
+        <div class="joystick translationJoystick" id="translation_joystick_zone">
+            <strong>Move joystick</strong>
+            <div>X: {{ translationJoystick.x.toFixed(2) }} Y: {{ translationJoystick.y.toFixed(2) }}</div>
+        </div>
+        <div class="joystick heightJoystick" id="height_joystick_zone">
+            <strong>Height joystick</strong>
+            <div>X: {{ heightJoystick.x.toFixed(2) }} Y: {{ heightJoystick.y.toFixed(2) }}</div>
+        </div>
+        <div class="joystick rotationJoystick" id="rotate_joystick_zone">
+            <strong>Rotation joystick</strong>
+            <div>X: {{ rotationJoystick.x.toFixed(2) }} Y: {{ rotationJoystick.y.toFixed(2) }}</div>
+        </div>
+    </div>
+    <script src="nipplejs/nipplejs.js"></script>
+    <script src="StanceController.js"></script>
+</body>
+
+</html>

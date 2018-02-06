@@ -16,6 +16,9 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 
+app.get('/stance', function (req, res) {
+    res.sendFile(__dirname + "/stance.html");
+});
 
 io.on('connection', function (socket) {
     robot.log(`User connected from ${socket.request.connection.remoteAddress}`);
@@ -28,6 +31,9 @@ io.on('connection', function (socket) {
     socket.on('rotation', function (msg) {
         lastCommand.rot = msg.y * -10;
         robot.sendCommandToRobot(lastCommand.x, lastCommand.y, lastCommand.rot);
+    });
+    socket.on('translationUpdate', function(msg){
+        robot.sendUpdateStanceCommand(msg.transform, msg.rotation);
     });
     socket.on('disconnected', function () {
         robot.log(`User disconnected from ${socket.request.connection.remoteAddress}`);

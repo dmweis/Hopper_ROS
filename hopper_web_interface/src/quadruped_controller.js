@@ -1,20 +1,22 @@
 const isLinux = process.platform.toLowerCase() === "linux";
 
-var publisher;
+var hopperMoveCommandPublisher;
+var hopperStanceTranslateCommandPublisher;
 
 if (isLinux) {
     var rosnodejs = require('rosnodejs')
     rosnodejs.initNode('hopper_web_interface')
         .then((node) => {
-            publisher = node.advertise('/quadruped_command', 'geometry_msgs/Twist');
+            hopperMoveCommandPublisher = node.advertise('/quadruped_command', 'geometry_msgs/Twist');
+            hopperStanceTranslateCommandPublisher = node.advertise('/hopper_stance_translate', 'geometry_msgs/Twist');
         });
 
 }
 
 exports.sendCommandToRobot = function (x, y, rotation) {
     if (isLinux) {
-        if (publisher) {
-            publisher.publish({ linear: { x: x, y: y, z: 0 }, angular: { x: rotation, y: 0, z: 0 } });
+        if (hopperMoveCommandPublisher) {
+            hopperMoveCommandPublisher.publish({ linear: { x: x, y: y, z: 0 }, angular: { x: rotation, y: 0, z: 0 } });
         }
         else {
             rosnodejs.log.info("Publisher not connected");
@@ -22,6 +24,22 @@ exports.sendCommandToRobot = function (x, y, rotation) {
     }
     else {
         console.log(`Robot moving to X:${x.toFixed(2)} Y:${y.toFixed(2)}, Rotation:${rotation.toFixed(2)}`);
+    }
+}
+
+exports.sendUpdateStanceCommand = function (transform, rotation) {
+    if (isLinux) {
+        if (hopperStanceTranslateCommandPublisher) {
+            hopperStanceTranslateCommandPublisher.publish({ linear: transform, angular: rotation });
+        }
+        else {
+            rosnodejs.log.info("Publisher not connected");
+        }
+    }
+    else {
+        console.log(`Stance updating:\n` +
+        `    Transform: x:${transform.x.toFixed(2)}, y:${transform.y.toFixed(2)}, z:${transform.z.toFixed(2)}\n` +
+        `    Rotation: x:${rotation.x.toFixed(2)}, y:${rotation.y.toFixed(2)}, z:${rotation.z.toFixed(2)}`);
     }
 }
 

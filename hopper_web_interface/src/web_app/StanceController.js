@@ -1,35 +1,87 @@
-﻿var socket = io();
+﻿function createStanceJoystick(element, color, joystickData, deadZone) {
+    nipplejs.create({ zone: element, color: color }).on('added',
+        function (evt, nipple) {
+            nipple.on('move',
+                function (evt, arg) {
+                    const size = arg.distance / 50;
+                    if (size < deadZone) {
+                        joystickData.x = 0;
+                        joystickData.y = 0;
+                        return;
+                    }
+                    joystickData.x = Math.sin(arg.angle.radian) * size;
+                    joystickData.y = -Math.cos(arg.angle.radian) * size;
+                });
+            nipple.on('start',
+                function () {
+                    joystickData.x = 0;
+                    joystickData.y = 0;
+                });
+            nipple.on('end',
+                function () {
+                    joystickData.x = 0;
+                    joystickData.y = 0;
+                });
+        });
+}
 
-const telemetricsVm = new Vue({
-    el: '#telemetrics_display',
+var socket = io();
+
+const translationViewModel = new Vue({
+    el: "#app",
     data: {
-        averageTemperature: 0,
-        averageVoltage: 0
+        transform: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0 },
+        translationJoystick: {
+            x: 0,
+            y: 0
+        },
+        heightJoystick: {
+            x: 0,
+            y: 0
+        },
+        rotationJoystick: {
+            x: 0,
+            y: 0
+        }
+    },
+    watch: {
+        transform: {
+            handler: function (newValue, oldValue) {
+                socket.emit("translationUpdate", {
+                    transform: this.transform,
+                    rotation: this.rotation
+                });
+            },
+            deep: true
+        },
+        rotation: {
+            handler: function (newValue, oldValue) {
+                socket.emit("translationUpdate", {
+                    transform: this.transform,
+                    rotation: this.rotation
+                });
+            },
+            deep: true
+        }
+    },
+    methods: {
+        reset: function () {
+            this.transform = { x: 0, y: 0, z: 0 };
+            this.rotation = { x: 0, y: 0, z: 0 };
+        }
     }
-});
+})
 
-socket.on('telemetrics', function (msg) {
-    telemetricsVm.averageVoltage = msg.AverageVoltage;
-    telemetricsVm.averageTemperature = msg.AverageTemperature;
-});
+createStanceJoystick(document.getElementById("translation_joystick_zone"), "red", translationViewModel.translationJoystick, 0.2);
+createStanceJoystick(document.getElementById("height_joystick_zone"), "navy", translationViewModel.heightJoystick, 0.2);
+createStanceJoystick(document.getElementById("rotate_joystick_zone"), "navy", translationViewModel.rotationJoystick, 0.2);
 
-const translationJoystick = createJoystick({
-    elementId: "#translation_joystick_zone",
-    color: "red",
-    name: "translation",
-    socket: socket
-});
-
-const heightJoystick = createJoystick({
-    elementId: "#height_joystick_zone",
-    color: "navy",
-    name: "height",
-    socket: socket
-});
-
-const bodyRotationJoystick = createJoystick({
-    elementId: "#rotate_joystick_zone",
-    color: "navy",
-    name: "bodyRotation",
-    socket: socket
-});
+setInterval(function () {
+    const multiplier = 0.1;
+    translationViewModel.transform.x += translationViewModel.translationJoystick.x * multiplier;
+    translationViewModel.transform.y += translationViewModel.translationJoystick.y * multiplier;
+    translationViewModel.transform.z += translationViewModel.heightJoystick.x * multiplier;
+    translationViewModel.rotation.x += translationViewModel.rotationJoystick.x * multiplier;
+    translationViewModel.rotation.y += translationViewModel.rotationJoystick.y * multiplier;
+}, 20);

@@ -26,17 +26,18 @@
 }
 
 function convertToTwist(translationJoystick, heightJoystick, rotationJoystick) {
-    const multiplier = 5;
+    const transformMultiplier = 5;
+    const rotationMultiplier = 10;
     return {
         transform: {
-            x: translationJoystick.x * multiplier,
-            y: translationJoystick.y * multiplier,
-            z: heightJoystick.x * multiplier
+            x: translationJoystick.x * transformMultiplier,
+            y: translationJoystick.y * transformMultiplier,
+            z: heightJoystick.x * transformMultiplier
         },
         rotation: {
-            x: -rotationJoystick.y * multiplier,
-            y: rotationJoystick.x * multiplier,
-            z: -heightJoystick.y * multiplier
+            x: -rotationJoystick.y * rotationMultiplier,
+            y: rotationJoystick.x * rotationMultiplier,
+            z: -heightJoystick.y * rotationMultiplier
         }
     }
 }

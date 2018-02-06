@@ -46,12 +46,31 @@ class Vector3(object):
                    self.z == other.z
         return False
 
+    def rotate_euler(self, rotation):
+        self.rotate_around_x(rotation.x)
+        self.rotate_around_y(rotation.y)
+        self.rotate_around_z(rotation.z)
+
     def rotate_around_z(self, angle):
         old_x = self.x
         old_y = self.y
         angle = math.radians(angle)
         self.x = old_x * math.cos(angle) - old_y * math.sin(angle)
         self.y = old_x * math.sin(angle) + old_y * math.cos(angle)
+
+    def rotate_around_x(self, angle):
+        old_z = self.z
+        old_y = self.y
+        angle = math.radians(angle)
+        self.z = old_z * math.cos(angle) - old_y * math.sin(angle)
+        self.y = old_z * math.sin(angle) + old_y * math.cos(angle)
+
+    def rotate_around_y(self, angle):
+        old_x = self.x
+        old_z = self.z
+        angle = math.radians(angle)
+        self.x = old_x * math.cos(angle) - old_z * math.sin(angle)
+        self.z = old_x * math.sin(angle) + old_z * math.cos(angle)
 
     def scale(self, number):
         return Vector3(self.x * number, self.y * number, self.z * number)
@@ -254,7 +273,7 @@ class LegPositions(object):
             new_position.right_rear += transform
         return  new_position
 
-    def rotate(self, angle, legs=LegFlags.ALL):
+    def turn(self, angle, legs=LegFlags.ALL):
         new_position = self.clone()
         if (legs & LegFlags.LEFT_FRONT) != 0:
             new_position.left_front.rotate_around_z(angle)
@@ -268,6 +287,22 @@ class LegPositions(object):
             new_position.left_rear.rotate_around_z(angle)
         if (legs & LegFlags.RIGHT_REAR) != 0:
             new_position.right_rear.rotate_around_z(angle)
+        return new_position
+
+    def rotate(self, euler, legs=LegFlags.ALL):
+        new_position = self.clone()
+        if (legs & LegFlags.LEFT_FRONT) != 0:
+            new_position.left_front.rotate_euler(euler)
+        if (legs & LegFlags.RIGHT_FRONT) != 0:
+            new_position.right_front.rotate_euler(euler)
+        if (legs & LegFlags.LEFT_MIDDLE) != 0:
+            new_position.left_middle.rotate_euler(euler)
+        if (legs & LegFlags.RIGHT_MIDDLE) != 0:
+            new_position.right_middle.rotate_euler(euler)
+        if (legs & LegFlags.LEFT_REAR) != 0:
+            new_position.left_rear.rotate_euler(euler)
+        if (legs & LegFlags.RIGHT_REAR) != 0:
+            new_position.right_rear.rotate_euler(euler)
         return new_position
 
     def change(self, new_position, legs=LegFlags.ALL):

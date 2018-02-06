@@ -30,6 +30,7 @@ var socket = io();
 const translationViewModel = new Vue({
     el: "#app",
     data: {
+        connected: false,
         transform: { x: 0, y: 0, z: 0 },
         rotation: { x: 0, y: 0, z: 0 },
         translationJoystick: {
@@ -63,6 +64,9 @@ const translationViewModel = new Vue({
                 });
             },
             deep: true
+        },
+        connected: function () {
+            console.log("Connection status changed to " + this.connected);
         }
     },
     methods: {
@@ -84,4 +88,9 @@ setInterval(function () {
     translationViewModel.transform.z += translationViewModel.heightJoystick.x * multiplier;
     translationViewModel.rotation.y += translationViewModel.rotationJoystick.x * multiplier;
     translationViewModel.rotation.x -= translationViewModel.rotationJoystick.y * multiplier;
+    translationViewModel.rotation.z += translationViewModel.heightJoystick.y * multiplier;
 }, 20);
+
+setInterval(function () {
+    translationViewModel.connected = socket.connected;
+}, 250);

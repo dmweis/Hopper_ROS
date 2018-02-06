@@ -14,18 +14,18 @@
 .telemetricsDisplay {
     background-color: lightgreen;
     text-align: center;
-    height: 30px;
+    height: 50px;
     width: 100%
 } 
 
 .joystickContainer {
     position: absolute;
     width: 100%;
-    top: 30px;
+    top: 50px;
     bottom: 0;
 }
 
-@media screen and (orientation:landscape) {    
+@media screen and (orientation:landscape) {
     .moveJoystick {
         float: left;
         width: 50%;

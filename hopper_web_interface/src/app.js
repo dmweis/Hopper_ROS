@@ -32,7 +32,7 @@ io.on('connection', function (socket) {
         lastCommand.rot = msg.y * -10;
         robot.sendCommandToRobot(lastCommand.x, lastCommand.y, lastCommand.rot);
     });
-    socket.on('translationUpdate', function(msg){
+    socket.on('translationUpdate', function (msg) {
         robot.sendUpdateStanceCommand(msg.transform, msg.rotation);
     });
     socket.on('disconnected', function () {

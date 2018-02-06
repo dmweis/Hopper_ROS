@@ -31,7 +31,11 @@
             <strong>Z:</strong>{{transform.z.toFixed(2)}}
             <strong>Rotation X:</strong>{{rotation.x.toFixed(2)}}
             <strong>Y:</strong>{{rotation.y.toFixed(2)}}
-            <strong>Z:</strong>{{rotation.z.toFixed(2)}}<br>
+            <strong>Z:</strong>{{rotation.z.toFixed(2)}}
+            <br>
+            <strong v-if="connected">CONNECTED</strong>
+            <strong v-else>DISCONNECTED</strong>
+            <br>
             <button v-on:click="reset">Reset</button>
         </div>
         <div class="joystickContainer">

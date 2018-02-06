@@ -29,6 +29,9 @@
             <strong>Temperature</strong> {{ averageTemperature.toFixed(2) }} &deg;C
             <strong>Voltage</strong> {{ averageVoltage.toFixed(2) }} V
             <strong>1/3</strong> {{ (averageVoltage / 3).toFixed(2) }} V
+            <br>
+            <strong v-if="connected">CONNECTED</strong>
+            <strong v-else>DISCONNECTED</strong>
         </div>
         <div class="joystickContainer">
             <div class="joystick moveJoystick" id="move_joystick_zone">

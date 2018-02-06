@@ -4,9 +4,19 @@ const telemetricsVm = new Vue({
     el: '#telemetrics_display',
     data: {
         averageTemperature: 0,
-        averageVoltage: 0
+        averageVoltage: 0,
+        connected: false
+    },
+    watch: {
+        connected: function () {
+            console.log("Connection status changed to " + this.connected);
+        }
     }
 });
+
+setInterval(function () {
+    telemetricsVm.connected = socket.connected;
+}, 250);
 
 socket.on('telemetrics', function (msg) {
     telemetricsVm.averageVoltage = msg.AverageVoltage;

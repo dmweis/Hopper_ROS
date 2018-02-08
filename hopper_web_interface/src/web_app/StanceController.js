@@ -25,7 +25,9 @@
         });
 }
 
-var socket = io();
+var socket = io({
+    transports: ['websocket']
+  });
 
 const translationViewModel = new Vue({
     el: "#app",

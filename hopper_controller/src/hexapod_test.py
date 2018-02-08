@@ -10,19 +10,15 @@ print("Start")
 servo_driver = DynamixelDriver("COM8")
 ik_driver = IkDriver(servo_driver)
 controller = GaitController(ik_driver)
-while not controller.ready:
-    print("waiting...")
-    sleep(1)
-print("Starting move")
 
-print("Changing")
-controller.update_relaxed_position(transform=Vector3(0, 0, 5))
-sleep(2)
-controller.direction = Vector2(3, 0)
-sleep(5)
-controller.direction = Vector2(0, 0)
+
+def on_telemetrics(telemetrics):
+    print(telemetrics)
+
+
+controller.telemetrics_callback = on_telemetrics
 
 print("Finished")
-
+raw_input("Press enter to exit")
 controller.stop()
 print("Exiting")

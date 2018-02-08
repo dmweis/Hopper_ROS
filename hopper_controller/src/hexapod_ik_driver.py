@@ -406,6 +406,14 @@ class IkDriver(object):
         for servo_id in ALL_SERVOS_IDS:
             self.__servo_driver.set_torque(servo_id, False)
 
+    def read_telemetrics(self):
+        telemetric_data = []
+        for servo_id in ALL_SERVOS_IDS:
+            voltage = self.__servo_driver.read_voltage(servo_id)
+            temperature = self.__servo_driver.read_temperature(servo_id)
+            telemetric_data.append((servo_id, voltage, temperature))
+        return telemetric_data
+
     def move_legs_synced(self, leg_positions):
         right_front_goal = calculate_ik_for_leg(leg_positions.right_front, RIGHT_FRONT)
         right_rear_goal = calculate_ik_for_leg(leg_positions.right_rear, RIGHT_REAR)

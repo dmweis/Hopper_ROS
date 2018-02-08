@@ -2,7 +2,7 @@ from __future__ import division
 from __future__ import absolute_import
 from hexapod_ik_driver import LegPositions, IkDriver, Vector3, Vector2, LegFlags
 import threading
-from time import sleep
+from time import sleep, time
 import math
 
 INTERPOLATION_FREQUENCY = 30
@@ -62,6 +62,8 @@ class GaitController(threading.Thread):
         self.__update_delay = 1000 / INTERPOLATION_FREQUENCY
         self.__keep_running = True
         self.__relaxed = True
+        self.__last_telemetrics_update_time = time()
+        self.telemetrics_callback = None
         self.ik_driver.setup()
         self.__last_written_position = self.ik_driver.read_current_leg_positions()
         self.start()
@@ -92,6 +94,9 @@ class GaitController(threading.Thread):
                 self.update_body_orientation(self.__relaxed_transformation, self.__relaxed_rotation)
             else:
                 sleep(self.__update_delay * 0.001)
+                if self.telemetrics_callback and time() - self.__last_telemetrics_update_time > 4:
+                    self.telemetrics_callback(self.ik_driver.read_telemetrics())
+                    self.__last_telemetrics_update_time = time()
         self.ready = False
         self.update_body_orientation(Vector3(0, 0, 0), Vector3(0, 0, 0))
         self.__go_to_relaxed(self.__get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)

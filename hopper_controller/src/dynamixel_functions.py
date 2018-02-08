@@ -106,6 +106,7 @@ readTxRx = dxl_lib.readTxRx
 read1ByteTx = dxl_lib.read1ByteTx
 read1ByteRx = dxl_lib.read1ByteRx
 read1ByteTxRx = dxl_lib.read1ByteTxRx
+read1ByteTxRx.restype = ctypes.c_ubyte
 
 read2ByteTx = dxl_lib.read2ByteTx
 read2ByteRx = dxl_lib.read2ByteRx

@@ -3,6 +3,8 @@
 from __future__ import absolute_import
 import rospy
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
+
 from hexapod_gait_engine import GaitController
 from hexapod_ik_driver import IkDriver, Vector2, Vector3
 from dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
@@ -13,10 +15,15 @@ class HexapodController(object):
         servo_driver = DynamixelDriver(search_usb_2_ax_port())
         ik_driver = IkDriver(servo_driver)
         self.controller = GaitController(ik_driver)
+        self.telemetrics_publisher = rospy.Publisher('hopper_telemetrics', String, queue_size=10)
+        self.controller.telemetrics_callback = self.publish_telemetrics_data
 
     def update_direction(self, twist):
         self.controller.direction = Vector2(twist.linear.x, twist.linear.y)
         self.controller.rotation = twist.angular.x
+
+    def publish_telemetrics_data(self, telemetrics):
+        self.telemetrics_publisher.publish(str(telemetrics))
 
     def update_stance(self, twist):
         transform = Vector3(twist.linear.x, twist.linear.y, twist.linear.z)

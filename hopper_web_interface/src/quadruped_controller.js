@@ -6,11 +6,9 @@ var hopperTelemetricsSubscriber;
 var telemetricsSubscribers = [];
 
 function telemetricsHandler(msg){
-    for (let subscriber in telemetricsSubscribers){
-        if (subscriber){
-            subscriber(msg);
-        }
-    }
+    telemetricsSubscribers.forEach(function(subscriber){
+        subscriber(msg);
+    });
 }
 
 if (isLinux) {

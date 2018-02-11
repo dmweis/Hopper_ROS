@@ -21,8 +21,9 @@ setInterval(function () {
 }, 250);
 
 socket.on('telemetrics', function (msg) {
-    telemetricsVm.averageVoltage = msg.AverageVoltage;
-    telemetricsVm.averageTemperature = msg.AverageTemperature;
+    // telemetricsVm.averageVoltage = msg.AverageVoltage;
+    // telemetricsVm.averageTemperature = msg.AverageTemperature;
+    console.log(msg);
 });
 
 const movementJoystick = createJoystick({

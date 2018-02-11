@@ -24,6 +24,10 @@ app.get('/fastStance', function (req, res) {
     res.sendFile(__dirname + "/fastStance.html");
 });
 
+robot.registerForTelemetrics(function(msg){
+    io.sockets.emit('telemetrics', msg);
+});
+
 io.on('connection', function (socket) {
     robot.log(`User connected from ${socket.request.connection.remoteAddress}`);
     var lastCommand = { x: 0, y: 0, rot: 0 };

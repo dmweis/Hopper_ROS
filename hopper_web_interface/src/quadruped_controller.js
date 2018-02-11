@@ -25,7 +25,7 @@ if (isLinux) {
 
 exports.registerForTelemetrics = function(callback){
     if (isLinux) {
-        telemetricsSubscribers.post(callback);
+        telemetricsSubscribers.push(callback);
     }
     else {
         console.log("Can not listen for topics if not on ROS platform");

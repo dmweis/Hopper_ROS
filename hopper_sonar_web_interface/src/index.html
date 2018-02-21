@@ -20,8 +20,6 @@
 
 <body>
     <script>
-        var points = {};
-        var sensors = {};
         var canvas = document.getElementById("mainCanvas");
         var backgroundCanvas = document.getElementById("backgroundCanvas");
         var ctx = canvas.getContext("2d");
@@ -38,11 +36,11 @@
             const angleInRad = angle * (Math.PI / 180);
             let directionX = backgroundCanvas.height / 2 + Math.cos(angleInRad) * 200;
             let directionY = backgroundCanvas.width / 2 + Math.sin(angleInRad) * 200;
-            if (color){
+            if (color) {
                 backgroundCtx.strokeStyle = color;
                 backgroundCtx.fillStyle = color;
             }
-            else{
+            else {
                 backgroundCtx.strokeStyle = "Black";
                 backgroundCtx.fillStyle = "Black";
             }
@@ -54,35 +52,45 @@
             backgroundCtx.closePath();
         }
 
-        socket.on('data', function (msg) {
-            msg.angle = -msg.angle;
-            if (points[msg.angle]) {
-                ctx.clearRect(points[msg.angle].x - 3, points[msg.angle].y - 3, 6, 6);
-            }
-            const angleInRad = msg.angle * (Math.PI / 180);
+        function drawPoint(angle, distance) {
+            const angleInRad = angle * (Math.PI / 180);
+            let x1 = canvas.height / 2 + Math.cos((angle + 2) * (Math.PI / 180)) * 210;
+            let y1 = canvas.width / 2 + Math.sin((angle + 2) * (Math.PI / 180)) * 210;
+            let x2 = canvas.height / 2 + Math.cos((angle - 2) * (Math.PI / 180)) * 210;
+            let y2 = canvas.width / 2 + Math.sin((angle - 2) * (Math.PI / 180)) * 210;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(backgroundCanvas.height / 2, backgroundCanvas.width / 2);
+            ctx.lineTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.clip();
+            ctx.clearRect(0, 0, canvas.height, canvas.width);
+            ctx.restore();
 
-            if (msg.sensor === "C") {
-                // center
-                backgroundCtx.clearRect(0, 0, backgroundCanvas.height, backgroundCanvas.width);
-                drawSensorLine(msg.angle, "Center");
-                drawSensorLine(msg.angle + 240, "Left");
-                drawSensorLine(msg.angle + 120, "Right");
-                drawSensorLine(0, "Center Line", "Green");
-            }
-            if (msg.distance) {
-                let x = canvas.height / 2 + Math.cos(angleInRad) * msg.distance;
-                let y = canvas.width / 2 + Math.sin(angleInRad) * msg.distance;
-                points[msg.angle] = { x: x, y: y, time: Date.now() };
+            if (distance) {
+                let x = canvas.height / 2 + Math.cos(angleInRad) * distance;
+                let y = canvas.width / 2 + Math.sin(angleInRad) * distance;
                 ctx.fillStyle = "Black";
                 ctx.fillRect(x - 1, y - 1, 3, 3);
             }
             else {
                 let x = canvas.height / 2 + Math.cos(angleInRad) * 200;
                 let y = canvas.width / 2 + Math.sin(angleInRad) * 200;
-                points[msg.angle] = { x: x, y: y, time: Date.now() };
                 ctx.fillStyle = "Red";
                 ctx.fillRect(x - 1, y - 1, 3, 3);
             }
+        }
+
+        socket.on('data', function (msg) {
+
+            backgroundCtx.clearRect(0, 0, backgroundCanvas.height, backgroundCanvas.width);
+            drawSensorLine(msg.angle, "Center");
+            drawSensorLine(msg.angle + 240, "Left");
+            drawSensorLine(msg.angle + 120, "Right");
+            drawSensorLine(0, "Center Line", "Green");
+            drawPoint(msg.angle, msg.centerSensor);
+            drawPoint(msg.angle + 240, msg.leftSensor);
+            drawPoint(msg.angle + 120, msg.rightSensor);
         });
     </script>
 </body>

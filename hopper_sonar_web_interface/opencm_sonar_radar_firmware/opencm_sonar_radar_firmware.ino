@@ -1,11 +1,11 @@
-#define leftSensorTrigPin 7
-#define leftSensorEchoPin 6
+#define leftSensorTrigPin 3
+#define leftSensorEchoPin 2
 
 #define centerSensorTrigPin 5
 #define centerSensorEchoPin 4
 
-#define rightSensorTrigPin 3
-#define rightSensorEchoPin 2
+#define rightSensorTrigPin 7
+#define rightSensorEchoPin 6
 
 #define maximumSensorRange 200
 #define minimumSensorRange 0

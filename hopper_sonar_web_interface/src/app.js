@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -14,7 +16,7 @@ app.get('/', function (req, res) {
 const parser = new parsers.Readline({
   delimiter: '\r\n'
 });
-const port = new SerialPort('COM19', {
+const port = new SerialPort('/dev/ttyUSB0', {
   baudRate: 9600
 });
 port.pipe(parser);
@@ -30,6 +32,6 @@ parser.on('data', function (msg) {
   }
 });
 
-http.listen(3000, function () {
+http.listen(3001, function () {
   console.log('Listening');
 });

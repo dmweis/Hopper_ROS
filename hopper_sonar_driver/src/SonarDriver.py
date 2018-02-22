@@ -8,7 +8,7 @@ import json
 
 def search_sonar_port():
     ports = list(serial.tools.list_ports.comports())
-    dynamixel_port = next(port for port in ports if "USBSerial" in port.description)
+    dynamixel_port = next(port for port in ports if "Serial" in port.description)
     return dynamixel_port.device
 
 class SonarDriver(object):
@@ -24,10 +24,10 @@ class SonarDriver(object):
                 try:
                     data = json.loads(message)
                     sonar_data = SonarSweep()
-                    sonar_data.angle = data['angle']
-                    sonar_data.leftDistance = data['leftSensor']
-                    sonar_data.centerDistance = data['centerSensor']
-                    sonar_data.rightDistance = data['rightSensor']
+                    sonar_data.angle = int(data['angle'])
+                    sonar_data.leftDistance = int(data['leftSensor'] or -1)
+                    sonar_data.centerDistance = int(data['centerSensor'] or -1)
+                    sonar_data.rightDistance = int(data['rightSensor'] or -1)
                     self.__publisher.publish(sonar_data)
                 except ValueError:
                     rospy.logwarn("Json parse error")

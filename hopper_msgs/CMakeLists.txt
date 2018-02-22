@@ -18,6 +18,7 @@ add_message_files(
   FILES
   ServoTelemetrics.msg
   HexapodTelemetrics.msg
+  SonarSweep.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

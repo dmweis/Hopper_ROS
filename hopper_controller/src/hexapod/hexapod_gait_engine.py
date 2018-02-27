@@ -70,12 +70,14 @@ class GaitController(threading.Thread):
         self.start()
 
     def run(self):
+        rospy.loginfo("Hexapod gait engine started")
         for leg in LegFlags.get_legs_as_list(LegFlags.ALL):
             new_position = self.__last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
             self.__execute_move(new_position, 6)
         self.__execute_move(WIDER_RELAXED_POSITION.clone(), 6)
         self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
         self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
+        rospy.loginfo("Hexapod ready")
         self.ready = True
         while self.__keep_running:
             if not self.direction.is_zero() or self.rotation != 0:

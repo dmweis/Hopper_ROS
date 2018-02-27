@@ -70,46 +70,49 @@ class GaitController(threading.Thread):
         self.start()
 
     def run(self):
-        rospy.loginfo("Hexapod gait engine started")
-        for leg in LegFlags.get_legs_as_list(LegFlags.ALL):
-            new_position = self.__last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
-            self.__execute_move(new_position, 6)
-        self.__execute_move(WIDER_RELAXED_POSITION.clone(), 6)
-        self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
-        self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
-        rospy.loginfo("Hexapod ready")
-        self.ready = True
-        while self.__keep_running:
-            if not self.direction.is_zero() or self.rotation != 0:
-                if self.direction.is_zero() and abs(self.rotation) > 8:
-                    # just rotation
-                    self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=6)
-                elif self.direction.length() > 5.5:
-                    # fast walking
-                    self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=5)
-                else:
-                    # regular walking
-                    self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=3)
-                self.__relaxed = False
-            elif not self.__relaxed:
-                # move to relaxed
-                self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
-                if self.direction.is_zero() and self.rotation == 0:
+        try:
+            rospy.loginfo("Hexapod gait engine started")
+            for leg in LegFlags.get_legs_as_list(LegFlags.ALL):
+                new_position = self.__last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
+                self.__execute_move(new_position, 6)
+            self.__execute_move(WIDER_RELAXED_POSITION.clone(), 6)
+            self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
+            self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
+            rospy.loginfo("Hexapod ready")
+            self.ready = True
+            while self.__keep_running:
+                if not self.direction.is_zero() or self.rotation != 0:
+                    if self.direction.is_zero() and abs(self.rotation) > 8:
+                        # just rotation
+                        self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=6)
+                    elif self.direction.length() > 5.5:
+                        # fast walking
+                        self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=5)
+                    else:
+                        # regular walking
+                        self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=3)
+                    self.__relaxed = False
+                elif not self.__relaxed:
+                    # move to relaxed
                     self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
-                self.__relaxed = True
-            elif self.__position_update_ready:
-                self.__position_update_ready = False
-                self.update_body_orientation(self.__relaxed_transformation, self.__relaxed_rotation)
-            else:
-                sleep(self.__update_delay * 0.001)
-                if self.telemetrics_callback and time() - self.__last_telemetrics_update_time > 4:
-                    self.telemetrics_callback(self.ik_driver.read_telemetrics())
-                    self.__last_telemetrics_update_time = time()
-        self.ready = False
-        self.update_body_orientation(Vector3(0, 0, 0), Vector3(0, 0, 0))
-        self.__go_to_relaxed(self.__get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
-        self.__go_to_relaxed(self.__get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
-        self.__execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
+                    if self.direction.is_zero() and self.rotation == 0:
+                        self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
+                    self.__relaxed = True
+                elif self.__position_update_ready:
+                    self.__position_update_ready = False
+                    self.update_body_orientation(self.__relaxed_transformation, self.__relaxed_rotation)
+                else:
+                    sleep(self.__update_delay * 0.001)
+                    if self.telemetrics_callback and time() - self.__last_telemetrics_update_time > 4:
+                        self.telemetrics_callback(self.ik_driver.read_telemetrics())
+                        self.__last_telemetrics_update_time = time()
+            self.ready = False
+            self.update_body_orientation(Vector3(0, 0, 0), Vector3(0, 0, 0))
+            self.__go_to_relaxed(self.__get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
+            self.__go_to_relaxed(self.__get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
+            self.__execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
+        except Exception as e:
+            rospy.signal_shutdown("Gait engine loop failed" + e)
 
     def stop(self, disable_motors=True):
         self.__keep_running = False
@@ -150,10 +153,11 @@ class GaitController(threading.Thread):
             for new_leg_pos, start_leg_pos in zip(new_position.get_legs_as_list(forward_legs), start_position.get_legs_as_list(forward_legs)):
                 new_leg_pos.z = start_leg_pos.z + current_leg_height
             self.__last_written_position = new_position
-            try:
-                self.ik_driver.move_legs_synced(self.__last_written_position)
-            except (ValueError, ArithmeticError):
-                rospy.logerr("Ik failed")
+            self.ik_driver.move_legs_synced(self.__last_written_position)
+            # try:
+                # pass
+            # except (ValueError, ArithmeticError):
+                # rospy.logerr("Ik failed")
             sleep(self.__update_delay * 0.001)
 
     def __go_to_relaxed(self, forward_legs, target_stance, speed_override=None, distance_speed_multiplier=None, leg_lift_height=2):

@@ -150,7 +150,7 @@ class GaitController(threading.Thread):
             self.__last_written_position = new_position
             try:
                 self.ik_driver.move_legs_synced(self.__last_written_position)
-            except ValueError:
+            except (ValueError, ArithmeticError):
                 rospy.logerr("Ik failed")
             sleep(self.__update_delay * 0.001)
 

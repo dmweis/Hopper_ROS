@@ -1,5 +1,6 @@
 from __future__ import division
 from __future__ import absolute_import
+import rospy
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 import threading
 from time import sleep, time
@@ -147,7 +148,10 @@ class GaitController(threading.Thread):
             for new_leg_pos, start_leg_pos in zip(new_position.get_legs_as_list(forward_legs), start_position.get_legs_as_list(forward_legs)):
                 new_leg_pos.z = start_leg_pos.z + current_leg_height
             self.__last_written_position = new_position
-            self.ik_driver.move_legs_synced(self.__last_written_position)
+            try:
+                self.ik_driver.move_legs_synced(self.__last_written_position)
+            except ValueError:
+                rospy.logerr("Ik failed")
             sleep(self.__update_delay * 0.001)
 
     def __go_to_relaxed(self, forward_legs, target_stance, speed_override=None, distance_speed_multiplier=None, leg_lift_height=2):

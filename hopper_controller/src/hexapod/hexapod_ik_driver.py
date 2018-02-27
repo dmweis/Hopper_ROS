@@ -1,6 +1,5 @@
 from __future__ import division
 from __future__ import absolute_import
-from dynamixel_driver import DynamixelDriver, clamp
 import math
 from enum import IntEnum
 from numbers import Number

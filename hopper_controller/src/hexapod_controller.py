@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import
 import rospy
 from geometry_msgs.msg import Twist
-from std_msgs.msg import String
-
-from hexapod_gait_engine import GaitController
-from hexapod_ik_driver import IkDriver, Vector2, Vector3
-from dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
+
+from hexapod.hexapod_gait_engine import GaitController
+from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
+from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
+
 
 class HexapodController(object):
     def __init__(self):
@@ -24,14 +23,14 @@ class HexapodController(object):
 
     def publish_telemetrics_data(self, telemetrics):
         msg = HexapodTelemetrics()
-	msg.servos = []
-	for id, voltage, temperature in telemetrics:
-	    tele = ServoTelemetrics()
-	    tele.id = id
-	    tele.temperature = temperature
-	    tele.voltage = voltage
+        msg.servos = []
+        for id, voltage, temperature in telemetrics:
+            tele = ServoTelemetrics()
+            tele.id = id
+            tele.temperature = temperature
+            tele.voltage = voltage
             msg.servos.append(tele)
-	self.telemetrics_publisher.publish(msg)
+        self.telemetrics_publisher.publish(msg)
 
     def update_stance(self, twist):
         transform = Vector3(twist.linear.x, twist.linear.y, twist.linear.z)
@@ -39,7 +38,7 @@ class HexapodController(object):
         self.controller.update_relaxed_position(transform=transform, rotation=rotation)
 
     def listener(self):
-        rospy.init_node('hopper_controller', anonymous=True)
+        rospy.init_node('hopper_controller')
         rospy.Subscriber("quadruped_command", Twist, self.update_direction)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_stance)
         rospy.spin()

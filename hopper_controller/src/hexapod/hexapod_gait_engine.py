@@ -1,6 +1,6 @@
 from __future__ import division
 from __future__ import absolute_import
-from hexapod_ik_driver import LegPositions, IkDriver, Vector3, Vector2, LegFlags
+from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 import threading
 from time import sleep, time
 import math

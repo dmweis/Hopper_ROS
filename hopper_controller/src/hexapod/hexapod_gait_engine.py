@@ -112,7 +112,7 @@ class GaitController(threading.Thread):
             self.__go_to_relaxed(self.__get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
             self.__execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
         except Exception as e:
-            rospy.logfatal("Gait engine loop failed", str(e))
+            rospy.logfatal("Gait engine loop failed" + str(e))
             rospy.signal_shutdown("Gait engine loop failed" + str(e))
 
     def stop(self, disable_motors=True):

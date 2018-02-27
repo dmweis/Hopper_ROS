@@ -15,7 +15,7 @@ if (isLinux) {
     var rosnodejs = require('rosnodejs')
     rosnodejs.initNode('hopper_web_interface')
         .then((node) => {
-            hopperMoveCommandPublisher = node.advertise('/quadruped_command', 'geometry_msgs/Twist');
+            hopperMoveCommandPublisher = node.advertise('/hopper_move_command', 'geometry_msgs/Twist');
             hopperStanceTranslateCommandPublisher = node.advertise('/hopper_stance_translate', 'geometry_msgs/Twist');
             hopperTelemetricsSubscriber = node.subscribe('/hopper_telemetrics', 'hopper_msgs/HexapodTelemetrics', telemetricsHandler);
         });

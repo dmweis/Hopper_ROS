@@ -39,7 +39,7 @@ class HexapodController(object):
 
     def listener(self):
         rospy.init_node('hopper_controller')
-        rospy.Subscriber("quadruped_command", Twist, self.update_direction)
+        rospy.Subscriber("hopper_move_command", Twist, self.update_direction)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_stance)
         rospy.spin()
         self.controller.stop()

@@ -79,15 +79,20 @@ class GaitController(threading.Thread):
         while self.__keep_running:
             if not self.direction.is_zero() or self.rotation != 0:
                 if self.direction.is_zero() and abs(self.rotation) > 8:
+                    # just rotation
                     self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=6)
                 elif self.direction.length() > 5.5:
+                    # fast walking
                     self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=5)
                 else:
+                    # regular walking
                     self.__execute_step(self.direction, self.rotation, self.__get_next_leg_combo(), distance_speed_multiplier=3)
                 self.__relaxed = False
             elif not self.__relaxed:
+                # move to relaxed
                 self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
-                self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
+                if self.direction.is_zero() and self.rotation == 0:
+                    self.__go_to_relaxed(self.__get_next_leg_combo(), self.__current_relaxed_position, distance_speed_multiplier=2)
                 self.__relaxed = True
             elif self.__position_update_ready:
                 self.__position_update_ready = False

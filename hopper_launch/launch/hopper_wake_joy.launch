@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Regular web launch file -->
+<launch>
+    <rosparam param="joy_node/dev">/dev/input/jsX</rosparam>
+    <node name="Xbox_gamepad" pkg="joy" type="joy_node" />
+    <node name="hopper_controller" pkg="hopper_controller" type="hexapod_controller.py" respawn="true" respawn_delay="5"/>
+    <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />
+</launch>
+

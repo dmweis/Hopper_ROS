@@ -13,9 +13,18 @@ class JoyTranslator(object):
 
     def translate_message(self, joy):
         new_message = Twist()
-        new_message.linear.x = joy.axes[0] * 6
-        new_message.linear.y = joy.axes[1] * 6
-        new_message.angular.x = joy.axes[2] * 10
+        x = 0
+        y = 0
+        rot = 0
+        if abs(joy.axes[1]) > 0.2:
+            x = joy.axes[1] * 6
+        if abs(joy.axes[0]) > 0.2:
+            y = joy.axes[0] * 6
+        if abs(joy.axes[3]) > 0.2:
+            rot = joy.axes[3] * 10
+        new_message.linear.x = x
+        new_message.linear.y = y
+        new_message.angular.x = rot
         self.pub.publish(new_message)
 
 

@@ -21,7 +21,7 @@ class JoyTranslator(object):
             x = joy.axes[1] * 6
             y = joy.axes[0] * 6
         if abs(joy.axes[3]) > 0.2:
-            rot = joy.axes[3] * 10
+            rot = -joy.axes[3] * 10
         new_message.linear.x = x
         new_message.linear.y = y
         new_message.angular.x = rot

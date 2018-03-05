@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import math
 import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy
@@ -16,9 +17,8 @@ class JoyTranslator(object):
         x = 0
         y = 0
         rot = 0
-        if abs(joy.axes[1]) > 0.2:
+        if math.sqrt(joy.axes[1] * joy.axes[1] + joy.axes[0] * joy.axes[0]) > 0.2:
             x = joy.axes[1] * 6
-        if abs(joy.axes[0]) > 0.2:
             y = joy.axes[0] * 6
         if abs(joy.axes[3]) > 0.2:
             rot = joy.axes[3] * 10

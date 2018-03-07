@@ -1,0 +1,2 @@
+sensor_msgs/CompressedImage image
+DetectedFace[] detected_faces

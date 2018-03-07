@@ -51,8 +51,8 @@ class EmotionalCore(object):
         cognitive_face.Key.set(api_key)
         cognitive_face.BaseUrl.set(api_url)
         self.image_subscriber = rospy.Subscriber("/camera/rgb/image_color/compressed", CompressedImage, self.new_image_callback, queue_size=1)
-        self.json_publisher = rospy.Publisher('person_stream', String)
-        self.face_detection_publisher = rospy.Publisher('detected_faces', FaceDetectionImage)
+        self.json_publisher = rospy.Publisher('person_stream', String, queue_size=1)
+        self.face_detection_publisher = rospy.Publisher('detected_faces', FaceDetectionImage, queue_size=1)
         rospy.spin()
 
     def new_image_callback(self, compressed_image):

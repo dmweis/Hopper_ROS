@@ -35,7 +35,7 @@ def translate_result(image, query_result):
         emotions.happiness = emo["happiness"]
         # faceAttributes
         face.face_attributes = FaceAttributes()
-        face.face_attributes.emotion = emotions
+        face.face_attributes.emotions = emotions
         face.face_attributes.gender = result['faceAttributes']['gender']
         face.face_attributes.age = result['faceAttributes']['age']
         result_image.detected_faces.append(face)

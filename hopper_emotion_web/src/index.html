@@ -44,8 +44,8 @@
             drawContext.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
             // draw each face
             msg.forEach(face => {
-                const faceRect = face.faceRectangle;
-                const emotions = face.faceAttributes.emotion;
+                const faceRect = face.face_rectangle;
+                const emotions = face.face_attributes.emotions;
                 let strongestEmotion = Object.keys(emotions).reduce((accumulator, key) => emotions[accumulator] > emotions[key] ? accumulator : key);
                 drawContext.strokeRect(faceRect.left, faceRect.top, faceRect.width, faceRect.height);
                 drawContext.fillText(strongestEmotion, faceRect.left, faceRect.top + faceRect.height + 48);

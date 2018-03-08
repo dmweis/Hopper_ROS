@@ -17,7 +17,7 @@ var lastReceivedImage = null;
 
 app.get('/image.jpeg', function (req, res) {
     res.contentType('image/jpeg');
-    res.end(lastReceivedImage, 'binary');
+    res.end(lastReceivedImage.data, 'binary');
 });
 
 faceDetectionInterface.registerForFaceDetection(function(msg){

@@ -10,12 +10,15 @@
 </head>
 
 <body>
+    <img id="viewportImage" src="/image.jpeg">
     <script>
         var socket = io({
             transports: ['websocket']
         });
+        var viewport = document.getElementById('viewportImage'); 
         socket.on('newImage', function (msg) {
             console.log(msg);
+            viewport.src = "/image.jpeg?" + new Date().getTime();
         });
     </script>
 </body>

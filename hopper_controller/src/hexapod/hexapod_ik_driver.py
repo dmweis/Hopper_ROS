@@ -270,7 +270,7 @@ class LegPositions(object):
             new_position.left_rear += transform
         if (legs & LegFlags.RIGHT_REAR) != 0:
             new_position.right_rear += transform
-        return  new_position
+        return new_position
 
     def turn(self, angle, legs=LegFlags.ALL):
         new_position = self.clone()

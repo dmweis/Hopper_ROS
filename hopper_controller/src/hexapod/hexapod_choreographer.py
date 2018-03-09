@@ -53,5 +53,7 @@ moves = {
 
 
 def execute_choreography(gait_engine, choreography_name):
-    moves[choreography_name](gait_engine)
-
+    try:
+        moves[choreography_name](gait_engine)
+    except KeyError:
+        rospy.logerr("Key: (%s) not present in moves dictionary", choreography_name)

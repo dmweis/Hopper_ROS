@@ -35,7 +35,7 @@ class HexapodController(object):
         self.controller.set_relaxed_pose(transform, rotation)
 
     def schedule_move(self, move_name):
-        self.controller.schedule_move(move_name)
+        self.controller.schedule_move(move_name.data)
 
     def publish_telemetrics_data(self, telemetrics):
         msg = HexapodTelemetrics()

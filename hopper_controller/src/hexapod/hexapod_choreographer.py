@@ -33,11 +33,16 @@ def happy_dance(gait_engine):
     legs_separated_pose = relaxed_pose.clone() \
         .transform(Vector3(y=-10), LegFlags.RIGHT_MIDDLE) \
         .transform(Vector3(y=10), LegFlags.LEFT_MIDDLE)
+    legs_separated_pose.left_middle.z = 0
+    legs_separated_pose.right_middle.z = 0
+
     down_pose = legs_separated_pose.clone() \
-        .transform(Vector3(z=-3), LegFlags.FRONT | LegFlags.REAR)
+        .transform(Vector3(z=-3), LegFlags.FRONT | LegFlags.REAR) \
+        .transform(Vector3(z=3), LegFlags.MIDDLE)
 
     up_pose = legs_separated_pose.clone() \
-        .transform(Vector3(z=3), LegFlags.FRONT | LegFlags.REAR)
+        .transform(Vector3(z=3), LegFlags.FRONT | LegFlags.REAR) \
+        .transform(Vector3(z=-3), LegFlags.MIDDLE)
 
     gait_engine.move_to_new_pose(down_pose, speed)
     for i in range(4):

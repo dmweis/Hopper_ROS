@@ -27,7 +27,7 @@ def happy_hand_dance(gait_engine):
 
 
 def happy_dance(gait_engine):
-    speed = 12
+    speed = 18
     gait_engine.reset_body_pose(speed)
     relaxed_pose = gait_engine.get_relaxed_pose()
     legs_separated_pose = relaxed_pose.clone() \
@@ -37,13 +37,14 @@ def happy_dance(gait_engine):
     legs_separated_pose.right_middle.z = 0
 
     down_pose = legs_separated_pose.clone() \
-        .transform(Vector3(z=-3), LegFlags.FRONT | LegFlags.REAR) \
-        .transform(Vector3(z=3), LegFlags.MIDDLE)
+        .rotate(Vector3(y=-3), LegFlags.FRONT | LegFlags.REAR)
+    down_pose.left_middle.x = 2
+    down_pose.right_middle.x = -2
 
     up_pose = legs_separated_pose.clone() \
-        .transform(Vector3(z=3), LegFlags.FRONT | LegFlags.REAR) \
-        .transform(Vector3(z=-3), LegFlags.MIDDLE)
-
+        .rotate(Vector3(y=3), LegFlags.FRONT | LegFlags.REAR)
+    up_pose.left_middle.x = -2
+    up_pose.right_middle.x = 2
     gait_engine.move_to_new_pose(down_pose, speed)
     for i in range(4):
         gait_engine.move_to_new_pose(up_pose, speed)

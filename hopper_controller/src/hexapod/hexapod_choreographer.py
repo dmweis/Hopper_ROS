@@ -9,7 +9,7 @@ def execute_choreography(gait_engine, choreography_name):
 
 
 def happy_dance(gait_engine):
-    gait_engine.reset_body_pose()
+    gait_engine.reset_body_pose(22)
     relaxed_pose = gait_engine.get_relaxed_pose()
     legs_separated_pose = relaxed_pose.clone() \
         .transform(Vector3(y=-10), LegFlags.RIGHT_MIDDLE) \
@@ -26,5 +26,5 @@ def happy_dance(gait_engine):
     for i in range(4):
         gait_engine.move_to_new_pose(left_up_pose, 22)
         gait_engine.move_to_new_pose(right_up_pose, 22)
-    gait_engine.reset_body_pose()
+    gait_engine.reset_body_pose(22)
 

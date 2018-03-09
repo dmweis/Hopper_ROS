@@ -182,21 +182,21 @@ class GaitEngine(object):
     def relax_next_leg(self):
         self._go_to_relaxed(self._get_next_leg_combo(), self._current_relaxed_position, distance_speed_multiplier=2)
 
-    def update_body_pose(self, transform, rotation, legs=LegFlags.ALL):
+    def update_body_pose(self, transform, rotation, legs=LegFlags.ALL, speed_override=None):
         self._current_relaxed_position = RELAXED_POSITION.clone() \
             .transform(transform * -1, legs) \
             .rotate(rotation, legs)
-        self._execute_move(self._current_relaxed_position)
-
-    def get_relaxed_pose(self):
-        return self._current_relaxed_position.clone()
+        self._execute_move(self._current_relaxed_position, speed_override)
 
     def move_to_new_pose(self, pose, speed_override=None):
         self._execute_move(pose, speed_override)
 
-    def reset_body_pose(self):
+    def reset_body_pose(self, speed_override=None):
         self._current_relaxed_position = RELAXED_POSITION.clone()
-        self._execute_move(self._current_relaxed_position)
+        self._execute_move(self._current_relaxed_position, speed_override)
+
+    def get_relaxed_pose(self):
+        return self._current_relaxed_position.clone()
 
     def read_telemetrics(self):
         return self._ik_driver.read_telemetrics()

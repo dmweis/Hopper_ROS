@@ -2,6 +2,7 @@
 
 <!-- Regular web launch file -->
 <launch>
+    <rosparam command="load" file="~/keys.yaml" />
     <include file="$(find freenect_launch)/launch/freenect.launch" />
     <node name="hopper_emotion_core" pkg="hopper_emotion_core" type="EmotionController.py"/>
     <node name="hopper_emotion_web" pkg="hopper_emotion_web" type="app.js" />

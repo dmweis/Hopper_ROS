@@ -11,12 +11,12 @@ def execute_choreography(gait_engine, choreography_name):
 def happy_dance(gait_engine):
     gait_engine.reset_body_pose()
     rospy.sleep(1)
-    gait_engine.update_body_pose(Vector3(y=20, z=-9), Vector3(), LegFlags.RIGHT_MIDDLE)
+    gait_engine.update_body_pose(Vector3(y=17, z=-9), Vector3(), LegFlags.RIGHT_MIDDLE)
     rospy.sleep(1)
     for i in xrange(4):
-        gait_engine.update_body_pose(Vector3(y=20, z=-11), Vector3(), LegFlags.RIGHT_MIDDLE)
+        gait_engine.update_body_pose(Vector3(y=17, z=-11), Vector3(), LegFlags.RIGHT_MIDDLE)
         rospy.sleep(1)
-        gait_engine.update_body_pose(Vector3(y=20, z=-7), Vector3(), LegFlags.RIGHT_MIDDLE)
+        gait_engine.update_body_pose(Vector3(y=17, z=-7), Vector3(), LegFlags.RIGHT_MIDDLE)
         rospy.sleep(1)
     rospy.sleep(3)
     gait_engine.reset_body_pose()

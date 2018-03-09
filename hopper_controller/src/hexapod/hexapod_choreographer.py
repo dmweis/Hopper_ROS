@@ -4,12 +4,9 @@ from .hexapod_ik_driver import  Vector3, Vector2, LegFlags
 import rospy
 
 
-def execute_choreography(gait_engine, choreography_name):
-    happy_dance(gait_engine)
-
-
-def happy_dance(gait_engine):
-    gait_engine.reset_body_pose(22)
+def happy_hand_dance(gait_engine):
+    speed = 22
+    gait_engine.reset_body_pose(speed)
     relaxed_pose = gait_engine.get_relaxed_pose()
     legs_separated_pose = relaxed_pose.clone() \
         .transform(Vector3(y=-10), LegFlags.RIGHT_MIDDLE) \
@@ -22,9 +19,39 @@ def happy_dance(gait_engine):
     right_up_pose.left_middle.z = -2
     right_up_pose.right_middle.z = 2
 
-    gait_engine.move_to_new_pose(right_up_pose, 22)
+    gait_engine.move_to_new_pose(right_up_pose, speed)
     for i in range(4):
-        gait_engine.move_to_new_pose(left_up_pose, 22)
-        gait_engine.move_to_new_pose(right_up_pose, 22)
-    gait_engine.reset_body_pose(22)
+        gait_engine.move_to_new_pose(left_up_pose, speed)
+        gait_engine.move_to_new_pose(right_up_pose, speed)
+    gait_engine.reset_body_pose(speed)
+
+
+def happy_dance(gait_engine):
+    speed = 12
+    gait_engine.reset_body_pose(speed)
+    relaxed_pose = gait_engine.get_relaxed_pose()
+    legs_separated_pose = relaxed_pose.clone() \
+        .transform(Vector3(y=-10), LegFlags.RIGHT_MIDDLE) \
+        .transform(Vector3(y=10), LegFlags.LEFT_MIDDLE)
+    down_pose = legs_separated_pose.clone() \
+        .transform(Vector3(z=-3), LegFlags.FRONT | LegFlags.REAR)
+
+    up_pose = legs_separated_pose.clone() \
+        .transform(Vector3(z=3), LegFlags.FRONT | LegFlags.REAR)
+
+    gait_engine.move_to_new_pose(down_pose, speed)
+    for i in range(4):
+        gait_engine.move_to_new_pose(up_pose, speed)
+        gait_engine.move_to_new_pose(down_pose, speed)
+    gait_engine.reset_body_pose(speed)
+
+
+moves = {
+    "happy_hand_dance": happy_hand_dance,
+    "happy_dance": happy_dance,
+}
+
+
+def execute_choreography(gait_engine, choreography_name):
+    moves[choreography_name](gait_engine)
 

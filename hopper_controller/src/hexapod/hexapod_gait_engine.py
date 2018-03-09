@@ -126,6 +126,7 @@ class GaitController(threading.Thread):
                 'relaxed_rotation': self._relaxed_rotation}
         rospy.loginfo("Current hexapod state: %s", str(data))
 
+
 class GaitEngine(object):
     def __init__(self, ik_driver):
         super(GaitEngine, self).__init__()

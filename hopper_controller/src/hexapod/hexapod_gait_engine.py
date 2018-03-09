@@ -79,23 +79,28 @@ class GaitController(threading.Thread):
         self._gait_engine.stand_up()
         while self._keep_running:
             if self._should_move():
+                # execute move
                 self._gait_engine.step(self._direction, self._rotation)
                 self._relaxed = False
             elif not self._relaxed:
+                # go to relaxed
                 self._gait_engine.relax_next_leg()
                 if not self._should_move():
                     self._gait_engine.relax_next_leg()
                     self._relaxed = True
             elif self._pose_update_ready:
+                # update pose
                 self._pose_update_ready = False
                 self._gait_engine.update_body_pose(self._relaxed_transformation, self._relaxed_rotation)
             else:
-                self._ros_timer.sleep()
+                # check diagnostics and sleep
                 if time() - self._last_telemetrics_update_time > 1:
                     self._last_telemetrics_update_time = time()
                     telemetrics = self._gait_engine.read_telemetrics()
                     for sub in self._telemetric_subscribers:
                         sub(telemetrics)
+                # this will sleep enough to maintain correct frequency
+                self._ros_timer.sleep()
         self._gait_engine.sit_down()
 
     def set_relaxed_pose(self, transform, rotation):

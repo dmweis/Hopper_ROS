@@ -182,12 +182,17 @@ class GaitEngine(object):
     def relax_next_leg(self):
         self._go_to_relaxed(self._get_next_leg_combo(), self._current_relaxed_position, distance_speed_multiplier=2)
 
-    def update_body_pose(self, transform, rotation, legs=LegFlags.ALL, execute_motion=True):
+    def update_body_pose(self, transform, rotation, legs=LegFlags.ALL):
         self._current_relaxed_position = RELAXED_POSITION.clone() \
             .transform(transform * -1, legs) \
             .rotate(rotation, legs)
-        if execute_motion:
-            self._execute_move(self._current_relaxed_position)
+        self._execute_move(self._current_relaxed_position)
+
+    def get_relaxed_pose(self):
+        return self._current_relaxed_position.clone()
+
+    def move_to_new_pose(self, pose, speed_override=None):
+        self._execute_move(pose, speed_override)
 
     def reset_body_pose(self):
         self._current_relaxed_position = RELAXED_POSITION.clone()
@@ -261,7 +266,7 @@ class GaitEngine(object):
 
     def _execute_move(self, target_position, speed_override=None):
         speed = self._speed
-        if speed_override:
+        if speed_override is not None:
             speed = speed_override
         while self._last_written_position.move_towards(target_position, speed * 0.001 * self._update_delay):
             self._ik_driver.move_legs_synced(self._last_written_position)

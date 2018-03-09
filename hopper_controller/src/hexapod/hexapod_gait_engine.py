@@ -155,7 +155,7 @@ class GaitEngine(object):
         if direction.is_zero() and abs(rotation) > 8:
             # just rotation
             self._execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6)
-        elif self.direction.length() > 5.5:
+        elif direction.length() > 5.5:
             # fast walking
             self._execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5)
         else:

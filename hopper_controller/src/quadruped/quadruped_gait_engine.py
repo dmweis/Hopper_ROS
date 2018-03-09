@@ -1,6 +1,6 @@
 from __future__ import division
 from __future__ import absolute_import
-from quadruped_ik_driver import LegPositions, IkDriver, Vector3, Vector2, LegFlags
+from .quadruped_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 import threading
 from time import sleep
 import math

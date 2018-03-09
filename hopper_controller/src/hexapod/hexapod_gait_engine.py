@@ -1,7 +1,9 @@
 from __future__ import division
 from __future__ import absolute_import
+from Queue import Queue
 import rospy
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
+from .hexapod_choreographer import execute_choreography
 import threading
 from time import sleep, time
 import math
@@ -55,13 +57,14 @@ class GaitController(threading.Thread):
         self._gait_engine = gait_engine
         self._keep_running = True
         self._relaxed = True
-        self._direction = Vector2(0, 0)
+        self._direction = Vector2()
         self._rotation = 0
-        self._relaxed_transformation = Vector3(0, 0, 0)
-        self._relaxed_rotation = Vector3(0, 0, 0)
+        self._relaxed_transformation = Vector3()
+        self._relaxed_rotation = Vector3()
         self._pose_update_ready = False
         self._telemetric_subscribers = []
         self._last_telemetrics_update_time = time()
+        self._command_queue = Queue()
         self._ros_timer = rospy.Rate(INTERPOLATION_FREQUENCY)
         self.start()
 
@@ -98,6 +101,8 @@ class GaitController(threading.Thread):
                     telemetrics = self._gait_engine.read_telemetrics()
                     for sub in self._telemetric_subscribers:
                         sub(telemetrics)
+                # execute any scheduled moves
+                self._check_and_execute_scheduled_move()
                 # this will sleep enough to maintain correct frequency
                 self._ros_timer.sleep()
         self._gait_engine.sit_down()
@@ -112,11 +117,14 @@ class GaitController(threading.Thread):
         self._rotation = rotation
 
     def stop_moving(self):
-        self._direction = Vector2(0, 0)
+        self._direction = Vector2()
         self._rotation = 0
 
     def subscribe_to_telemetrics(self, callback):
         self._telemetric_subscribers.append(callback)
+
+    def schedule_move(self, move_name):
+        self._command_queue.put_nowait(move_name)
 
     def stop(self):
         self._keep_running = False
@@ -125,6 +133,11 @@ class GaitController(threading.Thread):
 
     def _should_move(self):
         return not self._direction.is_zero() or self._rotation != 0
+
+    def _check_and_execute_scheduled_move(self):
+        while not self._command_queue.empty():
+            command = self._command_queue.get()
+            execute_choreography(self._gait_engine, command)
 
     def _log_current_state(self):
         data = {'direction': self._direction,
@@ -169,17 +182,22 @@ class GaitEngine(object):
     def relax_next_leg(self):
         self._go_to_relaxed(self._get_next_leg_combo(), self._current_relaxed_position, distance_speed_multiplier=2)
 
-    def update_body_pose(self, transform, rotation):
+    def update_body_pose(self, transform, rotation, legs=LegFlags.ALL, execute_motion=True):
         self._current_relaxed_position = RELAXED_POSITION.clone() \
-            .transform(transform * -1) \
-            .rotate(rotation)
+            .transform(transform * -1, legs) \
+            .rotate(rotation, legs)
+        if execute_motion:
+            self._execute_move(self._current_relaxed_position)
+
+    def reset_body_pose(self):
+        self._current_relaxed_position = RELAXED_POSITION.clone()
         self._execute_move(self._current_relaxed_position)
 
     def read_telemetrics(self):
         return self._ik_driver.read_telemetrics()
 
     def sit_down(self):
-        self.update_body_pose(Vector3(0, 0, 0), Vector3(0, 0, 0))
+        self.reset_body_pose()
         self._go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
         self._go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
         self._execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)

@@ -55,10 +55,20 @@ def happy_spin(gait_engine):
     gait_engine.reset_body_pose(speed)
 
 
+def sad_emote(gait_engine):
+    speed = 3
+    gait_engine.reset_body_pose(speed)
+    relaxed_pose = gait_engine.get_relaxed_pose()
+    gait_engine.move_to_new_pose(relaxed_pose.rotate(Vector3(y=-8)), speed)
+    gait_engine.move_to_new_pose(relaxed_pose.transform(Vector3(z=3)), speed)
+    gait_engine.reset_body_pose(speed)
+
+
 moves = {
     "happy_hand_dance": happy_hand_dance,
     "happy_dance": happy_dance,
-    "happy_spin": happy_spin
+    "happy_spin": happy_spin,
+    "sad_emote": sad_emote
 }
 
 

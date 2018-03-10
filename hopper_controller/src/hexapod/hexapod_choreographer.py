@@ -71,7 +71,7 @@ def wave_hi(gait_engine):
         .rotate(Vector3(y=-5)) \
         .rotate(Vector3(x=-5)) \
         .transform(Vector3(z=-2)) \
-        .transform(Vector3(4, -4), LegFlags.RIGHT_FRONT)
+        .transform(Vector3(6, -6), LegFlags.RIGHT_FRONT)
     lifted_pose.right_front.z = -4
     gait_engine.move_to_new_pose(lifted_pose, speed)
 
@@ -80,7 +80,7 @@ def wave_hi(gait_engine):
 
     paw_lowered = lifted_pose.clone()
     paw_lowered.right_front.z = -4
-    for i in range(4):
+    for i in range(3):
         gait_engine.move_to_new_pose(paw_lifted, speed)
         gait_engine.move_to_new_pose(paw_lowered, speed)
     gait_engine.reset_body_pose()

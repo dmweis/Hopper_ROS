@@ -64,11 +64,32 @@ def sad_emote(gait_engine):
     gait_engine.reset_body_pose(speed)
 
 
+def wave_hi(gait_engine):
+    speed = 8
+    gait_engine.reset_body_pose()
+    lifted_pose = gait_engine.get_relaxed_pose() \
+        .rotate(Vector3(y=-8)) \
+        .rotate(Vector3(x=5)) \
+        .transform(Vector3(z=-2))
+    gait_engine.move_to_new_pose(lifted_pose)
+
+    paw_lifted = lifted_pose.clone()
+    paw_lifted.front_right.z = 2
+
+    paw_lowered = lifted_pose.clone()
+    paw_lowered.front_right.z = -2
+    for i in range(4):
+        gait_engine.move_to_new_pose(paw_lifted, speed)
+        gait_engine.move_to_new_pose(paw_lowered, speed)
+    gait_engine.reset_body_pose()
+
+
 moves = {
     "happy_hand_dance": happy_hand_dance,
     "happy_dance": happy_dance,
     "happy_spin": happy_spin,
-    "sad_emote": sad_emote
+    "sad_emote": sad_emote,
+    "wave_hi": wave_hi
 }
 
 

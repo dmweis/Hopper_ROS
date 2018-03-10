@@ -11,18 +11,18 @@ def happy_hand_dance(gait_engine):
     legs_separated_pose = relaxed_pose.clone() \
         .transform(Vector3(y=-10), LegFlags.RIGHT_MIDDLE) \
         .transform(Vector3(y=10), LegFlags.LEFT_MIDDLE)
-    left_up_pose = legs_separated_pose.clone()
-    left_up_pose.left_middle.z = 2
-    left_up_pose.right_middle.z = -2
+    hands_up = legs_separated_pose.clone()
+    hands_up.left_middle.z = -2
+    hands_up.right_middle.z = -2
 
-    right_up_pose = legs_separated_pose.clone()
-    right_up_pose.left_middle.z = -2
-    right_up_pose.right_middle.z = 2
+    hands_down = legs_separated_pose.clone()
+    hands_down.left_middle.z = 2
+    hands_down.right_middle.z = 2
 
-    gait_engine.move_to_new_pose(right_up_pose, speed)
+    gait_engine.move_to_new_pose(hands_down, speed)
     for i in range(4):
-        gait_engine.move_to_new_pose(left_up_pose, speed)
-        gait_engine.move_to_new_pose(right_up_pose, speed)
+        gait_engine.move_to_new_pose(hands_up, speed)
+        gait_engine.move_to_new_pose(hands_down, speed)
     gait_engine.reset_body_pose(speed)
 
 
@@ -31,24 +31,18 @@ def happy_dance(gait_engine):
     gait_engine.reset_body_pose(speed)
     relaxed_pose = gait_engine.get_relaxed_pose()
     legs_separated_pose = relaxed_pose.clone() \
-        .transform(Vector3(y=-10), LegFlags.RIGHT_MIDDLE) \
-        .transform(Vector3(y=10), LegFlags.LEFT_MIDDLE)
-    legs_separated_pose.left_middle.z = 0
-    legs_separated_pose.right_middle.z = 0
+        .rotate(Vector3(y=-8))
 
-    down_pose = legs_separated_pose.clone() \
-        .rotate(Vector3(y=-3), LegFlags.FRONT | LegFlags.REAR)
-    down_pose.left_middle.x = 2
-    down_pose.right_middle.x = -2
+    lean_left = legs_separated_pose.clone() \
+        .rotate(Vector3(x=-2))
 
-    up_pose = legs_separated_pose.clone() \
-        .rotate(Vector3(y=3), LegFlags.FRONT | LegFlags.REAR)
-    up_pose.left_middle.x = -2
-    up_pose.right_middle.x = 2
-    gait_engine.move_to_new_pose(down_pose, speed)
+    lean_right = legs_separated_pose.clone() \
+        .rotate(Vector3(x=2))
+
+    gait_engine.move_to_new_pose(lean_left, speed)
     for i in range(4):
-        gait_engine.move_to_new_pose(up_pose, speed)
-        gait_engine.move_to_new_pose(down_pose, speed)
+        gait_engine.move_to_new_pose(lean_right, speed)
+        gait_engine.move_to_new_pose(lean_left, speed)
     gait_engine.reset_body_pose(speed)
 
 

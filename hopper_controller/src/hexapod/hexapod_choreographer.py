@@ -19,7 +19,6 @@ def happy_hand_dance(gait_engine):
     hands_down.left_middle.z = 2
     hands_down.right_middle.z = 2
 
-    gait_engine.move_to_new_pose(hands_down, speed)
     for i in range(4):
         gait_engine.move_to_new_pose(hands_up, speed)
         gait_engine.move_to_new_pose(hands_down, speed)
@@ -39,16 +38,27 @@ def happy_dance(gait_engine):
     lean_right = legs_separated_pose.clone() \
         .rotate(Vector3(x=2))
 
-    gait_engine.move_to_new_pose(lean_left, speed)
     for i in range(4):
         gait_engine.move_to_new_pose(lean_right, speed)
         gait_engine.move_to_new_pose(lean_left, speed)
     gait_engine.reset_body_pose(speed)
 
 
+def happy_spin(gait_engine):
+    speed = 18
+    gait_engine.reset_body_pose(speed)
+    turned_left = gait_engine.get_relaxed_pose().rotate(Vector3(z=5))
+    turned_right = gait_engine.get_relaxed_pose().rotate(Vector3(z=-5))
+    for i in range(4):
+        gait_engine.move_to_new_pose(turned_left, speed)
+        gait_engine.move_to_new_pose(turned_right, speed)
+    gait_engine.reset_body_pose(speed)
+
+
 moves = {
     "happy_hand_dance": happy_hand_dance,
     "happy_dance": happy_dance,
+    "happy_spin": happy_spin
 }
 
 

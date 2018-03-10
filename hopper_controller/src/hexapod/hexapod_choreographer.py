@@ -59,7 +59,7 @@ def sad_emote(gait_engine):
     speed = 3
     gait_engine.reset_body_pose(speed)
     relaxed_pose = gait_engine.get_relaxed_pose()
-    gait_engine.move_to_new_pose(relaxed_pose.rotate(Vector3(y=-8)), speed)
+    gait_engine.move_to_new_pose(relaxed_pose.rotate(Vector3(y=8)), speed)
     gait_engine.move_to_new_pose(relaxed_pose.transform(Vector3(z=3)), speed)
     gait_engine.reset_body_pose(speed)
 

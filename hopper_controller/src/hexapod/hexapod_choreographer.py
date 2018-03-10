@@ -47,8 +47,8 @@ def happy_dance(gait_engine):
 def happy_spin(gait_engine):
     speed = 18
     gait_engine.reset_body_pose(speed)
-    turned_left = gait_engine.get_relaxed_pose().rotate(Vector3(z=5))
-    turned_right = gait_engine.get_relaxed_pose().rotate(Vector3(z=-5))
+    turned_left = gait_engine.get_relaxed_pose().rotate(Vector3(z=3))
+    turned_right = gait_engine.get_relaxed_pose().rotate(Vector3(z=-3))
     for i in range(4):
         gait_engine.move_to_new_pose(turned_left, speed)
         gait_engine.move_to_new_pose(turned_right, speed)

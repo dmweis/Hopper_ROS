@@ -8,6 +8,11 @@ from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
 from hopper_emotion_core.msg import DetectedFace, FaceRectangle, FaceAttributes, Emotions, FaceDetectionImage
 
+# disable warnings on unsecure requests done by the MS face api library
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 
 def translate_result(image, query_result):
     result_image = FaceDetectionImage()

@@ -1,0 +1,3 @@
+string person_name
+string previous_emotion
+string new_emotion

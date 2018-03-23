@@ -23,6 +23,7 @@ add_message_files(
   FaceAttributes.msg
   FaceRectangle.msg
   FaceDetectionImage.msg
+  EmotionChange.msg
 )
 
 generate_messages(

@@ -46,9 +46,11 @@
             msg.forEach(face => {
                 const faceRect = face.face_rectangle;
                 const emotions = face.face_attributes.emotions;
+                const name = face.identified_name;
                 let strongestEmotion = Object.keys(emotions).reduce((accumulator, key) => emotions[accumulator] > emotions[key] ? accumulator : key);
                 drawContext.strokeRect(faceRect.left, faceRect.top, faceRect.width, faceRect.height);
                 drawContext.fillText(strongestEmotion, faceRect.left, faceRect.top + faceRect.height + 48);
+                drawContext.fillText(name, faceRect.left, faceRect.top + faceRect.height + 90);
             });
         });
     </script>

@@ -13,7 +13,8 @@ if (isLinux) {
     var rosnodejs = require('rosnodejs')
     rosnodejs.initNode('hopper_web_emotion_interface')
         .then((node) => {
-            hopperFaceSubscriber = node.subscribe('/detected_faces', 'hopper_emotion_core/FaceDetectionImage', faceDetectionHandler);
+            // hopperFaceSubscriber = node.subscribe('/detected_faces', 'hopper_emotion_core/FaceDetectionImage', faceDetectionHandler);
+            hopperFaceSubscriber = node.subscribe('/identified_faces', 'hopper_emotion_core/FaceDetectionImage', faceDetectionHandler);
         });
 }
 

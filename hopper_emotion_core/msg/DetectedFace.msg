@@ -1,3 +1,4 @@
 string face_id
+string identified_name
 FaceRectangle face_rectangle
 FaceAttributes face_attributes

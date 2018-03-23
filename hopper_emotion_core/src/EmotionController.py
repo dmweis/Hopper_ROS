@@ -61,7 +61,7 @@ class EmotionalCore(object):
         rospy.spin()
 
     def new_image_callback(self, compressed_image):
-        if time() - self.__last_update > 1:
+        if time() - self.__last_update > 3:
             self.__last_update = time()
             with BytesIO(compressed_image.data) as image_stream:
                 result = cognitive_face.face.detect(image_stream, attributes='age,gender,emotion')

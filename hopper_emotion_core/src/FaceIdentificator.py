@@ -27,9 +27,7 @@ class FaceIdentificator(object):
         rospy.spin()
 
     def new_person_callback(self, face_detection_image):
-        face_ids = []
-        for face in face_detection_image.detected_faces:
-            face_ids.append(face.face_id)
+        face_ids = [face.face_id for face in face_detection_image.detected_faces]
         if len(face_ids) > 0:
             result = cognitive_face.face.identify(face_ids, "primary_user_group")
             for identified in result:

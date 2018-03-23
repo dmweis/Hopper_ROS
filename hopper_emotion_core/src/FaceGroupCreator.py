@@ -36,7 +36,7 @@ class FaceGroupCreator(object):
         print("Perissted person id for " + str(person_name) + " is " + str(self.person_id))
         self.persisted_face_ids = []
         # init subscribe
-        self.image_subscriber = rospy.Subscriber("/camera/rgb/image_color/compressed", CompressedImage, self.new_image_callback, queue_size=1)
+        self.image_subscriber = rospy.Subscriber("/camera/rgb/image_color/compressed", CompressedImage, self.new_image_callback, queue_size=4)
         rospy.spin()
 
     def new_image_callback(self, compressed_image):

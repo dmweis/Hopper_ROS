@@ -22,7 +22,7 @@ class FaceIdentificator(object):
         api_url = rospy.get_param("face_api_base_url")
         cognitive_face.Key.set(api_key)
         cognitive_face.BaseUrl.set(api_url)
-        self.image_subscriber = rospy.Subscriber("detected_faces", FaceDetectionImage, self.new_person_callback, queue_size=1)
+        self.image_subscriber = rospy.Subscriber("detected_faces", FaceDetectionImage, self.new_person_callback, queue_size=4)
         self.image_publisher = rospy.Publisher("identified_faces", FaceDetectionImage, queue_size=1)
         rospy.spin()
 

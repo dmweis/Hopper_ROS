@@ -20,6 +20,8 @@ class EmotionalReactionController(object):
                 self.dance_command_publisher.publish("happy_hand_dance")
             if emotion_change.previous_emotion != "sadness" and emotion_change.new_emotion == "sadness":
                 self.dance_command_publisher.publish("sad_emote")
+            if emotion_change.previous_emotion != "anger" and emotion_change.new_emotion == "anger":
+                self.dance_command_publisher.publish("sad_emote")
 
 if __name__ == "__main__":
     EmotionalReactionController()

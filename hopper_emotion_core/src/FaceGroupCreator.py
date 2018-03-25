@@ -8,6 +8,7 @@ import cognitive_face
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
 from hopper_emotion_core.msg import DetectedFace, FaceRectangle, FaceAttributes, Emotions, FaceDetectionImage
+from hopper_emotion_core.srv import GetPersonIdByName
 
 # disable warnings on unsecure requests done by the MS face api library
 import requests
@@ -31,8 +32,14 @@ class FaceGroupCreator(object):
         # cognitive_face.person_group.create(self.person_group_id)
         # print("Created person group")
         # init first user
-        person_name = "Dominika"
-        self.person_id = cognitive_face.person.create(self.person_group_id, person_name)
+        person_name = "David"
+        rospy.wait_for_service("get_name_by_person_id")
+        self.get_person_id_by_name_database = rospy.ServiceProxy("get_person_id_by_name", GetPersonIdByName)
+        person_id = self.get_person_id_by_name_database(person_name)
+        if person_id:
+            self.person_id = person_id
+        else:
+            self.person_id = cognitive_face.person.create(self.person_group_id, person_name)
         print("Perissted person id for " + str(person_name) + " is " + str(self.person_id))
         self.persisted_face_ids = []
         # init subscribe

@@ -4,6 +4,7 @@
 <launch>
     <rosparam command="load" file="$(env HOME)/keys.yaml" />
     <include file="$(find freenect_launch)/launch/freenect.launch" />
+    <param name="face_api_refresh_rate" type="int" value="3"/>
     <node name="hopper_emotion_core" pkg="hopper_emotion_core" type="EmotionController.py"/>
     <node name="hopper_emotion_identificator" pkg="hopper_emotion_core" type="FaceIdentificator.py"/>
     <node name="hopper_emotion_tracker" pkg="hopper_emotion_core" type="EmotionSwitchDetector.py"/>

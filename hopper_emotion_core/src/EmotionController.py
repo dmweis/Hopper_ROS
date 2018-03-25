@@ -53,6 +53,7 @@ class EmotionalCore(object):
         rospy.init_node("Emotioanl_core", anonymous=True)
         api_key = rospy.get_param("face_api_key")
         api_url = rospy.get_param("face_api_base_url")
+        self.refresh_framerate = rospy.get_param("face_api_refresh_rate", 3)
         cognitive_face.Key.set(api_key)
         cognitive_face.BaseUrl.set(api_url)
         self.image_subscriber = rospy.Subscriber("/camera/rgb/image_color/compressed", CompressedImage, self.new_image_callback, queue_size=4)
@@ -61,7 +62,7 @@ class EmotionalCore(object):
         rospy.spin()
 
     def new_image_callback(self, compressed_image):
-        if time() - self.__last_update > 3:
+        if time() - self.__last_update > self.refresh_framerate:
             self.__last_update = time()
             with BytesIO(compressed_image.data) as image_stream:
                 result = cognitive_face.face.detect(image_stream, attributes='age,gender,emotion')

@@ -5,4 +5,3 @@
     <node name="hopper_controller" pkg="hopper_controller" type="hexapod_controller.py" respawn="true" respawn_delay="5"/>
     <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />
 </launch>
-

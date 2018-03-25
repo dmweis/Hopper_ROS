@@ -35,7 +35,7 @@ class FaceGroupCreator(object):
         person_name = "David"
         rospy.wait_for_service("get_name_by_person_id")
         self.get_person_id_by_name_database = rospy.ServiceProxy("get_person_id_by_name", GetPersonIdByName)
-        person_id = self.get_person_id_by_name_database(person_name)
+        person_id = self.get_person_id_by_name_database(person_name).person_id
         if person_id:
             self.person_id = person_id
         else:

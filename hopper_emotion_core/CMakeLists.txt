@@ -24,6 +24,13 @@ add_message_files(
   FaceRectangle.msg
   FaceDetectionImage.msg
   EmotionChange.msg
+  NameAndPersonId.msg
+)
+
+add_service_files(
+  FILES
+  GetPersonIdByName.srv
+  GetNameByPersonId.srv
 )
 
 generate_messages(

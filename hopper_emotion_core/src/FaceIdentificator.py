@@ -6,7 +6,9 @@ import rospy
 import cognitive_face
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
-from hopper_emotion_core.msg import DetectedFace, FaceRectangle, FaceAttributes, Emotions, FaceDetectionImage
+from hopper_emotion_core.msg import DetectedFace, FaceRectangle, FaceAttributes, Emotions, FaceDetectionImage, NameAndPersonId
+from hopper_emotion_core.srv import GetNameByPersonId
+
 
 # disable warnings on unsecure requests done by the MS face api library
 import requests
@@ -22,9 +24,25 @@ class FaceIdentificator(object):
         api_url = rospy.get_param("face_api_base_url")
         cognitive_face.Key.set(api_key)
         cognitive_face.BaseUrl.set(api_url)
+        rospy.wait_for_service("get_name_by_person_id")
+        self.get_name_by_person_id_database = rospy.ServiceProxy("get_name_by_person_id", GetNameByPersonId)
         self.image_subscriber = rospy.Subscriber("detected_faces", FaceDetectionImage, self.new_person_callback, queue_size=4)
         self.image_publisher = rospy.Publisher("identified_faces", FaceDetectionImage, queue_size=1)
+        self.save_new_person = rospy.Publisher("hopper_register_new_person", NameAndPersonId, queue_size=10)
         rospy.spin()
+
+    def _get_name_from_person_id(self, person_id):
+        database_name = self.get_name_by_person_id_database(person_id)
+        if not database_name.name:
+            name = cognitive_face.person.get("primary_user_group", person_id)['name']
+            rospy.logwarn("Creating new user for " + str(name))
+            new_person = NameAndPersonId()
+            new_person.person_id = person_id
+            new_person.name = name
+            self.save_new_person.publish(new_person)
+            return name
+        else:
+            return database_name.name
 
     def new_person_callback(self, face_detection_image):
         face_ids = [face.face_id for face in face_detection_image.detected_faces]
@@ -32,10 +50,10 @@ class FaceIdentificator(object):
             result = cognitive_face.face.identify(face_ids, "primary_user_group")
             for identified in result:
                 if len(identified['candidates']) > 0:
-                    name_query_result = cognitive_face.person.get("primary_user_group", identified['candidates'][0]['personId'])
+                    name = self._get_name_from_person_id(str(identified['candidates'][0]['personId']))
                     for face in face_detection_image.detected_faces:
                         if face.face_id == identified['faceId']:
-                            face.identified_name = name_query_result['name']
+                            face.identified_name = name
         self.image_publisher.publish(face_detection_image)
 
 if __name__ == "__main__":

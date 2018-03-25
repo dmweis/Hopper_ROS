@@ -39,7 +39,7 @@ class FaceGroupCreator(object):
         if person_id:
             self.person_id = person_id
         else:
-            self.person_id = cognitive_face.person.create(self.person_group_id, person_name)
+            self.person_id = cognitive_face.person.create(self.person_group_id, person_name)['personId']
         print("Perissted person id for " + str(person_name) + " is " + str(self.person_id))
         self.persisted_face_ids = []
         # init subscribe
@@ -51,7 +51,7 @@ class FaceGroupCreator(object):
         if self.face_counter < self.face_counter_max:
             self.face_counter += 1
             with BytesIO(compressed_image.data) as image_stream:
-                new_persistent_face_id = cognitive_face.person.add_face(image_stream, self.person_group_id, self.person_id['personId'])
+                new_persistent_face_id = cognitive_face.person.add_face(image_stream, self.person_group_id, self.person_id)
                 print("Added new face under: " + str(new_persistent_face_id))
                 self.persisted_face_ids.append(new_persistent_face_id)
         else:

@@ -34,6 +34,6 @@ io.on('connection', function (socket) {
     });
 });
 
-http.listen(3000, function () {
+http.listen(3001, function () {
     faceDetectionInterface.log('Listening');
 });

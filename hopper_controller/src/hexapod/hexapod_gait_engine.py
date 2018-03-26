@@ -51,9 +51,9 @@ def get_height_for_step(distance, full_step_length, height):
     return math.sin(distance * math.pi) * height
 
 
-class GaitController(threading.Thread):
+class MovementController(threading.Thread):
     def __init__(self, gait_engine):
-        super(GaitController, self).__init__()
+        super(MovementController, self).__init__()
         self._gait_engine = gait_engine
         self._keep_running = True
         self._relaxed = True

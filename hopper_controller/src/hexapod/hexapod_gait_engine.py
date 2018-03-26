@@ -225,9 +225,9 @@ class GaitEngine(object):
         normalized_transformation_vectors.normalize_vectors()
         total_distance = transformation_vectors.longest_length()
         speed = self._speed
-        if speed_override:
+        if speed_override is not None:
             speed = speed_override
-        elif distance_speed_multiplier:
+        elif distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
         distance_traveled = 0
         while distance_traveled <= total_distance:
@@ -248,9 +248,9 @@ class GaitEngine(object):
         normalized_transformation_vectors.normalize_vectors()
         total_distance = transformation_vectors.longest_length()
         speed = self._speed
-        if speed_override:
+        if speed_override is not None:
             speed = speed_override
-        elif distance_speed_multiplier:
+        elif distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
         distance_traveled = 0
         while distance_traveled <= total_distance:

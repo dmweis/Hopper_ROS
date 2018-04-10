@@ -188,7 +188,8 @@ class GaitEngine(object):
         :type direction: Vector2
         :type rotation: float
         """
-        if direction.is_zero() and abs(rotation) > 8:
+        self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed)
+        """if direction.is_zero() and abs(rotation) > 8:
             # just rotation
             self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6)
         elif direction.length() > 5.5:
@@ -196,7 +197,7 @@ class GaitEngine(object):
             self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5)
         else:
             # regular walking
-            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3)
+            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3)"""
 
     def relax_next_leg(self):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)

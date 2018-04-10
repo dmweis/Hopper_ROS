@@ -53,6 +53,10 @@ def get_height_for_step(distance, full_step_length, height):
 
 class MovementController(threading.Thread):
     def __init__(self, gait_engine):
+        """
+
+        :type gait_engine: GaitEngine
+        """
         super(MovementController, self).__init__()
         self._gait_engine = gait_engine
         self._keep_running = True
@@ -93,7 +97,7 @@ class MovementController(threading.Thread):
             elif self._pose_update_ready:
                 # update pose
                 self._pose_update_ready = False
-                self._gait_engine.update_body_pose(self._relaxed_transformation, self._relaxed_rotation)
+                self._gait_engine.update_relaxed_body_pose(self._relaxed_transformation, self._relaxed_rotation)
             else:
                 # check diagnostics and sleep
                 if time() - self._last_telemetrics_update_time > 1:
@@ -108,11 +112,21 @@ class MovementController(threading.Thread):
         self._gait_engine.sit_down()
 
     def set_relaxed_pose(self, transform, rotation):
+        """
+
+        :type transform: Vector3
+        :type rotation: Vector3
+        """
         self._relaxed_transformation = transform
         self._relaxed_rotation = rotation
         self._pose_update_ready = True
 
     def set_direction(self, direction, rotation):
+        """
+
+        :type direction: Vector2
+        :type rotation: float
+        """
         self._direction = direction
         self._rotation = rotation
 
@@ -148,74 +162,108 @@ class MovementController(threading.Thread):
 
 
 class GaitEngine(object):
-    def __init__(self, ik_driver):
+    def __init__(self, gait_sequencer):
+        """
+
+        :type gait_sequencer: TripodGait
+        """
+        self.gait_sequencer = gait_sequencer
         super(GaitEngine, self).__init__()
-        self._ik_driver = ik_driver
-        self._current_relaxed_position = RELAXED_POSITION.clone()
         self._last_used_forward_legs = LegFlags.LEFT_TRIPOD
         self._speed = 9
-        self._update_delay = 1000 / INTERPOLATION_FREQUENCY
-        self._ik_driver.setup()
-        self._last_written_position = self._ik_driver.read_current_leg_positions()
 
     def stand_up(self):
         rospy.loginfo("Hexapod gait engine started")
         for leg in LegFlags.get_legs_as_list(LegFlags.ALL):
-            new_position = self._last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
-            self._execute_move(new_position, 6)
-        self._execute_move(WIDER_RELAXED_POSITION.clone(), 6)
-        self._go_to_relaxed(self._get_next_leg_combo(), self._current_relaxed_position, distance_speed_multiplier=2)
-        self._go_to_relaxed(self._get_next_leg_combo(), self._current_relaxed_position, distance_speed_multiplier=2)
+            new_position = self.gait_sequencer.last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
+            self.gait_sequencer.execute_move(new_position, 6)
+        self.gait_sequencer.execute_move(WIDER_RELAXED_POSITION.clone(), 6)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)
         rospy.loginfo("Hexapod ready")
 
     def step(self, direction, rotation):
+        """
+
+        :type direction: Vector2
+        :type rotation: float
+        """
         if direction.is_zero() and abs(rotation) > 8:
             # just rotation
-            self._execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6)
+            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6)
         elif direction.length() > 5.5:
             # fast walking
-            self._execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5)
+            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5)
         else:
             # regular walking
-            self._execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3)
+            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3)
 
     def relax_next_leg(self):
-        self._go_to_relaxed(self._get_next_leg_combo(), self._current_relaxed_position, distance_speed_multiplier=2)
-
-    def update_body_pose(self, transform, rotation, legs=LegFlags.ALL, speed_override=None):
-        self._current_relaxed_position = RELAXED_POSITION.clone() \
-            .transform(transform * -1, legs) \
-            .rotate(rotation, legs)
-        self._execute_move(self._current_relaxed_position, speed_override)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)
 
     def move_to_new_pose(self, pose, speed_override=None):
-        self._execute_move(pose, speed_override)
+        """
 
-    def reset_body_pose(self, speed_override=None):
-        self._current_relaxed_position = RELAXED_POSITION.clone()
-        self._execute_move(self._current_relaxed_position, speed_override)
+        :type pose: LegPositions
+        :type speed_override: float
+        """
+        self.gait_sequencer.execute_move(pose, speed_override)
 
-    def get_relaxed_pose(self):
-        return self._current_relaxed_position.clone()
+    def update_relaxed_body_pose(self, transform, rotation, legs=LegFlags.ALL, speed_override=None):
+        speed = self._speed
+        if speed_override is not None:
+            speed = speed_override
+        self.gait_sequencer.update_relaxed_body_pose(transform, rotation, speed, legs)
 
     def read_telemetrics(self):
-        return self._ik_driver.read_telemetrics()
+        return self.gait_sequencer.read_telemetrics()
 
     def sit_down(self):
-        self.reset_body_pose()
-        self._go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
-        self._go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
-        self._execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
+        self.gait_sequencer.reset_relaxed_body_pose()
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
+        self.gait_sequencer.execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
+
+    def _get_next_leg_combo(self):
+        self._last_used_forward_legs = LegFlags.RIGHT_TRIPOD if self._last_used_forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
+        return self._last_used_forward_legs
+
+
+class TripodGait(object):
+    def __init__(self, ik_driver):
+        super(TripodGait, self).__init__()
+        self._ik_driver = ik_driver
+        self._update_delay = 1000 / INTERPOLATION_FREQUENCY
+        self.current_relaxed_position = RELAXED_POSITION.clone()
+        self._ik_driver.setup()
+        self.last_written_position = self._ik_driver.read_current_leg_positions()
 
     def stop(self, disable_motors=True):
         if disable_motors:
             self._ik_driver.disable_motors()
         self._ik_driver.close()
 
-    def _execute_step(self, direction, angle, forward_legs, speed_override=None, distance_speed_multiplier=None, leg_lift_height=2):
+    def update_relaxed_body_pose(self, transform, rotation, speed, legs=LegFlags.ALL):
+        """
+
+        :type transform: Vector3
+        :type rotation: Vector3
+        :type speed: float
+        :type legs: LegFlags
+        """
+        self.current_relaxed_position = RELAXED_POSITION.clone() \
+            .transform(transform * -1, legs) \
+            .rotate(rotation, legs)
+        self.execute_move(self.current_relaxed_position, speed)
+
+    def reset_relaxed_body_pose(self, speed_override=None):
+        self.current_relaxed_position = RELAXED_POSITION.clone()
+        self.execute_move(self.current_relaxed_position, speed_override)
+
+    def execute_step(self, direction, angle, forward_legs, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
         backwards_legs = LegFlags.RIGHT_TRIPOD if forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
-        start_position = self._last_written_position.clone()
-        target_position = self._current_relaxed_position.clone() \
+        start_position = self.last_written_position.clone()
+        target_position = self.current_relaxed_position.clone() \
             .transform(Vector3(direction.x / 2, direction.y / 2, 0), forward_legs) \
             .turn(-angle / 2, forward_legs) \
             .transform(Vector3(-direction.x / 2, -direction.y / 2, 0), backwards_legs) \
@@ -224,10 +272,7 @@ class GaitEngine(object):
         normalized_transformation_vectors = transformation_vectors.clone()
         normalized_transformation_vectors.normalize_vectors()
         total_distance = transformation_vectors.longest_length()
-        speed = self._speed
-        if speed_override is not None:
-            speed = speed_override
-        elif distance_speed_multiplier is not None:
+        if distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
         distance_traveled = 0
         while distance_traveled <= total_distance:
@@ -236,21 +281,18 @@ class GaitEngine(object):
             current_leg_height = get_height_for_step(distance_traveled, total_distance, leg_lift_height)
             for new_leg_pos, start_leg_pos in zip(new_position.get_legs_as_list(forward_legs), start_position.get_legs_as_list(forward_legs)):
                 new_leg_pos.z = start_leg_pos.z + current_leg_height
-            self._last_written_position = new_position
-            self._ik_driver.move_legs_synced(self._last_written_position)
+            self.last_written_position = new_position
+            self._ik_driver.move_legs_synced(self.last_written_position)
             sleep(self._update_delay * 0.001)
 
-    def _go_to_relaxed(self, forward_legs, target_stance, speed_override=None, distance_speed_multiplier=None, leg_lift_height=2):
-        start_position = self._last_written_position.clone()
+    def go_to_relaxed(self, forward_legs, target_stance, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
+        start_position = self.last_written_position.clone()
         target_position = start_position.update_from_other(target_stance, forward_legs)
         transformation_vectors = target_position - start_position
         normalized_transformation_vectors = transformation_vectors.clone()
         normalized_transformation_vectors.normalize_vectors()
         total_distance = transformation_vectors.longest_length()
-        speed = self._speed
-        if speed_override is not None:
-            speed = speed_override
-        elif distance_speed_multiplier is not None:
+        if distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
         distance_traveled = 0
         while distance_traveled <= total_distance:
@@ -260,20 +302,17 @@ class GaitEngine(object):
             for new_leg_pos, start_leg_pos in zip(new_position.get_legs_as_list(forward_legs),
                                                   start_position.get_legs_as_list(forward_legs)):
                 new_leg_pos.z = start_leg_pos.z + current_leg_height
-            self._last_written_position = new_position
-            self._ik_driver.move_legs_synced(self._last_written_position)
+            self.last_written_position = new_position
+            self._ik_driver.move_legs_synced(self.last_written_position)
             sleep(self._update_delay * 0.001)
 
-    def _execute_move(self, target_position, speed_override=None):
-        speed = self._speed
-        if speed_override is not None:
-            speed = speed_override
-        while self._last_written_position.move_towards(target_position, speed * 0.001 * self._update_delay):
-            self._ik_driver.move_legs_synced(self._last_written_position)
+    def execute_move(self, target_position, speed):
+        while self.last_written_position.move_towards(target_position, speed * 0.001 * self._update_delay):
+            self._ik_driver.move_legs_synced(self.last_written_position)
             sleep(self._update_delay * 0.001)
-        self._ik_driver.move_legs_synced(self._last_written_position)
+        self._ik_driver.move_legs_synced(self.last_written_position)
         sleep(self._update_delay * 0.001)
 
-    def _get_next_leg_combo(self):
-        self._last_used_forward_legs = LegFlags.RIGHT_TRIPOD if self._last_used_forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
-        return self._last_used_forward_legs
+    def read_telemetrics(self):
+        return self._ik_driver.read_telemetrics()
+

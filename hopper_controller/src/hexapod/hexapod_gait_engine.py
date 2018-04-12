@@ -229,6 +229,9 @@ class GaitEngine(object):
         self._last_used_forward_legs = LegFlags.RIGHT_TRIPOD if self._last_used_forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
         return self._last_used_forward_legs
 
+    def stop(self):
+        self.gait_sequencer.stop()
+
 
 class TripodGait(object):
     def __init__(self, ik_driver):

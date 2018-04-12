@@ -5,7 +5,7 @@ from geometry_msgs.msg import Twist
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
 from std_msgs.msg import String
 
-from hexapod.hexapod_gait_engine import GaitEngine, MovementController
+from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
 from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 
@@ -16,7 +16,8 @@ class HexapodController(object):
         rospy.init_node('hopper_controller')
         servo_driver = DynamixelDriver(search_usb_2_ax_port())
         ik_driver = IkDriver(servo_driver)
-        gait_engine = GaitEngine(ik_driver)
+        tripod_gait = TripodGait(ik_driver)
+        gait_engine = GaitEngine(tripod_gait)
         self.controller = MovementController(gait_engine)
         self.telemetrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         rospy.Subscriber("hopper_move_command", Twist, self.update_direction)

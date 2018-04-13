@@ -220,7 +220,7 @@ class GaitEngine(object):
         return self.gait_sequencer.read_telemetrics()
 
     def sit_down(self):
-        self.gait_sequencer.reset_relaxed_body_pose()
+        self.gait_sequencer.reset_relaxed_body_pose(speed_override=9)
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
         self.gait_sequencer.execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)

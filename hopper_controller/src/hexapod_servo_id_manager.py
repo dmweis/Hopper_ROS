@@ -31,7 +31,7 @@ legs_to_assign = {
 }
 
 print("Setting ids up to make sure none are taken")
-first_free_id = max(legs_to_assign.keys())
+first_free_id = max(legs_to_assign.keys()) + 1
 for servo_id in servo_ids:
     if servo_id >= first_free_id:
         continue
@@ -44,11 +44,11 @@ for servo_id in servo_ids:
 
 servo_ids = servo_driver.search_servos()
 
-print("New servo ids are:")
+print("\nNew servo ids are:")
 for servo_id in servo_ids:
-    print(servo_id)
+    print(servo_id, end=' ')
 
-print("\nTurning off al LEDs")
+print("\nTurning off al LEDs\n")
 
 for servo_id in servo_ids:
     servo_driver.set_led(servo_id, False)

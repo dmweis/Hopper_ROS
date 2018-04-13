@@ -44,6 +44,12 @@ for servo_id in servo_ids:
 
 servo_ids = servo_driver.search_servos()
 
+print("New servo ids are:")
+for servo_id in servo_ids:
+    print(servo_id)
+
+print("\nTurning off al LEDs")
+
 for servo_id in servo_ids:
     servo_driver.set_led(servo_id, False)
 

@@ -56,6 +56,37 @@ class DynamixelDriver(object):
         if not dynamixel.setBaudRate(self.__port_num, 1000000):
             raise IOError("Failed to set baud rate")
 
+    def ping(self, servo_id):
+        dynamixel.ping(self.__port_num, PROTOCOL, servo_id)
+        dxl_comm_result = dynamixel.getLastTxRxResult(self.__port_num, 1)
+        dxl_error = dynamixel.getLastRxPacketError(self.__port_num, 1)
+        if dxl_comm_result != 0:
+            return False
+        if dxl_error != 0:
+            dynamixel.printRxPacketError(PROTOCOL, dxl_error)
+            raise IOError()
+        return True
+
+    def search_servos(self, start_id=0, end_id=252):
+        found_servos = []
+        for servo_id in range(start_id, end_id + 1):
+            if self.ping(servo_id):
+                found_servos.append(servo_id)
+        return found_servos
+
+    def set_id(self, servo_id, new_servo_id):
+        if self.ping(new_servo_id):
+            raise IOError("New Id already taken")
+        self.__write_byte(servo_id, ID, new_servo_id)
+
+    def set_led(self, servo_id, status):
+        """
+
+        :type servo_id: int
+        :type status: bool
+        """
+        self.__write_byte(servo_id, LED_ENABLE, int(status))
+
     def set_goal_position(self, servo_id, goal_position):
         self.__write_uint_16(servo_id, GOAL_POSITION, goal_position)
 

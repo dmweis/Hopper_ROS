@@ -47,8 +47,18 @@ WIDER_RELAXED_POSITION = LegPositions(
 
 
 def get_height_for_step(distance, full_step_length, height):
+    """
+
+    :param distance: distance along the step
+    :type distance: float
+    :param full_step_length: full length of the step
+    :type full_step_length: float
+    :param height: max height that the leg should lift to
+    :type height: float
+    :return:
+    """
     distance = distance / full_step_length
-    return math.sin(distance * math.pi) * height
+    return max(math.sin(distance * math.pi) * height, 0)
 
 
 class MovementController(threading.Thread):

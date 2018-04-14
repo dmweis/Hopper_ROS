@@ -206,7 +206,7 @@ class GaitEngine(object):
         :type rotation: float
         """
         if static_speed:
-            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed)
+            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed, leg_lift_height=lift_height)
         else:
             if direction.is_zero() and abs(rotation) > 8:
                 # just rotation

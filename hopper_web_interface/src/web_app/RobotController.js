@@ -7,11 +7,28 @@ const telemetricsVm = new Vue({
     data: {
         averageTemperature: 0,
         averageVoltage: 0,
-        connected: false
+        connected: false,
+        staticSpeedMode: false,
+        liftHeight: 2
     },
     watch: {
         connected: function () {
             console.log("Connection status changed to " + this.connected);
+        },
+        liftHeight: function() {
+            socket.emit('walkingModeUpdate', {
+                staticSpeedMode: this.staticSpeedMode,
+                liftHeight: this.liftHeight
+            });
+        }
+    },
+    methods: {
+        toggleStaticSpeedMode: function(){
+            this.staticSpeedMode= !this.staticSpeedMode;
+            socket.emit('walkingModeUpdate', {
+                staticSpeedMode: this.staticSpeedMode,
+                liftHeight: this.liftHeight
+            });
         }
     }
 });

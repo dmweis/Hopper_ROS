@@ -2,7 +2,7 @@
 
 import rospy
 from geometry_msgs.msg import Twist
-from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
+from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, WalkingMode
 from std_msgs.msg import String
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
@@ -21,9 +21,14 @@ class HexapodController(object):
         self.controller = MovementController(gait_engine)
         self.telemetrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         rospy.Subscriber("hopper_move_command", Twist, self.update_direction)
+        rospy.Subscriber("hopper_walking_mode", WalkingMode, self.set_walking_mode)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose)
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
         self.controller.subscribe_to_telemetrics(self.publish_telemetrics_data)
+
+    def set_walking_mode(self, walking_mode):
+        static_speed_mode_enabled = walking_mode.selectedMode == WalkingMode.STATIC_SPEED
+        self.controller.set_walking_mode(static_speed_mode_enabled, walking_mode.liftHeight)
 
     def update_direction(self, twist):
         direction = Vector2(twist.linear.x, twist.linear.y)

@@ -35,6 +35,8 @@
             <br>
             <strong v-if="connected">CONNECTED</strong>
             <strong v-else>DISCONNECTED</strong>
+            <button v-on:click="toggleStaticSpeedMode">Static mode: {{staticSpeedMode}}</button>
+            <input v-model="liftHeight">
         </div>
         <div class="joystickContainer">
             <div class="joystick moveJoystick" id="move_joystick_zone">

@@ -43,6 +43,9 @@ io.on('connection', function (socket) {
     socket.on('translationUpdate', function (msg) {
         robot.sendUpdateStanceCommand(msg.transform, msg.rotation);
     });
+    socket.on('walkingModeUpdate', function(msg) {
+        robot.sendWalkingModeUpdate(msg.staticSpeedMode. msg.liftHeight);
+    });
     socket.on('disconnected', function () {
         robot.log(`User disconnected from ${socket.request.connection.remoteAddress}`);
     });

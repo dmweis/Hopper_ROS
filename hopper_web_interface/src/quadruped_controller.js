@@ -2,6 +2,7 @@ const isLinux = process.platform.toLowerCase() === "linux";
 
 var hopperMoveCommandPublisher;
 var hopperStanceTranslateCommandPublisher;
+var hopperWalkingModePublisher;
 var hopperTelemetricsSubscriber;
 var telemetricsSubscribers = [];
 
@@ -17,6 +18,7 @@ if (isLinux) {
         .then((node) => {
             hopperMoveCommandPublisher = node.advertise('/hopper_move_command', 'geometry_msgs/Twist');
             hopperStanceTranslateCommandPublisher = node.advertise('/hopper_stance_translate', 'geometry_msgs/Twist');
+            hopperWalkingModePublisher = node.advertise('/hopper_walking_mode', 'hopper_msgs/WalkingMode');
             hopperTelemetricsSubscriber = node.subscribe('/hopper_telemetrics', 'hopper_msgs/HexapodTelemetrics', telemetricsHandler);
         });
 }
@@ -57,6 +59,15 @@ exports.sendUpdateStanceCommand = function (transform, rotation) {
         console.log(`Stance updating:\n` +
         `    Transform: x:${transform.x.toFixed(2)}, y:${transform.y.toFixed(2)}, z:${transform.z.toFixed(2)}\n` +
         `    Rotation: x:${rotation.x.toFixed(2)}, y:${rotation.y.toFixed(2)}, z:${rotation.z.toFixed(2)}`);
+    }
+}
+
+exports.sendWalkingModeUpdate = function(staticSpeedMode, liftHeight) {
+    if (isLinux){
+        if (hopperWalkingModePublisher){
+            selectedMode = staticSpeedMode ? 2 : 1;
+            hopperWalkingModePublisher.publish({ selectedMode: selectedMode, liftHeight: liftHeight});
+        }
     }
 }
 

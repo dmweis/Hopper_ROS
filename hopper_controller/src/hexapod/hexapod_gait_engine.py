@@ -2,6 +2,7 @@ from __future__ import division
 from __future__ import absolute_import
 from Queue import Queue
 import rospy
+from hopper_msgs.msg import WalkingMode
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 from .hexapod_choreographer import execute_choreography
 import threading
@@ -75,6 +76,8 @@ class MovementController(threading.Thread):
         self._rotation = 0
         self._relaxed_transformation = Vector3()
         self._relaxed_rotation = Vector3()
+        self._lift_height = WalkingMode.DEFAULT_LIFT_HEIGHT
+        self._static_speed_mode=False
         self._pose_update_ready = False
         self._telemetric_subscribers = []
         self._last_telemetrics_update_time = time()
@@ -96,7 +99,7 @@ class MovementController(threading.Thread):
         while self._keep_running:
             if self._should_move():
                 # execute move
-                self._gait_engine.step(self._direction, self._rotation)
+                self._gait_engine.step(self._direction, self._rotation, self._static_speed_mode, self._lift_height)
                 self._relaxed = False
             elif not self._relaxed:
                 # go to relaxed
@@ -139,6 +142,10 @@ class MovementController(threading.Thread):
         """
         self._direction = direction
         self._rotation = rotation
+
+    def set_walking_mode(self, static_speed_mode_enabled, lift_height):
+        self._static_speed_mode = static_speed_mode_enabled
+        self._lift_height = lift_height
 
     def stop_moving(self):
         self._direction = Vector2()
@@ -192,22 +199,24 @@ class GaitEngine(object):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)
         rospy.loginfo("Hexapod ready")
 
-    def step(self, direction, rotation):
+    def step(self, direction, rotation, static_speed=False, lift_height=2):
         """
 
         :type direction: Vector2
         :type rotation: float
         """
-        self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed)
-        """if direction.is_zero() and abs(rotation) > 8:
-            # just rotation
-            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6)
-        elif direction.length() > 5.5:
-            # fast walking
-            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5)
+        if static_speed:
+            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed)
         else:
-            # regular walking
-            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3)"""
+            if direction.is_zero() and abs(rotation) > 8:
+                # just rotation
+                self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6, leg_lift_height=lift_height)
+            elif direction.length() > 5.5:
+                # fast walking
+                self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5, leg_lift_height=lift_height)
+            else:
+                # regular walking
+                self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3, leg_lift_height=lift_height)
 
     def relax_next_leg(self):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)

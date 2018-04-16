@@ -11,9 +11,9 @@ class HopperSpeechHandles(object):
         super(HopperSpeechHandles, self).__init__()
         rospy.init_node("hopper_speech_core")
         self.sound_client = SoundClient()
-        self.play_sound_sub = rospy.Subscriber("hopper_play_sound", String, self.on_play_sound)
         rospack = rospkg.RosPack()
         self.sound_path = rospack.get_path('hopper_speech') + "/sounds/"
+        self.play_sound_sub = rospy.Subscriber("hopper_play_sound", String, self.on_play_sound)
         rospy.spin()
 
     def on_play_sound(self, string):

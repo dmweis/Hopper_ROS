@@ -10,6 +10,15 @@ from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
 from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 
 
+class SoundPlayer(object):
+    def __init__(self, speech_publisher):
+        super(SoundPlayer, self).__init__()
+        self.publisher = speech_publisher
+
+    def say(self, file_name):
+        self.publisher.publish(file_name)
+
+
 class HexapodController(object):
     def __init__(self):
         super(HexapodController, self).__init__()
@@ -18,7 +27,9 @@ class HexapodController(object):
         ik_driver = IkDriver(servo_driver)
         tripod_gait = TripodGait(ik_driver)
         gait_engine = GaitEngine(tripod_gait)
-        self.controller = MovementController(gait_engine)
+        self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
+        self.sound_player = SoundPlayer(self.speech_publisher)
+        self.controller = MovementController(gait_engine, self.sound_player)
         self.telemetrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         rospy.Subscriber("hopper_move_command", Twist, self.update_direction)
         rospy.Subscriber("hopper_walking_mode", WalkingMode, self.set_walking_mode)

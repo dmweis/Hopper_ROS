@@ -63,13 +63,14 @@ def get_height_for_step(distance, full_step_length, height):
 
 
 class MovementController(threading.Thread):
-    def __init__(self, gait_engine):
+    def __init__(self, gait_engine, speech_service):
         """
 
         :type gait_engine: GaitEngine
         """
         super(MovementController, self).__init__()
         self._gait_engine = gait_engine
+        self._speech_service = speech_service
         self._keep_running = True
         self._relaxed = True
         self._direction = Vector2()
@@ -90,12 +91,14 @@ class MovementController(threading.Thread):
             self._main_controller_loop()
         except Exception as e:
             self._log_current_state()
+            self._speech_service.say("ik_failure")
             rospy.logfatal("Gait engine loop failed " + str(e))
             rospy.signal_shutdown("Gait engine loop failed " + str(e))
 
     def _main_controller_loop(self):
         rospy.loginfo("Hexapod gait engine started")
         self._gait_engine.stand_up()
+        self._speech_service.say("initialized_successfully")
         while self._keep_running:
             if self._should_move():
                 # execute move
@@ -145,6 +148,10 @@ class MovementController(threading.Thread):
 
     def set_walking_mode(self, static_speed_mode_enabled, lift_height):
         self._static_speed_mode = static_speed_mode_enabled
+        if static_speed_mode_enabled:
+            self._speech_service.say("static_speed_mode")
+        else:
+            self._speech_service.say("adjusted_speed_mode")
         self._lift_height = lift_height
 
     def stop_moving(self):

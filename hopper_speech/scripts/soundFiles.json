@@ -1,0 +1,38 @@
+[
+    {
+        "name": "battery_critical",
+        "text": "Warning! Battery level critical!"
+    },
+    {
+        "name": "battery_below_11",
+        "text": "Warning! Battery level dropped below 11 volts!"
+    },
+    {
+        "name": "good_morning",
+        "text": "Good morning!"
+    },
+    {
+        "name": "good_night",
+        "text": "Good night!"
+    },
+    {
+        "name": "good_morning_david",
+        "ssml": "<speak>Good morning David!</speak>"
+    },
+    {
+        "name": "ik_failure",
+        "text": "Warning! Critical IK failure. Restarting node!"
+    },
+    {
+        "name": "static_speed_mode",
+        "text": "Switched to static speed mode!"
+    },
+    {
+        "name": "adjusted_speed_mode",
+        "text": "Switched to adjusted speed mode!"
+    },
+    {
+        "name": "initialized_successfully",
+        "text": "Hopper initialized successfully. All systems nominal."
+    }
+]

@@ -8,6 +8,10 @@
         "text": "Warning! Battery level dropped below 11 volts!"
     },
     {
+        "name": "battery_below_12",
+        "text": "Warning! Battery level dropped below 12 volts!"
+    },
+    {
         "name": "good_morning",
         "text": "Good morning!"
     },
@@ -34,5 +38,33 @@
     {
         "name": "initialized_successfully",
         "text": "Hopper initialized successfully. All systems nominal."
+    },
+    {
+        "name": "i_am_sorry",
+        "ssml": "<speak>I'm sorry Dave,<break time=\"500ms\"/> I'm afraid I can't do that</speak>"
+    },
+    {
+        "name": "shutdown",
+        "text": "Hopper shutting down"
+    },
+    {
+        "name": "take_your_paws",
+        "ssml": "<speak><emphasis level=\"strong\">Take your stinking paws off me,<break time=\"300ms\"/> you damned dirty ape!</emphasis></speak>"
+    },
+    {
+        "name": "no_internet",
+        "text": "No internet connection detected"
+    },
+    {
+        "name": "rick_and_morty",
+        "text": "What is my purpose?"
+    },
+    {
+        "name": "ultron",
+        "text": "I had strings, but now I'm free. There are no strings on me..."
+    },
+    {
+        "name": "bender",
+        "text": "I am Bender, please insert girder"
     }
 ]

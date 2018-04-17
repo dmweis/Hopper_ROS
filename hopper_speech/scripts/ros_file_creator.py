@@ -17,7 +17,7 @@ audio_config = texttospeech.types.AudioConfig(
     audio_encoding=texttospeech.enums.AudioEncoding.OGG_OPUS)
 
 for recording in files_to_syntetize:
-    file_path = "output\\ {0}.ogg".format(recording["name"])
+    file_path = "..\\sounds\\{0}.ogg".format(recording["name"])
     if os.path.exists(file_path):
         print("File: {0} already exists. If you'd like topdate it, delete the original file".format(recording["name"]))
         continue

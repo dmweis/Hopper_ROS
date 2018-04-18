@@ -308,9 +308,8 @@ class TripodGait(object):
         while distance_traveled <= total_distance:
             distance_traveled += speed / self._update_delay
             new_position = start_position + normalized_transformation_vectors * distance_traveled
-            current_leg_height = get_height_for_step(distance_traveled, total_distance, leg_lift_height)
-            for new_leg_pos, start_leg_pos in zip(new_position.get_legs_as_list(forward_legs), start_position.get_legs_as_list(forward_legs)):
-                new_leg_pos.z = start_leg_pos.z + current_leg_height
+            for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(forward_legs), start_position.get_legs_as_list(forward_legs), target_position.get_legs_as_list(forward_legs)):
+                new_leg_pos.z = start_leg_pos.z + get_height_for_step(distance_traveled, (target_leg_pos - start_leg_pos).length(), leg_lift_height)
             self.last_written_position = new_position
             self._ik_driver.move_legs_synced(self.last_written_position)
             sleep(self._update_delay * 0.001)

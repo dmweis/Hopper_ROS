@@ -85,7 +85,7 @@ class Vector3(object):
     def move_towards(self, target, distance):
         transform = target - self
         transform_length = transform.length()
-        if transform_length < distance:
+        if transform_length <= distance:
             self.x = target.x
             self.y = target.y
             self.z = target.z

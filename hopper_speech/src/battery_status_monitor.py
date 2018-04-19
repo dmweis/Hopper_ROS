@@ -13,6 +13,9 @@ class BatteryStatusMonitor(object):
         rospy.init_node("hopper_battery_monitor")
         self.lowest_recorded_voltage = 15.0
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
+        # sleep for 30 seconds to prevent overcovering with init voice
+        # TODO: find a better way to do this
+        rospy.sleep(30)
         self.telemetrics_sub = rospy.Subscriber("hopper_telemetrics", HexapodTelemetrics, self.on_new_telemetrics, queue_size=1)
         rospy.spin()
 

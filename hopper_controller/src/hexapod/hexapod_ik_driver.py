@@ -83,8 +83,17 @@ class Vector3(object):
         return self.clone()
 
     def move_towards(self, target, distance):
+        """
+        Moves vector towards target vector traveling distance each step
+        :param target: target vector towards which we are moving
+        :param distance: max distance traveled with this step
+        :return: returns True is move is not finished
+        """
         transform = target - self
         transform_length = transform.length()
+        # if no distance to travel just finish
+        if transform_length * distance == 0:
+            return False
         if transform_length <= distance:
             self.x = target.x
             self.y = target.y

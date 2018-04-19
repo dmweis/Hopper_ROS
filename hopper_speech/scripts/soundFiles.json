@@ -29,11 +29,11 @@
     },
     {
         "name": "static_speed_mode",
-        "text": "Switched to constant speed mode!"
+        "text": "Constant speed mode engaged!"
     },
     {
         "name": "adjusted_speed_mode",
-        "text": "Switched to adaptive speed mode!"
+        "text": "Adaptive speed mode engaged!"
     },
     {
         "name": "initialized_successfully",

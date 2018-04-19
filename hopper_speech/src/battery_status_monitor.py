@@ -17,7 +17,7 @@ class BatteryStatusMonitor(object):
         rospy.spin()
 
     def on_new_telemetrics(self, message):
-        voltages = [data.voltage for data in message]
+        voltages = [data.voltage for data in message.servos]
         mean_voltage = mean(voltages)
         if mean_voltage < self.lowest_recorded_voltage:
             self.lowest_recorded_voltage = mean_voltage

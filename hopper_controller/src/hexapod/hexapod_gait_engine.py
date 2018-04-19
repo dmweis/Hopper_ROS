@@ -303,12 +303,13 @@ class TripodGait(object):
         if distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
         move_finished = False
-        current_position = start_position.clone()
+        current_position_on_ground = start_position.clone()
         while not move_finished:
-            move_finished = not current_position.move_towards(target_position, speed / self._update_delay)
-            for new_leg_pos, start_leg_pos, target_leg_pos in zip(current_position.get_legs_as_list(forward_legs), start_position.get_legs_as_list(forward_legs), target_position.get_legs_as_list(forward_legs)):
+            move_finished = not current_position_on_ground.move_towards(target_position, speed / self._update_delay)
+            new_position = current_position_on_ground.clone()
+            for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(forward_legs), start_position.get_legs_as_list(forward_legs), target_position.get_legs_as_list(forward_legs)):
                 new_leg_pos.z = start_leg_pos.z + get_height_for_step((new_leg_pos - start_leg_pos).length(), (target_leg_pos - start_leg_pos).length(), leg_lift_height)
-            self.last_written_position = current_position
+            self.last_written_position = new_position
             self._ik_driver.move_legs_synced(self.last_written_position)
             sleep(self._update_delay * 0.001)
 

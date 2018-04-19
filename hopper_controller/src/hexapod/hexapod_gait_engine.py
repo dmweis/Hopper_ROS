@@ -318,7 +318,7 @@ class TripodGait(object):
     def _step_to_position(self, forward_legs, target_position, speed, leg_lift_height):
         start_position = self.last_written_position.clone()
         current_position_on_ground = start_position.clone()
-        while not current_position_on_ground.move_towards(target_position, speed / self._update_delay):
+        while current_position_on_ground.move_towards(target_position, speed / self._update_delay):
             new_position = current_position_on_ground.clone()
             for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(forward_legs),
                                                                   start_position.get_legs_as_list(forward_legs),

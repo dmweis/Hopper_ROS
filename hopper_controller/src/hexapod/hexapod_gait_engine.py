@@ -302,16 +302,7 @@ class TripodGait(object):
         total_distance = transformation_vectors.longest_length()
         if distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
-        move_finished = False
-        current_position_on_ground = start_position.clone()
-        while not move_finished:
-            move_finished = not current_position_on_ground.move_towards(target_position, speed / self._update_delay)
-            new_position = current_position_on_ground.clone()
-            for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(forward_legs), start_position.get_legs_as_list(forward_legs), target_position.get_legs_as_list(forward_legs)):
-                new_leg_pos.z = start_leg_pos.z + get_height_for_step((new_leg_pos - start_leg_pos).length(), (target_leg_pos - start_leg_pos).length(), leg_lift_height)
-            self.last_written_position = new_position
-            self._ik_driver.move_legs_synced(self.last_written_position)
-            sleep(self._update_delay * 0.001)
+        self._step_to_position(forward_legs, target_position, speed, leg_lift_height)
 
     def go_to_relaxed(self, forward_legs, target_stance, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
         start_position = self.last_written_position.clone()
@@ -322,14 +313,21 @@ class TripodGait(object):
         total_distance = transformation_vectors.longest_length()
         if distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
-        distance_traveled = 0
-        while distance_traveled <= total_distance:
-            distance_traveled += speed / self._update_delay
-            new_position = start_position + normalized_transformation_vectors * distance_traveled
-            current_leg_height = get_height_for_step(distance_traveled, total_distance, leg_lift_height)
-            for new_leg_pos, start_leg_pos in zip(new_position.get_legs_as_list(forward_legs),
-                                                  start_position.get_legs_as_list(forward_legs)):
-                new_leg_pos.z = start_leg_pos.z + current_leg_height
+        self._step_to_position(forward_legs, target_position, speed, leg_lift_height)
+
+    def _step_to_position(self, forward_legs, target_position, speed, leg_lift_height):
+        start_position = self.last_written_position.clone()
+        move_finished = False
+        current_position_on_ground = start_position.clone()
+        while not move_finished:
+            move_finished = not current_position_on_ground.move_towards(target_position, speed / self._update_delay)
+            new_position = current_position_on_ground.clone()
+            for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(forward_legs),
+                                                                  start_position.get_legs_as_list(forward_legs),
+                                                                  target_position.get_legs_as_list(forward_legs)):
+                new_leg_pos.z = start_leg_pos.z + get_height_for_step((new_leg_pos - start_leg_pos).length(),
+                                                                      (target_leg_pos - start_leg_pos).length(),
+                                                                      leg_lift_height)
             self.last_written_position = new_position
             self._ik_driver.move_legs_synced(self.last_written_position)
             sleep(self._update_delay * 0.001)

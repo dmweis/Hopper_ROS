@@ -299,17 +299,15 @@ class TripodGait(object):
             .transform(Vector3(-direction.x / 2, -direction.y / 2, 0), backwards_legs) \
             .turn(angle / 2, backwards_legs)
         transformation_vectors = target_position - start_position
-        normalized_transformation_vectors = transformation_vectors.clone()
-        normalized_transformation_vectors.normalize_vectors()
         total_distance = transformation_vectors.longest_length()
         if distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
-        distance_traveled = 0
-        while distance_traveled <= total_distance:
-            distance_traveled += speed / self._update_delay
-            new_position = start_position + normalized_transformation_vectors * distance_traveled
+        move_finished = False
+        while not move_finished:
+            new_position = start_position.clone()
+            move_finished = not new_position.move_towards(target_position, speed / self._update_delay)
             for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(forward_legs), start_position.get_legs_as_list(forward_legs), target_position.get_legs_as_list(forward_legs)):
-                new_leg_pos.z = start_leg_pos.z + get_height_for_step(distance_traveled, (target_leg_pos - start_leg_pos).length(), leg_lift_height)
+                new_leg_pos.z = start_leg_pos.z + get_height_for_step((new_leg_pos - start_leg_pos).length(), (target_leg_pos - start_leg_pos).length(), leg_lift_height)
             self.last_written_position = new_position
             self._ik_driver.move_legs_synced(self.last_written_position)
             sleep(self._update_delay * 0.001)

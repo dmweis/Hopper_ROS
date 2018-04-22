@@ -5,6 +5,7 @@
     </material>
     <link name="base_link">
         <visual>
+            <origin xyz="0.2 0.25 0.0"/>
             <geometry>
                 <mesh filename="package://hopper_description/meshes/hopper_body.stl" scale="0.001 0.001 0.001"/>
             </geometry>

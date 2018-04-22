@@ -14,7 +14,7 @@
     </link>
     <link name="right_front_coxa">
         <visual>
-            <origin xyz="-0.035 -0.024 0.0"/>        
+            <origin xyz="-0.035 -0.024 0.0"/>
             <geometry>
                 <mesh filename="package://hopper_description/meshes/hopper_leg_coxa.stl" scale="0.001 0.001 0.001"/>
             </geometry>
@@ -28,7 +28,7 @@
     </joint>
     <link name="left_front_coxa">
         <visual>
-            <origin xyz="-0.035 -0.024 0.0"/>                    
+            <origin xyz="-0.035 -0.024 0.0"/>
             <geometry>
                 <mesh filename="package://hopper_description/meshes/hopper_leg_coxa.stl" scale="0.001 0.001 0.001"/>
             </geometry>

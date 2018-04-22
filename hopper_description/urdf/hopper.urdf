@@ -3,7 +3,7 @@
     <link name="base_link">
         <visual>
             <geometry>
-            <mesh filename="package://hopper_description/meshes/hopper_body.stl"/>
+            <mesh filename="package://hopper_description/meshes/hopper_body.stl" scale="0.001 0.001 0.001"/>
             </geometry>>
         </visual>
     </link>

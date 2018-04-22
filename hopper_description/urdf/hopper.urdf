@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="Hopper">
+    <link name="base_link">
+        <visual>
+            <geometry>
+            <mesh filename="package://hopper_description/meshes/hopper_body.stl"/>
+            </geometry>>
+        </visual>
+    </link>
+</robot>>

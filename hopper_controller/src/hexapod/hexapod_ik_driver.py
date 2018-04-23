@@ -484,22 +484,22 @@ class IkDriver(object):
         self.__servo_driver.group_sync_write_goal_degrees(commands)
         joint_positions = [
             left_front_goal.coxa - 150,
-            left_front_goal.femur - LEFT_FRONT.femur_correction,
+            left_front_goal.femur - 150,
             left_front_goal.tibia,
             right_front_goal.coxa - 150,
-            right_front_goal.femur - RIGHT_FRONT.femur_correction,
+            right_front_goal.femur - 150,
             right_front_goal.tibia,
             left_middle_goal.coxa - 150,
-            left_middle_goal.femur - LEFT_MIDDLE.femur_correction,
+            left_middle_goal.femur - 150,
             left_middle_goal.tibia,
             right_middle_goal.coxa - 150,
-            right_middle_goal.femur - RIGHT_MIDDLE.femur_correction,
+            right_middle_goal.femur - 150,
             right_middle_goal.tibia,
             left_rear_goal.coxa - 150,
-            left_rear_goal.femur - LEFT_REAR.femur_correction,
+            left_rear_goal.femur - 150,
             left_rear_goal.tibia,
             right_rear_goal.coxa - 150,
-            right_rear_goal.femur - RIGHT_REAR.femur_correction,
+            right_rear_goal.femur - 150,
             right_rear_goal.tibia
         ]
         self.joint_state_publisher.publish(JOINT_NAMES, map(math.radians, joint_positions))

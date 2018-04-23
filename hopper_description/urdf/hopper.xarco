@@ -44,7 +44,7 @@
             <parent link="${side}_${position}_leg_base" />
             <child link="${side}_${position}_coxa" />
             <axis xyz="0.0 0.0 1.0" />
-            <limit lower="-${pi}" upper="${pi}"/>
+            <limit lower="-${pi}" upper="${pi}" effort="1000.0" velocity="1"/>
         </joint>
         <!-- femur -->
         <link name="${side}_${position}_femur">
@@ -60,7 +60,7 @@
             <parent link="${side}_${position}_coxa" />
             <child link="${side}_${position}_femur" />
             <axis xyz="0.0 0.0 ${-axis}" />
-            <limit lower="-${pi}" upper="${pi}"/>
+            <limit lower="-${pi}" upper="${pi}" effort="1000.0" velocity="1"/>
         </joint>
         <!-- tibia -->
         <link name="${side}_${position}_tibia">
@@ -76,7 +76,7 @@
             <parent link="${side}_${position}_femur" />
             <child link="${side}_${position}_tibia" />
             <axis xyz="0.0 0.0 ${axis}" />
-            <limit lower="-${pi}" upper="${pi}"/>
+            <limit lower="-${pi}" upper="${pi}" effort="1000.0" velocity="1"/>
         </joint>
     </xacro:macro>
     <!--build legs-->

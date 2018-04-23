@@ -487,19 +487,19 @@ class IkDriver(object):
             left_front_goal.femur - 150 + FEMUR_OFFSET,
             left_front_goal.tibia,
             right_front_goal.coxa - 150,
-            right_front_goal.femur - 150 + FEMUR_OFFSET,
+            right_front_goal.femur - 150 - FEMUR_OFFSET,
             right_front_goal.tibia,
             left_middle_goal.coxa - 150,
             left_middle_goal.femur - 150 + FEMUR_OFFSET,
             left_middle_goal.tibia,
             right_middle_goal.coxa - 150,
-            right_middle_goal.femur - 150 + FEMUR_OFFSET,
+            right_middle_goal.femur - 150 - FEMUR_OFFSET,
             right_middle_goal.tibia,
             left_rear_goal.coxa - 150,
             left_rear_goal.femur - 150 + FEMUR_OFFSET,
             left_rear_goal.tibia,
             right_rear_goal.coxa - 150,
-            right_rear_goal.femur - 150 + FEMUR_OFFSET,
+            right_rear_goal.femur - 150 - FEMUR_OFFSET,
             right_rear_goal.tibia
         ]
         self.joint_state_publisher.publish(JOINT_NAMES, map(math.radians, joint_positions))

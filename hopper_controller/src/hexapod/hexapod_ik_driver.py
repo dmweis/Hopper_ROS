@@ -485,19 +485,20 @@ class IkDriver(object):
         joint_positions = [
             left_front_goal.coxa - 150,
             left_front_goal.femur - 150 + FEMUR_OFFSET,
-            left_front_goal.tibia - 150 + TIBIA_OFFSET,
+            left_front_goal.tibia - 150 - TIBIA_OFFSET,
             right_front_goal.coxa - 150,
             right_front_goal.femur - 150 - FEMUR_OFFSET,
             right_front_goal.tibia - 150 + TIBIA_OFFSET,
             left_middle_goal.coxa - 150,
             left_middle_goal.femur - 150 + FEMUR_OFFSET,
-            left_middle_goal.tibia - 150 + TIBIA_OFFSET,
+            left_middle_goal.tibia - 150 - TIBIA_OFFSET,
+
             right_middle_goal.coxa - 150,
             right_middle_goal.femur - 150 - FEMUR_OFFSET,
             right_middle_goal.tibia - 150 + TIBIA_OFFSET,
             left_rear_goal.coxa - 150,
             left_rear_goal.femur - 150 + FEMUR_OFFSET,
-            left_rear_goal.tibia - 150 + TIBIA_OFFSET,
+            left_rear_goal.tibia - 150 - TIBIA_OFFSET,
             right_rear_goal.coxa - 150,
             right_rear_goal.femur - 150 - FEMUR_OFFSET,
             right_rear_goal.tibia - 150 + TIBIA_OFFSET

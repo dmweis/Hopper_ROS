@@ -402,7 +402,7 @@ TIBIA_LENGTH = 13
 JOINT_NAMES = [
     "left_front_coxa_joint",
     "left_front_femur_joint",
-    "left_front_tibi_joint",
+    "left_front_tibia_joint",
     "right_front_coxa_joint",
     "right_front_femur_joint",
     "right_front_tibia_joint",
@@ -483,22 +483,22 @@ class IkDriver(object):
         ]
         self.__servo_driver.group_sync_write_goal_degrees(commands)
         joint_positions = [
-            left_front_goal.coxa,
+            left_front_goal.coxa - 150,
             left_front_goal.femur,
             left_front_goal.tibia,
-            right_front_goal.coxa,
+            right_front_goal.coxa - 150,
             right_front_goal.femur,
             right_front_goal.tibia,
-            left_middle_goal.coxa,
+            left_middle_goal.coxa - 150,
             left_middle_goal.femur,
             left_middle_goal.tibia,
-            right_middle_goal.coxa,
+            right_middle_goal.coxa - 150,
             right_middle_goal.femur,
             right_middle_goal.tibia,
-            left_rear_goal.coxa,
+            left_rear_goal.coxa - 150,
             left_rear_goal.femur,
             left_rear_goal.tibia,
-            right_rear_goal.coxa,
+            right_rear_goal.coxa - 150,
             right_rear_goal.femur,
             right_rear_goal.tibia
         ]

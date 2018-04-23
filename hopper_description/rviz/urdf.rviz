@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /RobotModel1/Status1
       Splitter Ratio: 0.57710278
     Tree Height: 1725
   - Class: rviz/Selection
@@ -203,6 +202,8 @@ Visualization Manager:
           Value: true
         left_front_leg_base:
           Value: true
+        left_front_tibia:
+          Value: true
         left_middle_coxa:
           Value: true
         left_middle_femur:
@@ -254,7 +255,8 @@ Visualization Manager:
             left_front_leg_base:
               left_front_coxa:
                 left_front_femur:
-                  {}
+                  left_front_tibia:
+                    {}
             left_middle_leg_base:
               left_middle_coxa:
                 left_middle_femur:
@@ -322,10 +324,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.950397849
+      Pitch: 0.75039804
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.24357939
+      Yaw: 6.12858105
     Saved: ~
 Window Geometry:
   Displays:

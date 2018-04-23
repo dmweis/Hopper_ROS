@@ -402,7 +402,7 @@ TIBIA_LENGTH = 13
 JOINT_NAMES = [
     "left_front_coxa_joint",
     "left_front_femur_joint",
-    "left_front_tibi_joint",
+    "left_front_tibia_joint",
     "right_front_coxa_joint",
     "right_front_femur_joint",
     "right_front_tibia_joint",

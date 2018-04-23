@@ -3,7 +3,8 @@
 import rospy
 from geometry_msgs.msg import Twist
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, WalkingMode
-from std_msgs.msg import String
+from std_msgs.msg import String, Header
+from sensor_msgs.msg import JointState
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
@@ -19,12 +20,35 @@ class SoundPlayer(object):
         self.publisher.publish(file_name)
 
 
+class JointStatePublisher(object):
+    def __init__(self, join_state_publisher):
+        super(JointStatePublisher, self).__init__()
+        self._internal_publisher = join_state_publisher
+
+    def publish(self, joint_names, joint_positions):
+        """
+        :param joint_names: list of names of the joints
+        :param joint_positions: positions of joints
+        :return:
+        """
+        joint_state = JointState()
+        joint_state.header = Header()
+        joint_state.header.stamp = rospy.Time.now()
+        joint_state.name = joint_names
+        joint_state.position = joint_positions
+        joint_state.velocity = []
+        joint_state.effort = []
+        self._internal_publisher.publish(joint_state)
+
+
 class HexapodController(object):
     def __init__(self):
         super(HexapodController, self).__init__()
         rospy.init_node('hopper_controller')
         servo_driver = DynamixelDriver(search_usb_2_ax_port())
-        ik_driver = IkDriver(servo_driver)
+        self.join_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=10)
+
+        ik_driver = IkDriver(servo_driver, JointStatePublisher(self.join_state_publisher))
         tripod_gait = TripodGait(ik_driver)
         gait_engine = GaitEngine(tripod_gait)
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)

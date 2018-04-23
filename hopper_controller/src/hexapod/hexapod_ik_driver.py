@@ -399,10 +399,36 @@ COXA_LENGTH = 5.3
 FEMUR_LENGTH = 6.5
 TIBIA_LENGTH = 13
 
+JOINT_NAMES = [
+    "left_front_coxa_joint",
+    "left_front_femur_joint",
+    "left_front_tibi_joint",
+    "right_front_coxa_joint",
+    "right_front_femur_joint",
+    "right_front_tibia_joint",
+    "left_middle_coxa_joint",
+    "left_middle_femur_joint",
+    "left_middle_tibia_joint",
+    "right_middle_coxa_joint",
+    "right_middle_femur_joint",
+    "right_middle_tibia_joint",
+    "left_rear_coxa_joint",
+    "left_rear_femur_joint",
+    "left_rear_tibia_joint",
+    "right_rear_coxa_joint",
+    "right_rear_femur_joint",
+    "right_rear_tibia_joint",
+]
+
 
 class IkDriver(object):
-    def __init__(self, servo_driver):
+    def __init__(self, servo_driver, joint_state_publisher):
+        """
+        :type servo_driver: DynamixelDriver
+        :type joint_state_publisher: JointStatePublisher
+        """
         self.__servo_driver = servo_driver
+        self.joint_state_publisher = joint_state_publisher
 
     def setup(self):
         for servo_id in ALL_SERVOS_IDS:
@@ -456,6 +482,27 @@ class IkDriver(object):
             (LEFT_REAR.tibia_id, left_rear_goal.tibia),
         ]
         self.__servo_driver.group_sync_write_goal_degrees(commands)
+        joint_positions = [
+            left_front_goal.coxa,
+            left_front_goal.femur,
+            left_front_goal.tibia,
+            right_front_goal.coxa,
+            right_front_goal.femur,
+            right_front_goal.tibia,
+            left_middle_goal.coxa,
+            left_middle_goal.femur,
+            left_middle_goal.tibia,
+            right_middle_goal.coxa,
+            right_middle_goal.femur,
+            right_middle_goal.tibia,
+            left_rear_goal.coxa,
+            left_rear_goal.femur,
+            left_rear_goal.tibia,
+            right_rear_goal.coxa,
+            right_rear_goal.femur,
+            right_rear_goal.tibia
+        ]
+        self.joint_state_publisher.publish(JOINT_NAMES, map(math.radians, joint_positions))
 
     def read_current_leg_positions(self):
         left_front = self.__read_single_current_leg_position(LEFT_FRONT)

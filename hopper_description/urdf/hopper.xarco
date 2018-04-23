@@ -80,10 +80,10 @@
         </joint>
     </xacro:macro>
     <!--build legs-->
-    <xacro:leg side="right" position="rear" x="-0.120" y="-0.060" angle="-${pi*3/4}" axis="1" />
+    <xacro:leg side="right" position="rear" x="-0.115" y="-0.050" angle="-${pi*3/4}" axis="1" />
     <xacro:leg side="right" position="middle" x="0.0" y="-0.100" angle="-${pi/2}" axis="1" />
-    <xacro:leg side="right" position="front" x="0.120" y="-0.060" angle="-${pi/4}" axis="1" />
-    <xacro:leg side="left" position="rear" x="-0.120" y="0.060" angle="${pi*3/4}" axis="-1" />
+    <xacro:leg side="right" position="front" x="0.115" y="-0.050" angle="-${pi/4}" axis="1" />
+    <xacro:leg side="left" position="rear" x="-0.115" y="0.050" angle="${pi*3/4}" axis="-1" />
     <xacro:leg side="left" position="middle" x="0.0" y="0.100" angle="${pi/2}" axis="-1" />
-    <xacro:leg side="left" position="front" x="0.120" y="0.060" angle="${pi/4}" axis="-1" />
+    <xacro:leg side="left" position="front" x="0.115" y="0.050" angle="${pi/4}" axis="-1" />
 </robot>

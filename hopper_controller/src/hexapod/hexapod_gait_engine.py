@@ -2,6 +2,7 @@ from __future__ import division
 from __future__ import absolute_import
 from Queue import Queue
 import rospy
+import tf
 from hopper_msgs.msg import WalkingMode
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 from .hexapod_choreographer import execute_choreography
@@ -188,11 +189,11 @@ class MovementController(threading.Thread):
 class GaitEngine(object):
     def __init__(self, gait_sequencer):
         """
-
         :type gait_sequencer: TripodGait
         """
-        self.gait_sequencer = gait_sequencer
         super(GaitEngine, self).__init__()
+        self.gait_sequencer = gait_sequencer
+        self._transform_broadcaster = tf.TransformBroadcaster()
         self._last_used_forward_legs = LegFlags.LEFT_TRIPOD
         self._speed = 9
 

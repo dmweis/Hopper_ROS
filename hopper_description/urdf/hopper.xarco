@@ -21,6 +21,12 @@
         <parent link="base_link" />
         <child link="body_link" />
     </joint>
+    <!-- laser attachment -->
+    <link name="laser"/>
+    <joint name="body_laser_joint" type="fixed">
+        <parent link="body_link" />
+        <child link="laser" />
+    </joint>
     <!-- xarco macro for leg -->
     <xacro:macro name="leg" params="side position x y angle axis">
         <!-- leg base -->

@@ -267,7 +267,7 @@ class GaitEngine(object):
         :type direction: Vector2
         :type rotation: float
         """
-        new_rotation = transformations.quaternion_from_euler(0, 0, math.degrees(rotation))
+        new_rotation = transformations.quaternion_from_euler(0, 0, math.radians(rotation))
         self.odometry_rotation = transformations.quaternion_multiply(new_rotation, self.odometry_rotation)
         self.odometry_position += direction
         message = TransformStamped()

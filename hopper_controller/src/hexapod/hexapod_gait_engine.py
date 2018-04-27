@@ -196,7 +196,8 @@ class GaitEngine(object):
         super(GaitEngine, self).__init__()
         self.gait_sequencer = gait_sequencer
         self._transform_broadcaster = tf2_ros.TransformBroadcaster()
-        self.rotation = transformations.quaternion_from_euler(0, 0, 0)
+        self.odometry_rotation = transformations.quaternion_from_euler(0, 0, 0)
+        self.odometry_position = Vector2()
         self._last_used_forward_legs = LegFlags.LEFT_TRIPOD
         self._speed = 9
 
@@ -267,18 +268,19 @@ class GaitEngine(object):
         :type rotation: float
         """
         new_rotation = transformations.quaternion_from_euler(0, 0, math.degrees(rotation))
-        self.rotation = transformations.quaternion_multiply(new_rotation, self.rotation)
+        self.odometry_rotation = transformations.quaternion_multiply(new_rotation, self.odometry_rotation)
+        self.odometry_position += direction
         message = TransformStamped()
         message.header.stamp = rospy.Time.now()
         message.header.frame_id = "world"
         message.child_frame_id = "base_link"
-        message.transform.translation.x = direction.x / 100
-        message.transform.translation.y = direction.y / 100
+        message.transform.translation.x = self.odometry_position.x / 100
+        message.transform.translation.y = self.odometry_position.y / 100
         message.transform.translation.z = 0
-        message.transform.rotation.x = self.rotation[0]
-        message.transform.rotation.y = self.rotation[1]
-        message.transform.rotation.z = self.rotation[2]
-        message.transform.rotation.w = self.rotation[3]
+        message.transform.rotation.x = self.odometry_rotation[0]
+        message.transform.rotation.y = self.odometry_rotation[1]
+        message.transform.rotation.z = self.odometry_rotation[2]
+        message.transform.rotation.w = self.odometry_rotation[3]
         self._transform_broadcaster.sendTransform(message)
 
 

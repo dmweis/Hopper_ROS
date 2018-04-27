@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from threading import Thread
 import rospy
 from geometry_msgs.msg import Twist
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, WalkingMode
@@ -20,10 +21,13 @@ class SoundPlayer(object):
         self.publisher.publish(file_name)
 
 
-class JointStatePublisher(object):
+class JointStatePublisher(Thread):
     def __init__(self, join_state_publisher):
         super(JointStatePublisher, self).__init__()
+        self._last_joint_state = JointState()
         self._internal_publisher = join_state_publisher
+        self.rate = rospy.Rate(30)
+        self.start()
 
     def publish(self, joint_names, joint_positions):
         """
@@ -32,13 +36,17 @@ class JointStatePublisher(object):
         :return:
         """
         joint_state = JointState()
-        joint_state.header = Header()
-        joint_state.header.stamp = rospy.Time.now()
         joint_state.name = joint_names
         joint_state.position = joint_positions
         joint_state.velocity = []
         joint_state.effort = []
-        self._internal_publisher.publish(joint_state)
+        self._last_joint_state = joint_state
+
+    def run(self):
+        while not rospy.is_shutdown():
+            self._last_joint_state.header.stamp = rospy.Time.now()
+            self._internal_publisher.publish(self._last_joint_state)
+            self.rate.sleep()
 
 
 class HexapodController(object):

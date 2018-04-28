@@ -31,10 +31,15 @@ class TransformPublisher(Thread):
         self._join_state_publisher = join_state_publisher
         self._transform_brodcaster = transform_brodcaster
         self._last_joint_state = JointState()
+        # initialize default tf transform
         self._last_odometry_message = TransformStamped()
         self._last_odometry_message.header.frame_id = "world"
         self._last_odometry_message.child_frame_id = "base_link"
         self.odometry_rotation = transformations.quaternion_from_euler(0, 0, 0)
+        self._last_odometry_message.transform.rotation.x = self.odometry_rotation[0]
+        self._last_odometry_message.transform.rotation.y = self.odometry_rotation[1]
+        self._last_odometry_message.transform.rotation.z = self.odometry_rotation[2]
+        self._last_odometry_message.transform.rotation.w = self.odometry_rotation[3]
         self.odometry_position = Vector2()
 
         self.rate = rospy.Rate(30)

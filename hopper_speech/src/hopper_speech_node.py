@@ -9,7 +9,7 @@ from std_msgs.msg import String
 class HopperSpeechHandles(object):
     def __init__(self):
         super(HopperSpeechHandles, self).__init__()
-        rospy.init_node("hopper_speech_core")
+        rospy.init_node("hopper_speech_core", anonymous=True)
         self.sound_client = SoundClient()
         rospack = rospkg.RosPack()
         self.sound_path = rospack.get_path('hopper_speech') + "/sounds/"

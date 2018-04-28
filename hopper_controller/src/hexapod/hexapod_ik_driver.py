@@ -503,7 +503,7 @@ class IkDriver(object):
             right_rear_goal.femur - 150 - FEMUR_OFFSET,
             right_rear_goal.tibia - 150 + TIBIA_OFFSET
         ]
-        self.joint_state_publisher.publish(JOINT_NAMES, map(math.radians, joint_positions))
+        self.joint_state_publisher.update_joint_states(JOINT_NAMES, map(math.radians, joint_positions))
 
     def read_current_leg_positions(self):
         left_front = self.__read_single_current_leg_position(LEFT_FRONT)

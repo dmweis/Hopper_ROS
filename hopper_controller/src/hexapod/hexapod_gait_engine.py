@@ -2,10 +2,7 @@ from __future__ import division
 from __future__ import absolute_import
 from Queue import Queue
 import rospy
-import tf.transformations as transformations
-import tf2_ros
 from hopper_msgs.msg import WalkingMode
-from geometry_msgs.msg import TransformStamped
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 from .hexapod_choreographer import execute_choreography
 import threading
@@ -189,15 +186,13 @@ class MovementController(threading.Thread):
 
 
 class GaitEngine(object):
-    def __init__(self, gait_sequencer):
+    def __init__(self, gait_sequencer, transform_publisher):
         """
         :type gait_sequencer: TripodGait
         """
         super(GaitEngine, self).__init__()
         self.gait_sequencer = gait_sequencer
-        self._transform_broadcaster = tf2_ros.TransformBroadcaster()
-        self.odometry_rotation = transformations.quaternion_from_euler(0, 0, 0)
-        self.odometry_position = Vector2()
+        self._transform_publisher = transform_publisher
         self._last_used_forward_legs = LegFlags.LEFT_TRIPOD
         self._speed = 9
 
@@ -213,11 +208,10 @@ class GaitEngine(object):
 
     def step(self, direction, rotation, static_speed=False, lift_height=2):
         """
-
         :type direction: Vector2
         :type rotation: float
         """
-        self._publish_odometry(direction, rotation)
+        self._transform_publisher.update_translation(direction, rotation)
         if static_speed:
             self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed, leg_lift_height=lift_height)
         else:
@@ -260,29 +254,6 @@ class GaitEngine(object):
     def _get_next_leg_combo(self):
         self._last_used_forward_legs = LegFlags.RIGHT_TRIPOD if self._last_used_forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
         return self._last_used_forward_legs
-
-    def _publish_odometry(self, direction, rotation):
-        """
-
-        :type direction: Vector2
-        :type rotation: float
-        """
-        new_rotation = transformations.quaternion_from_euler(0, 0, math.radians(rotation))
-        self.odometry_rotation = transformations.quaternion_multiply(new_rotation, self.odometry_rotation)
-        self.odometry_position += direction
-        message = TransformStamped()
-        message.header.stamp = rospy.Time.now()
-        message.header.frame_id = "world"
-        message.child_frame_id = "base_link"
-        message.transform.translation.x = self.odometry_position.x / 100
-        message.transform.translation.y = self.odometry_position.y / 100
-        message.transform.translation.z = 0
-        message.transform.rotation.x = self.odometry_rotation[0]
-        message.transform.rotation.y = self.odometry_rotation[1]
-        message.transform.rotation.z = self.odometry_rotation[2]
-        message.transform.rotation.w = self.odometry_rotation[3]
-        self._transform_broadcaster.sendTransform(message)
-
 
     def stop(self):
         self.gait_sequencer.stop()

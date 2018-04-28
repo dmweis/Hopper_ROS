@@ -4,4 +4,8 @@
     <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find hopper_description)/rviz/urdf.rviz" required="true" />
+    <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py" />
+    <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py" />
+    <node name="Xbox_gamepad" pkg="joy" type="joy_node" />
+    <node name="joy_translator" pkg="hopper_joy_translator" type="joyTranslator.py" />
 </launch>

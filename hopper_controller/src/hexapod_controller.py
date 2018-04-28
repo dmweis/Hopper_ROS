@@ -32,6 +32,8 @@ class TransformPublisher(Thread):
         self._transform_brodcaster = transform_brodcaster
         self._last_joint_state = JointState()
         self._last_odometry_message = TransformStamped()
+        self._last_odometry_message.header.frame_id = "world"
+        self._last_odometry_message.child_frame_id = "base_link"
         self.odometry_rotation = transformations.quaternion_from_euler(0, 0, 0)
         self.odometry_position = Vector2()
 

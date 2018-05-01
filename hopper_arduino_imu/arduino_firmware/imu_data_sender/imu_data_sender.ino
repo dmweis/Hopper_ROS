@@ -7,7 +7,7 @@ Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0();
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   if (!lsm.begin())
   {
     Serial.println("Oops ... unable to initialize the LSM9DS0. Check your wiring!");

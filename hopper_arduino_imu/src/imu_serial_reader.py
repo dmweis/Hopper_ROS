@@ -38,7 +38,7 @@ class ImuReader(object):
         self.read()
 
     def read(self):
-        with serial.Serial(self._port_name, 9600) as port:
+        with serial.Serial(self._port_name, 115200) as port:
             while not rospy.is_shutdown():
                 message = port.readline()
                 try:

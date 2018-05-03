@@ -10,7 +10,7 @@ def mean(numbers):
 class BatteryStatusMonitor(object):
     def __init__(self):
         super(BatteryStatusMonitor, self).__init__()
-        rospy.init_node("hopper_battery_monitor")
+        rospy.init_node("hopper_battery_monitor", anonymous=True)
         self.lowest_recorded_voltage = 15.0
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         # sleep for 30 seconds to prevent overcovering with init voice

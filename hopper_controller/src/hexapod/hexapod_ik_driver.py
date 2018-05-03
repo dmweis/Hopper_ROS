@@ -399,10 +399,36 @@ COXA_LENGTH = 5.3
 FEMUR_LENGTH = 6.5
 TIBIA_LENGTH = 13
 
+JOINT_NAMES = [
+    "left_front_coxa_joint",
+    "left_front_femur_joint",
+    "left_front_tibia_joint",
+    "right_front_coxa_joint",
+    "right_front_femur_joint",
+    "right_front_tibia_joint",
+    "left_middle_coxa_joint",
+    "left_middle_femur_joint",
+    "left_middle_tibia_joint",
+    "right_middle_coxa_joint",
+    "right_middle_femur_joint",
+    "right_middle_tibia_joint",
+    "left_rear_coxa_joint",
+    "left_rear_femur_joint",
+    "left_rear_tibia_joint",
+    "right_rear_coxa_joint",
+    "right_rear_femur_joint",
+    "right_rear_tibia_joint",
+]
+
 
 class IkDriver(object):
-    def __init__(self, servo_driver):
+    def __init__(self, servo_driver, joint_state_publisher):
+        """
+        :type servo_driver: DynamixelDriver
+        :type joint_state_publisher: JointStatePublisher
+        """
         self.__servo_driver = servo_driver
+        self.joint_state_publisher = joint_state_publisher
 
     def setup(self):
         for servo_id in ALL_SERVOS_IDS:
@@ -456,6 +482,28 @@ class IkDriver(object):
             (LEFT_REAR.tibia_id, left_rear_goal.tibia),
         ]
         self.__servo_driver.group_sync_write_goal_degrees(commands)
+        joint_positions = [
+            left_front_goal.coxa - 150,
+            left_front_goal.femur - 150 + FEMUR_OFFSET,
+            left_front_goal.tibia - 150 - TIBIA_OFFSET,
+            right_front_goal.coxa - 150,
+            right_front_goal.femur - 150 - FEMUR_OFFSET,
+            right_front_goal.tibia - 150 + TIBIA_OFFSET,
+            left_middle_goal.coxa - 150,
+            left_middle_goal.femur - 150 + FEMUR_OFFSET,
+            left_middle_goal.tibia - 150 - TIBIA_OFFSET,
+
+            right_middle_goal.coxa - 150,
+            right_middle_goal.femur - 150 - FEMUR_OFFSET,
+            right_middle_goal.tibia - 150 + TIBIA_OFFSET,
+            left_rear_goal.coxa - 150,
+            left_rear_goal.femur - 150 + FEMUR_OFFSET,
+            left_rear_goal.tibia - 150 - TIBIA_OFFSET,
+            right_rear_goal.coxa - 150,
+            right_rear_goal.femur - 150 - FEMUR_OFFSET,
+            right_rear_goal.tibia - 150 + TIBIA_OFFSET
+        ]
+        self.joint_state_publisher.update_joint_states(JOINT_NAMES, map(math.radians, joint_positions))
 
     def read_current_leg_positions(self):
         left_front = self.__read_single_current_leg_position(LEFT_FRONT)

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <param name="imu_serial_port" value="/dev/ttyUSB0" />
+    <node name="rviz" pkg="rviz" type="rviz" required="true" />
+    <node name="imu_reader" pkg="hopper_arduino_imu" type="imu_serial_reader.py" />
+    <node name="imu_filter" pkg="imu_filter_madgwick" type="imu_filter_node">
+        <param name="fixed_frame" value="world" />
+        <param name="world_frame" value="nwu" />
+    </node>
+</launch>

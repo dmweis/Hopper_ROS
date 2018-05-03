@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Regular web launch file -->
+<launch>
+    <node name="hopper_controller" pkg="hopper_controller" type="hexapod_controller.py" respawn="true" respawn_delay="5"/>
+    <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />
+    <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py">
+        <env name="AUDIODEV" value="/dev/audio1"/>
+    </node>
+    <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py"/>
+    <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>
+</launch>

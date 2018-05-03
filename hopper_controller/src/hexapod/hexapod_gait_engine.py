@@ -186,13 +186,13 @@ class MovementController(threading.Thread):
 
 
 class GaitEngine(object):
-    def __init__(self, gait_sequencer):
+    def __init__(self, gait_sequencer, transform_publisher):
         """
-
         :type gait_sequencer: TripodGait
         """
-        self.gait_sequencer = gait_sequencer
         super(GaitEngine, self).__init__()
+        self.gait_sequencer = gait_sequencer
+        self._transform_publisher = transform_publisher
         self._last_used_forward_legs = LegFlags.LEFT_TRIPOD
         self._speed = 9
 
@@ -208,10 +208,10 @@ class GaitEngine(object):
 
     def step(self, direction, rotation, static_speed=False, lift_height=2):
         """
-
         :type direction: Vector2
         :type rotation: float
         """
+        self._transform_publisher.update_translation(direction, rotation)
         if static_speed:
             self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed, leg_lift_height=lift_height)
         else:

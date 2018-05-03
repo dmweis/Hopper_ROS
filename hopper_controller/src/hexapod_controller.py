@@ -1,9 +1,15 @@
 #!/usr/bin/env python
 
+from threading import Thread
+import math
 import rospy
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, TransformStamped
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, WalkingMode
 from std_msgs.msg import String
+from sensor_msgs.msg import JointState
+import tf.transformations as transformations
+import tf2_ros
+
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
@@ -19,14 +25,83 @@ class SoundPlayer(object):
         self.publisher.publish(file_name)
 
 
+class TransformPublisher(Thread):
+    def __init__(self, join_state_publisher, transform_brodcaster):
+        super(TransformPublisher, self).__init__()
+        self._join_state_publisher = join_state_publisher
+        self._transform_brodcaster = transform_brodcaster
+        self._last_joint_state = JointState()
+        # initialize default tf transform
+        self._last_odometry_message = TransformStamped()
+        self._last_odometry_message.header.frame_id = "world"
+        self._last_odometry_message.child_frame_id = "base_link"
+        self.odometry_rotation = transformations.quaternion_from_euler(0, 0, 0)
+        self._last_odometry_message.transform.rotation.x = self.odometry_rotation[0]
+        self._last_odometry_message.transform.rotation.y = self.odometry_rotation[1]
+        self._last_odometry_message.transform.rotation.z = self.odometry_rotation[2]
+        self._last_odometry_message.transform.rotation.w = self.odometry_rotation[3]
+        self.odometry_position = Vector2()
+
+        self.rate = rospy.Rate(30)
+        self.start()
+
+    def update_translation(self, direction, rotation):
+        """
+        :type direction: Vector2
+        :type rotation: float
+        """
+        new_rotation = transformations.quaternion_from_euler(0, 0, math.radians(rotation))
+        self.odometry_rotation = transformations.quaternion_multiply(new_rotation, self.odometry_rotation)
+        self.odometry_position += direction
+        message = TransformStamped()
+        message.header.stamp = rospy.Time.now()
+        message.header.frame_id = "world"
+        message.child_frame_id = "base_link"
+        message.transform.translation.x = self.odometry_position.x / 100
+        message.transform.translation.y = self.odometry_position.y / 100
+        message.transform.translation.z = 0
+        message.transform.rotation.x = self.odometry_rotation[0]
+        message.transform.rotation.y = self.odometry_rotation[1]
+        message.transform.rotation.z = self.odometry_rotation[2]
+        message.transform.rotation.w = self.odometry_rotation[3]
+        self._last_odometry_message = message
+
+    def update_joint_states(self, joint_names, joint_positions):
+        """
+        :param joint_names: list of names of the joints
+        :param joint_positions: positions of joints
+        :return:
+        """
+        joint_state = JointState()
+        joint_state.name = joint_names
+        joint_state.position = joint_positions
+        joint_state.velocity = []
+        joint_state.effort = []
+        self._last_joint_state = joint_state
+
+    def run(self):
+        while not rospy.is_shutdown():
+            now = rospy.Time.now()
+            self._last_joint_state.header.stamp = now
+            self._last_odometry_message.header.stamp = now
+            self._join_state_publisher.publish(self._last_joint_state)
+            self._transform_brodcaster.sendTransform(self._last_odometry_message)
+            self.rate.sleep()
+
+
 class HexapodController(object):
     def __init__(self):
         super(HexapodController, self).__init__()
         rospy.init_node('hopper_controller')
         servo_driver = DynamixelDriver(search_usb_2_ax_port())
-        ik_driver = IkDriver(servo_driver)
+        self.join_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=10)
+        # publisher for tf and joint states
+        transform_broadcaster = tf2_ros.TransformBroadcaster()
+        transform_publisher = TransformPublisher(self.join_state_publisher, transform_broadcaster)
+        # build controller
+        ik_driver = IkDriver(servo_driver, transform_publisher)
         tripod_gait = TripodGait(ik_driver)
-        gait_engine = GaitEngine(tripod_gait)
+        gait_engine = GaitEngine(tripod_gait, transform_publisher)
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.sound_player = SoundPlayer(self.speech_publisher)
         self.controller = MovementController(gait_engine, self.sound_player)

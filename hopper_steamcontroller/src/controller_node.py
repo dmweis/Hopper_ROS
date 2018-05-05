@@ -6,7 +6,6 @@ import struct
 from threading import Thread
 import rospy
 from geometry_msgs.msg import Twist, Quaternion, Vector3
-from sensor_msgs.msg import Imu
 from std_msgs.msg import String
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
 
@@ -55,6 +54,7 @@ class SteamControllerRosHandler(object):
         self._right_pad_moved = 0
 
         self.pub = rospy.Publisher("hopper_move_command", Twist, queue_size=10)
+        self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.sc = SteamController(self.on_controller_data)
         # activate IMU
         self.sc._sendControl(struct.pack('>' + 'I' * 6,
@@ -84,13 +84,25 @@ class SteamControllerRosHandler(object):
         buttons_pressed = _xor & controller_data.buttons
 
         # buttons
-        # for button in list(SCButtons):
-        #     if button & buttons:
-        #         # button is down
-        #     if button & buttons_pressed:
-        #         # button was pressed this event
-        #     elif button & buttons_lifted:
-        #         # button was released this event
+        for button in list(SCButtons):
+            if button & buttons:
+                pass
+                # button is down
+            if button & buttons_pressed:
+                # button was pressed this event
+                if button == SCButtons.A:
+                    self.speech_pub.publish("bender")
+                elif button == SCButtons.B:
+                    self.speech_pub.publish("rick_and_morty")
+                elif button == SCButtons.X:
+                    self.speech_pub.publish("i_am_sorry")
+                elif button == SCButtons.X:
+                    self.speech_pub.publish("ultron")
+                elif button == SCButtons.RGRIP:
+                    self.speech_pub.publish("take_your_paws")
+            elif button & buttons_lifted:
+                pass
+                # button was released this event
 
         # pads
         robot_x = 0

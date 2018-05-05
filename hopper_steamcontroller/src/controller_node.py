@@ -3,6 +3,7 @@
 from __future__ import division
 import math
 import struct
+from threading import Thread
 import rospy
 from geometry_msgs.msg import Twist, Quaternion, Vector3
 from sensor_msgs.msg import Imu
@@ -63,7 +64,11 @@ class SteamControllerRosHandler(object):
                                         0x07000707,
                                         0x00301400,
                                         0x2f010000))
-        self.sc.run()
+        self.sc_thread = Thread(target=self.sc.run)
+        self.sc_thread.start()
+        rospy.spin()
+        self.sc.addExit()
+        self.sc_thread.join()
 
     def on_controller_data(self, controller, controller_data):
 

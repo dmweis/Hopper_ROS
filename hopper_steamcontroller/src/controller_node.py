@@ -96,7 +96,7 @@ class SteamControllerRosHandler(object):
                     self.speech_pub.publish("rick_and_morty")
                 elif button == SCButtons.X:
                     self.speech_pub.publish("i_am_sorry")
-                elif button == SCButtons.X:
+                elif button == SCButtons.Y:
                     self.speech_pub.publish("ultron")
                 elif button == SCButtons.RGRIP:
                     self.speech_pub.publish("take_your_paws")

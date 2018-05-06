@@ -108,7 +108,7 @@ class SteamControllerRosHandler(object):
                 elif button == SCButtons.RGRIP:
                     self.speech_pub.publish("take_your_paws")
                 elif button == SCButtons.RB:
-                    self._static_speed_mode != self._static_speed_mode
+                    self._static_speed_mode = not self._static_speed_mode
                     if self._static_speed_mode:
                         self.speech_pub.publish("static_speed_mode")
                     else:

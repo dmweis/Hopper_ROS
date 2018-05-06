@@ -56,6 +56,7 @@ class SteamControllerRosHandler(object):
 
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
+        self._static_speed_mode = False
         self._hopper_move_command_msg = HopperMoveCommand()
         self.sc = SteamController(self.on_controller_data)
         # activate IMU
@@ -88,14 +89,11 @@ class SteamControllerRosHandler(object):
         buttons_pressed = _xor & controller_data.buttons
 
         turbo = False
-        static_speed_mode = False
         # buttons
         for button in list(SCButtons):
             if button & buttons:
                 if button == SCButtons.LPAD:
                     turbo = True
-                if button == SCButtons.RB:
-                    static_speed_mode = True
                 # button is down
             if button & buttons_pressed:
                 # button was pressed this event
@@ -109,6 +107,12 @@ class SteamControllerRosHandler(object):
                     self.speech_pub.publish("ultron")
                 elif button == SCButtons.RGRIP:
                     self.speech_pub.publish("take_your_paws")
+                elif button == SCButtons.RB:
+                    self._static_speed_mode != self._static_speed_mode
+                    if self._static_speed_mode:
+                        self.speech_pub.publish("static_speed_mode")
+                    else:
+                        self.speech_pub.publish("adjusted_speed_mode")
             elif button & buttons_lifted:
                 pass
                 # button was released this event
@@ -152,7 +156,7 @@ class SteamControllerRosHandler(object):
         if controller_data.rtrig != 0:
             lift_height += 2 * scale_trigger(controller_data.rtrig)
             # print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
-        self.update_robot_command(robot_x, robot_y, robot_rot, lift_height=lift_height, turbo=turbo, static_speed_mode=static_speed_mode)
+        self.update_robot_command(robot_x, robot_y, robot_rot, lift_height=lift_height, turbo=turbo, static_speed_mode=self._static_speed_mode)
 
     def publisher_loop(self):
         rate = rospy.Rate(60)

@@ -271,7 +271,7 @@ class GaitEngine(object):
     def reset_relaxed_body_pose(self, speed_override=9):
         self.gait_sequencer.reset_relaxed_body_pose(speed_override)
 
-    def reset_relaxed_body_pose(self):
+    def get_relaxed_pose(self):
         return self.gait_sequencer.current_relaxed_position.clone()
 
     def _get_next_leg_combo(self):

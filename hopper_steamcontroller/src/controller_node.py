@@ -88,11 +88,14 @@ class SteamControllerRosHandler(object):
         buttons_pressed = _xor & controller_data.buttons
 
         turbo = False
+        static_speed_mode = False
         # buttons
         for button in list(SCButtons):
             if button & buttons:
                 if button == SCButtons.LPAD:
                     turbo = True
+                if button == SCButtons.RB
+                    static_speed_mode = True
                 # button is down
             if button & buttons_pressed:
                 # button was pressed this event
@@ -149,7 +152,7 @@ class SteamControllerRosHandler(object):
         if controller_data.rtrig != 0:
             lift_height += 2 * scale_trigger(controller_data.rtrig)
             # print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
-        self.update_robot_command(robot_x, robot_y, robot_rot, lift_height=lift_height, turbo=turbo)
+        self.update_robot_command(robot_x, robot_y, robot_rot, lift_height=lift_height, turbo=turbo, static_speed_mode=static_speed_mode)
 
     def publisher_loop(self):
         rate = rospy.Rate(60)

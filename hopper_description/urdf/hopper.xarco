@@ -7,6 +7,9 @@
     <material name="white">
         <color rgba="1 1 1 1"/>
     </material>
+    <material name="red">
+        <color rgba="255 0 0 1"/>
+    </material>
     <!-- main body -->
     <link name="base_link"/>
     <link name="body_link">
@@ -20,6 +23,20 @@
     <joint name="base_joint" type="fixed">
         <parent link="base_link" />
         <child link="body_link" />
+    </joint>
+    <!-- forward arrow -->
+    <link name="arrow">
+        <visual>
+            <geometry>
+                <cylinder length="0.2" radius="0.01"/>
+            </geometry>
+            <material name="red"/>
+            <origin rpy="0 1.57075 0 " xyz="0.1 0 0"/>
+        </visual>
+    </link>
+    <joint name="arrow_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="arrow" />
     </joint>
     <!-- laser attachment -->
     <link name="laser"/>

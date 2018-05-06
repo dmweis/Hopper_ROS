@@ -295,9 +295,9 @@ class TripodGait(object):
         start_position = self.last_written_position.clone()
         target_position = self.current_relaxed_position.clone() \
             .transform(Vector3(direction.x / 2, direction.y / 2, 0), lifted_legs) \
-            .turn(-angle / 2, lifted_legs) \
+            .turn(angle / 2, lifted_legs) \
             .transform(Vector3(-direction.x / 2, -direction.y / 2, 0), grounded_legs) \
-            .turn(angle / 2, grounded_legs)
+            .turn(-angle / 2, grounded_legs)
         transformation_vectors = target_position - start_position
         total_distance = transformation_vectors.longest_length()
         if distance_speed_multiplier is not None:

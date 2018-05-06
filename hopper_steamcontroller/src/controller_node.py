@@ -159,10 +159,9 @@ class SteamControllerRosHandler(object):
 
     def update_robot_command(self, x, y, rot, lift_height=2, static_speed_mode=False, turbo=False):
         move_command = HopperMoveCommand()
-        if math.sqrt(y ** 2 + x ** 2) > 0.2:
-            tmp = x
-            x = y * 0.06
-            y = tmp * 0.06
+        tmp = x
+        x = y * 0.06
+        y = tmp * 0.06
         if abs(rot) > 0.2:
             rot = -rot * 10
         move_command.direction.linear.x = x

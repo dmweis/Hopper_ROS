@@ -271,6 +271,9 @@ class GaitEngine(object):
     def reset_relaxed_body_pose(self, speed_override=9):
         self.gait_sequencer.reset_relaxed_body_pose(speed_override)
 
+    def reset_relaxed_body_pose(self):
+        return self.gait_sequencer.current_relaxed_position.clone()
+
     def _get_next_leg_combo(self):
         self._last_used_lifted_legs = LegFlags.RIGHT_TRIPOD if self._last_used_lifted_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
         return self._last_used_lifted_legs

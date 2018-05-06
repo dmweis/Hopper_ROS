@@ -129,6 +129,18 @@ class Vector2(object):
                    self.y == other.y
         return False
 
+    def __truediv__(self, other):
+        if isinstance(other, Vector2):
+            return Vector2(self.x / other.x, self.y / other.y)
+        elif isinstance(other, Number):
+            return Vector2(self.x / other, self.y / other)
+
+    def __mul__(self, other):
+        if isinstance(other, Vector2):
+            return Vector2(self.x * other.x, self.y * other.y)
+        elif isinstance(other, Number):
+            return Vector2(self.x * other, self.y * other)
+
     def length(self):
         return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2))
 

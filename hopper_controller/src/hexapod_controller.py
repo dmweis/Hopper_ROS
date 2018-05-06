@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
+from __future__ import division
 from threading import Thread
 import math
 import rospy
 from geometry_msgs.msg import Twist, TransformStamped
-from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, WalkingMode
+from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, WalkingMode, HopperMoveCommand
 from std_msgs.msg import String
 from sensor_msgs.msg import JointState
 import tf.transformations as transformations
@@ -107,10 +108,20 @@ class HexapodController(object):
         self.controller = MovementController(gait_engine, self.sound_player)
         self.telemetrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         rospy.Subscriber("hopper_move_command", Twist, self.update_direction)
+        rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
         rospy.Subscriber("hopper_walking_mode", WalkingMode, self.set_walking_mode)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose)
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
         self.controller.subscribe_to_telemetrics(self.publish_telemetrics_data)
+
+    def on_move_command(self, move_command):
+        direction = Vector2(move_command.direction.linear.x, move_command.direction.linear.y) * 1000
+        rotation = move_command.direction.angular.x
+        self.controller.set_move_command(direction,
+                                         rotation,
+                                         move_command.lift_height,
+                                         move_command.static_speed_mode,
+                                         move_command.turbo)
 
     def set_walking_mode(self, walking_mode):
         static_speed_mode_enabled = walking_mode.selectedMode == WalkingMode.STATIC_SPEED

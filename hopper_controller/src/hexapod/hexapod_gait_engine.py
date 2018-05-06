@@ -79,6 +79,7 @@ class MovementController(threading.Thread):
         self._relaxed_rotation = Vector3()
         self._lift_height = WalkingMode.DEFAULT_LIFT_HEIGHT
         self._static_speed_mode=False
+        self._turbo = False
         self._pose_update_ready = False
         self._telemetric_subscribers = []
         self._last_telemetrics_update_time = time()
@@ -102,7 +103,7 @@ class MovementController(threading.Thread):
         while self._keep_running:
             if self._should_move():
                 # execute move
-                self._gait_engine.step(self._direction, self._rotation, self._static_speed_mode, self._lift_height)
+                self._gait_engine.step(self._direction, self._rotation, self._static_speed_mode, self._lift_height, self._turbo)
                 self._relaxed = False
             elif not self._relaxed:
                 # go to relaxed
@@ -137,6 +138,21 @@ class MovementController(threading.Thread):
         self._relaxed_rotation = rotation
         self._pose_update_ready = True
 
+    def set_move_command(self, direction, rotation, lift_height, static_speed_mode, turbo):
+        """
+        :type direction: Vector2
+        :type rotation: float
+        :type lift_height: float
+        :type static_speed_mode: bool
+        :type turbo: bool
+
+        """
+        self._direction = direction
+        self._rotation = rotation
+        self._lift_height = lift_height
+        self._static_speed_mode = static_speed_mode
+        self._turbo = turbo
+
     def set_direction(self, direction, rotation):
         """
 
@@ -147,11 +163,12 @@ class MovementController(threading.Thread):
         self._rotation = rotation
 
     def set_walking_mode(self, static_speed_mode_enabled, lift_height):
+        if self._static_speed_mode != static_speed_mode_enabled:
+            if static_speed_mode_enabled:
+                self._speech_service.say("static_speed_mode")
+            else:
+                self._speech_service.say("adjusted_speed_mode")
         self._static_speed_mode = static_speed_mode_enabled
-        if static_speed_mode_enabled:
-            self._speech_service.say("static_speed_mode")
-        else:
-            self._speech_service.say("adjusted_speed_mode")
         self._lift_height = lift_height
 
     def stop_moving(self):
@@ -206,7 +223,7 @@ class GaitEngine(object):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)
         rospy.loginfo("Hexapod ready")
 
-    def step(self, direction, rotation, static_speed=False, lift_height=2):
+    def step(self, direction, rotation, static_speed=False, lift_height=2, turbo=False):
         """
         :type direction: Vector2
         :type rotation: float
@@ -218,7 +235,7 @@ class GaitEngine(object):
             if direction.is_zero() and abs(rotation) > 8:
                 # just rotation
                 self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6, leg_lift_height=lift_height)
-            elif direction.length() > 5.5:
+            elif turbo:
                 # fast walking
                 self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5, leg_lift_height=lift_height)
             else:

@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   rospy
   std_msgs
+  hopper_msgs
 )
 
 catkin_package()

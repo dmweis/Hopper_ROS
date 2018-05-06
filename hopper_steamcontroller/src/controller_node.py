@@ -56,6 +56,7 @@ class SteamControllerRosHandler(object):
 
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
+        self._hopper_move_command_msg = HopperMoveCommand()
         self.sc = SteamController(self.on_controller_data)
         # activate IMU
         self.sc._sendControl(struct.pack('>' + 'I' * 6,
@@ -66,7 +67,9 @@ class SteamControllerRosHandler(object):
                                         0x00301400,
                                         0x2f010000))
         self.sc_thread = Thread(target=self.sc.run)
+        self.publisher_thread = Thread(target=self.publisher_loop)
         self.sc_thread.start()
+        self.publisher_thread.start()
         rospy.spin()
         self.sc.addExit()
         self.sc_thread.join()
@@ -146,9 +149,15 @@ class SteamControllerRosHandler(object):
         if controller_data.rtrig != 0:
             lift_height += 2 * scale_trigger(controller_data.rtrig)
             # print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
-        self.send_robot_command(robot_x, robot_y, robot_rot, lift_height=lift_height, turbo=turbo)
+        self.update_robot_command(robot_x, robot_y, robot_rot, lift_height=lift_height, turbo=turbo)
 
-    def send_robot_command(self, x, y, rot, lift_height=2, static_speed_mode=False, turbo=False):
+    def publisher_loop(self):
+        rate = rospy.Rate(60)
+        while not rospy.is_shutdown():
+            self.pub.publish(self._hopper_move_command_msg)
+            rate.sleep()
+
+    def update_robot_command(self, x, y, rot, lift_height=2, static_speed_mode=False, turbo=False):
         move_command = HopperMoveCommand()
         if math.sqrt(y ** 2 + x ** 2) > 0.2:
             tmp = x
@@ -162,7 +171,7 @@ class SteamControllerRosHandler(object):
         move_command.lift_height = lift_height
         move_command.turbo = turbo
         move_command.static_speed_mode = static_speed_mode
-        self.pub.publish(move_command)
+        self._hopper_move_command_msg = move_command
 
 if __name__ == "__main__":
     SteamControllerRosHandler()

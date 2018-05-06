@@ -11,17 +11,20 @@ class BatteryStatusMonitor(object):
     def __init__(self):
         super(BatteryStatusMonitor, self).__init__()
         rospy.init_node("hopper_battery_monitor", anonymous=True)
-        self.lowest_recorded_voltage = 15.0
+        self.lowest_recorded_voltage = 24
+        self.first_message = True
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
-        # sleep for 30 seconds to prevent overcovering with init voice
-        # TODO: find a better way to do this
-        rospy.sleep(30)
         self.telemetrics_sub = rospy.Subscriber("hopper_telemetrics", HexapodTelemetrics, self.on_new_telemetrics, queue_size=1)
         rospy.spin()
 
     def on_new_telemetrics(self, message):
         voltages = [data.voltage for data in message.servos]
         mean_voltage = mean(voltages)
+        # skip the first message so that you don't get a warning if battery is alredy bellow some value
+        if self.first_message:
+            self.first_message = False
+            self.lowest_recorded_voltage = mean_voltage
+            return
         if mean_voltage < self.lowest_recorded_voltage:
             if mean_voltage < 10.5 and self.lowest_recorded_voltage > 10.5:
                 self.speech_publisher.publish("battery_critical")

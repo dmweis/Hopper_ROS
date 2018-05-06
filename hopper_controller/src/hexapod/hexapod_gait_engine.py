@@ -268,6 +268,9 @@ class GaitEngine(object):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
         self.gait_sequencer.execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
 
+    def reset_relaxed_body_pose(self, speed_override=9):
+        self.gait_sequencer.reset_relaxed_body_pose(speed_override)
+
     def _get_next_leg_combo(self):
         self._last_used_lifted_legs = LegFlags.RIGHT_TRIPOD if self._last_used_lifted_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
         return self._last_used_lifted_legs

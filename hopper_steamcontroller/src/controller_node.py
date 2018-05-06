@@ -88,7 +88,7 @@ class SteamControllerRosHandler(object):
         # buttons
         for button in list(SCButtons):
             if button & buttons:
-                if button == SCButtons.LPADTOUCH:
+                if button == SCButtons.LPAD:
                     turbo = True
                 # button is down
             if button & buttons_pressed:

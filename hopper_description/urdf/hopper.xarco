@@ -23,7 +23,7 @@
     <joint name="base_joint" type="fixed">
         <parent link="base_link" />
         <child link="body_link" />
-        <origin xyz="0 0 0" rpy="0 0 3.1416"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
     </joint>
     <!-- forward arrow -->
     <link name="arrow">

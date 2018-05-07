@@ -32,7 +32,7 @@
                 <cylinder length="0.2" radius="0.01"/>
             </geometry>
             <material name="red"/>
-            <origin rpy="0 1.57075 0 " xyz="0.1 0 0"/>
+            <origin xyz="0.1 0 0" rpy="0 ${pi/2} 0"/>
         </visual>
     </link>
     <joint name="arrow_joint" type="fixed">

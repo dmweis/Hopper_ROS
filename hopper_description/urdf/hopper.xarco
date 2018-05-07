@@ -23,7 +23,6 @@
     <joint name="base_joint" type="fixed">
         <parent link="base_link" />
         <child link="body_link" />
-        <origin xyz="0 0 0" rpy="0 0 0"/>
     </joint>
     <!-- forward arrow -->
     <link name="arrow">
@@ -44,6 +43,7 @@
     <joint name="body_laser_joint" type="fixed">
         <parent link="body_link" />
         <child link="laser" />
+        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
     </joint>
     <!-- xarco macro for leg -->
     <xacro:macro name="leg" params="side position x y angle axis">

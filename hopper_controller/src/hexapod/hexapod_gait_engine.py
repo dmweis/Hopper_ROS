@@ -79,6 +79,7 @@ class MovementController(threading.Thread):
         self._relaxed_rotation = Vector3()
         self._lift_height = WalkingMode.DEFAULT_LIFT_HEIGHT
         self._static_speed_mode=False
+        self._turbo = False
         self._pose_update_ready = False
         self._telemetric_subscribers = []
         self._last_telemetrics_update_time = time()
@@ -102,7 +103,7 @@ class MovementController(threading.Thread):
         while self._keep_running:
             if self._should_move():
                 # execute move
-                self._gait_engine.step(self._direction, self._rotation, self._static_speed_mode, self._lift_height)
+                self._gait_engine.step(self._direction, self._rotation, self._static_speed_mode, self._lift_height, self._turbo)
                 self._relaxed = False
             elif not self._relaxed:
                 # go to relaxed
@@ -137,6 +138,21 @@ class MovementController(threading.Thread):
         self._relaxed_rotation = rotation
         self._pose_update_ready = True
 
+    def set_move_command(self, direction, rotation, lift_height, static_speed_mode, turbo):
+        """
+        :type direction: Vector2
+        :type rotation: float
+        :type lift_height: float
+        :type static_speed_mode: bool
+        :type turbo: bool
+
+        """
+        self._direction = direction
+        self._rotation = rotation
+        self._lift_height = lift_height
+        self._static_speed_mode = static_speed_mode
+        self._turbo = turbo
+
     def set_direction(self, direction, rotation):
         """
 
@@ -147,11 +163,12 @@ class MovementController(threading.Thread):
         self._rotation = rotation
 
     def set_walking_mode(self, static_speed_mode_enabled, lift_height):
+        if self._static_speed_mode != static_speed_mode_enabled:
+            if static_speed_mode_enabled:
+                self._speech_service.say("static_speed_mode")
+            else:
+                self._speech_service.say("adjusted_speed_mode")
         self._static_speed_mode = static_speed_mode_enabled
-        if static_speed_mode_enabled:
-            self._speech_service.say("static_speed_mode")
-        else:
-            self._speech_service.say("adjusted_speed_mode")
         self._lift_height = lift_height
 
     def stop_moving(self):
@@ -193,7 +210,7 @@ class GaitEngine(object):
         super(GaitEngine, self).__init__()
         self.gait_sequencer = gait_sequencer
         self._transform_publisher = transform_publisher
-        self._last_used_forward_legs = LegFlags.LEFT_TRIPOD
+        self._last_used_lifted_legs = LegFlags.LEFT_TRIPOD
         self._speed = 9
 
     def stand_up(self):
@@ -206,7 +223,7 @@ class GaitEngine(object):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)
         rospy.loginfo("Hexapod ready")
 
-    def step(self, direction, rotation, static_speed=False, lift_height=2):
+    def step(self, direction, rotation, static_speed=False, lift_height=2, turbo=False):
         """
         :type direction: Vector2
         :type rotation: float
@@ -218,7 +235,7 @@ class GaitEngine(object):
             if direction.is_zero() and abs(rotation) > 8:
                 # just rotation
                 self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6, leg_lift_height=lift_height)
-            elif direction.length() > 5.5:
+            elif turbo:
                 # fast walking
                 self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5, leg_lift_height=lift_height)
             else:
@@ -251,9 +268,15 @@ class GaitEngine(object):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
         self.gait_sequencer.execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
 
+    def reset_relaxed_body_pose(self, speed_override=9):
+        self.gait_sequencer.reset_relaxed_body_pose(speed_override=speed_override)
+
+    def get_relaxed_pose(self):
+        return self.gait_sequencer.current_relaxed_position.clone()
+
     def _get_next_leg_combo(self):
-        self._last_used_forward_legs = LegFlags.RIGHT_TRIPOD if self._last_used_forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
-        return self._last_used_forward_legs
+        self._last_used_lifted_legs = LegFlags.RIGHT_TRIPOD if self._last_used_lifted_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
+        return self._last_used_lifted_legs
 
     def stop(self):
         self.gait_sequencer.stop()
@@ -290,39 +313,39 @@ class TripodGait(object):
         self.current_relaxed_position = RELAXED_POSITION.clone()
         self.execute_move(self.current_relaxed_position, speed_override)
 
-    def execute_step(self, direction, angle, forward_legs, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
-        backwards_legs = LegFlags.RIGHT_TRIPOD if forward_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
+    def execute_step(self, direction, angle, lifted_legs, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
+        grounded_legs = LegFlags.RIGHT_TRIPOD if lifted_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
         start_position = self.last_written_position.clone()
         target_position = self.current_relaxed_position.clone() \
-            .transform(Vector3(direction.x / 2, direction.y / 2, 0), forward_legs) \
-            .turn(-angle / 2, forward_legs) \
-            .transform(Vector3(-direction.x / 2, -direction.y / 2, 0), backwards_legs) \
-            .turn(angle / 2, backwards_legs)
+            .transform(Vector3(direction.x / 2, direction.y / 2, 0), lifted_legs) \
+            .turn(angle / 2, lifted_legs) \
+            .transform(Vector3(-direction.x / 2, -direction.y / 2, 0), grounded_legs) \
+            .turn(-angle / 2, grounded_legs)
         transformation_vectors = target_position - start_position
         total_distance = transformation_vectors.longest_length()
         if distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
-        self._step_to_position(forward_legs, target_position, speed, leg_lift_height)
+        self._step_to_position(lifted_legs, target_position, speed, leg_lift_height)
 
-    def go_to_relaxed(self, forward_legs, target_stance, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
+    def go_to_relaxed(self, lifted_legs, target_stance, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
         start_position = self.last_written_position.clone()
-        target_position = start_position.update_from_other(target_stance, forward_legs)
+        target_position = start_position.update_from_other(target_stance, lifted_legs)
         transformation_vectors = target_position - start_position
         normalized_transformation_vectors = transformation_vectors.clone()
         normalized_transformation_vectors.normalize_vectors()
         total_distance = transformation_vectors.longest_length()
         if distance_speed_multiplier is not None:
             speed = total_distance * distance_speed_multiplier
-        self._step_to_position(forward_legs, target_position, speed, leg_lift_height)
+        self._step_to_position(lifted_legs, target_position, speed, leg_lift_height)
 
-    def _step_to_position(self, forward_legs, target_position, speed, leg_lift_height):
+    def _step_to_position(self, lifted_legs, target_position, speed, leg_lift_height):
         start_position = self.last_written_position.clone()
         current_position_on_ground = start_position.clone()
         while current_position_on_ground.move_towards(target_position, speed / self._update_delay):
             new_position = current_position_on_ground.clone()
-            for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(forward_legs),
-                                                                  start_position.get_legs_as_list(forward_legs),
-                                                                  target_position.get_legs_as_list(forward_legs)):
+            for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(lifted_legs),
+                                                                  start_position.get_legs_as_list(lifted_legs),
+                                                                  target_position.get_legs_as_list(lifted_legs)):
                 new_leg_pos.z = start_leg_pos.z + get_height_for_step((new_leg_pos - start_leg_pos).length(),
                                                                       (target_leg_pos - start_leg_pos).length(),
                                                                       leg_lift_height)

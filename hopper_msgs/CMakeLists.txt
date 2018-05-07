@@ -20,6 +20,7 @@ add_message_files(
   HexapodTelemetrics.msg
   SonarSweep.msg
   WalkingMode.msg
+  HopperMoveCommand.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

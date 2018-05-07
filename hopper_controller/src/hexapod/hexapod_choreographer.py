@@ -86,12 +86,24 @@ def wave_hi(gait_engine):
     gait_engine.reset_relaxed_body_pose()
 
 
+def lift_legs(gait_engine):
+    speed = 12
+    gait_engine.reset_relaxed_body_pose(speed)
+    relaxed_pose = gait_engine.get_relaxed_pose().clone()
+    for leg in LegFlags.get_legs_as_list(LegFlags.ALL):
+        lifted_leg = relaxed_pose.transform(Vector3(z=5), leg).clone()
+        gait_engine.move_to_new_pose(lifted_leg, speed)
+        gait_engine.move_to_new_pose(relaxed_pose, speed)
+    gait_engine.reset_relaxed_body_pose()
+
+
 moves = {
     "happy_hand_dance": happy_hand_dance,
     "happy_dance": happy_dance,
     "happy_spin": happy_spin,
     "sad_emote": sad_emote,
-    "wave_hi": wave_hi
+    "wave_hi": wave_hi,
+    "lifted_legs": lift_legs
 }
 
 

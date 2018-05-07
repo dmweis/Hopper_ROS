@@ -6,6 +6,7 @@ import struct
 from threading import Thread
 import rospy
 from geometry_msgs.msg import Twist, Quaternion, Vector3
+from hopper_msgs.msg import HopperMoveCommand
 from std_msgs.msg import String
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
 
@@ -53,8 +54,10 @@ class SteamControllerRosHandler(object):
         self._left_pad_moved = 0
         self._right_pad_moved = 0
 
-        self.pub = rospy.Publisher("hopper_move_command", Twist, queue_size=10)
+        self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
+        self._static_speed_mode = False
+        self._hopper_move_command_msg = HopperMoveCommand()
         self.sc = SteamController(self.on_controller_data)
         # activate IMU
         self.sc._sendControl(struct.pack('>' + 'I' * 6,
@@ -65,7 +68,9 @@ class SteamControllerRosHandler(object):
                                         0x00301400,
                                         0x2f010000))
         self.sc_thread = Thread(target=self.sc.run)
+        self.publisher_thread = Thread(target=self.publisher_loop)
         self.sc_thread.start()
+        self.publisher_thread.start()
         rospy.spin()
         self.sc.addExit()
         self.sc_thread.join()
@@ -83,10 +88,12 @@ class SteamControllerRosHandler(object):
         buttons_lifted = _xor & previous_data.buttons
         buttons_pressed = _xor & controller_data.buttons
 
+        turbo = False
         # buttons
         for button in list(SCButtons):
             if button & buttons:
-                pass
+                if button == SCButtons.LPAD:
+                    turbo = True
                 # button is down
             if button & buttons_pressed:
                 # button was pressed this event
@@ -100,6 +107,12 @@ class SteamControllerRosHandler(object):
                     self.speech_pub.publish("ultron")
                 elif button == SCButtons.RGRIP:
                     self.speech_pub.publish("take_your_paws")
+                elif button == SCButtons.RB:
+                    self._static_speed_mode = not self._static_speed_mode
+                    if self._static_speed_mode:
+                        self.speech_pub.publish("static_speed_mode")
+                    else:
+                        self.speech_pub.publish("adjusted_speed_mode")
             elif button & buttons_lifted:
                 pass
                 # button was released this event
@@ -136,26 +149,35 @@ class SteamControllerRosHandler(object):
             robot_y = y
             # print "Stick is at X:{0:.3f} Y:{1:.3f}".format(x, y)
         
+        lift_height = 2
         # triggers
         # if controller_data.ltrig != 0:
         #     print "Left trigger at {0:.2f}".format(scale_trigger(controller_data.ltrig))
+        if controller_data.rtrig != 0:
+            lift_height += 2 * scale_trigger(controller_data.rtrig)
+            # print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
+        self.update_robot_command(robot_x, robot_y, robot_rot, lift_height=lift_height, turbo=turbo, static_speed_mode=self._static_speed_mode)
 
-        # if controller_data.rtrig != 0:
-        #     print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
-        self.send_robot_command(robot_x, robot_y, robot_rot)
+    def publisher_loop(self):
+        rate = rospy.Rate(60)
+        while not rospy.is_shutdown():
+            self.pub.publish(self._hopper_move_command_msg)
+            rate.sleep()
 
-    def send_robot_command(self, x, y, rot):
-        new_message = Twist()
-        if math.sqrt(y ** 2 + x ** 2) > 0.2:
-            tmp = x
-            x = y * 6
-            y = tmp * 6
+    def update_robot_command(self, x, y, rot, lift_height=2, static_speed_mode=False, turbo=False):
+        move_command = HopperMoveCommand()
+        tmp = x
+        x = y * 0.10
+        y = tmp * 0.10
         if abs(rot) > 0.2:
             rot = -rot * 10
-        new_message.linear.x = x
-        new_message.linear.y = y
-        new_message.angular.x = rot
-        self.pub.publish(new_message)
+        move_command.direction.linear.x = x
+        move_command.direction.linear.y = y
+        move_command.direction.angular.x = rot
+        move_command.lift_height = lift_height
+        move_command.turbo = turbo
+        move_command.static_speed_mode = static_speed_mode
+        self._hopper_move_command_msg = move_command
 
 if __name__ == "__main__":
     SteamControllerRosHandler()

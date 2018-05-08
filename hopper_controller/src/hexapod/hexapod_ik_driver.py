@@ -141,6 +141,14 @@ class Vector2(object):
         elif isinstance(other, Number):
             return Vector2(self.x * other, self.y * other)
 
+    def rotate_by_angle_rad(self, angle):
+        distance = math.hypot(self.x, self.y)
+        corrected_angle = math.atan2(self.x, self.y) + angle
+        new_vector = Vector2()
+        new_vector.x = math.sin(corrected_angle) * distance
+        new_vector.y = math.cos(corrected_angle) * distance
+        return new_vector
+
     def length(self):
         return math.sqrt(math.pow(self.x, 2) + math.pow(self.y, 2))
 

@@ -283,9 +283,10 @@ class GaitEngine(object):
 
 
 class TripodGait(object):
-    def __init__(self, ik_driver):
+    def __init__(self, ik_driver, height_publisher):
         super(TripodGait, self).__init__()
         self._ik_driver = ik_driver
+        self._height_publisher = height_publisher
         self._update_delay = 1000 / INTERPOLATION_FREQUENCY
         self.current_relaxed_position = RELAXED_POSITION.clone()
         self._ik_driver.setup()
@@ -298,7 +299,6 @@ class TripodGait(object):
 
     def update_relaxed_body_pose(self, transform, rotation, speed, legs=LegFlags.ALL):
         """
-
         :type transform: Vector3
         :type rotation: Vector3
         :type speed: float
@@ -351,14 +351,23 @@ class TripodGait(object):
                                                                       leg_lift_height)
             self.last_written_position = new_position
             self._ik_driver.move_legs_synced(self.last_written_position)
+            self.publish_height()
             sleep(self._update_delay * 0.001)
 
     def execute_move(self, target_position, speed):
         while self.last_written_position.move_towards(target_position, speed * 0.001 * self._update_delay):
             self._ik_driver.move_legs_synced(self.last_written_position)
+            self.publish_height()
             sleep(self._update_delay * 0.001)
         self._ik_driver.move_legs_synced(self.last_written_position)
+        self.publish_height()
         sleep(self._update_delay * 0.001)
+
+    def publish_height(self):
+        heights = [-x.z for x in self.last_written_position.get_legs_as_list(LegFlags.ALL)]
+        tallest = sorted(heights, reverse=True)
+        average_height = sum(tallest) / len(tallest)
+        self._height_publisher.update_height(average_height)
 
     def read_telemetrics(self):
         return self._ik_driver.read_telemetrics()

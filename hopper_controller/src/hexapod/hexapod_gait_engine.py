@@ -365,7 +365,7 @@ class TripodGait(object):
 
     def publish_height(self):
         heights = [-x.z for x in self.last_written_position.get_legs_as_list(LegFlags.ALL)]
-        tallest = sorted(heights, reverse=True)
+        tallest = sorted(heights, reverse=True)[:3]
         average_height = sum(tallest) / len(tallest)
         self._height_publisher.update_height(average_height)
 

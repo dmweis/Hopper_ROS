@@ -49,7 +49,7 @@ class JointStatePublisher(object):
         self._publisher = publisher
         self._last_message = JointState()
 
-    def update_joint_state(self, joint_names, joint_positions):
+    def update_joint_states(self, joint_names, joint_positions):
         """
         :param joint_names: list of names of the joints
         :param joint_positions: positions of joints

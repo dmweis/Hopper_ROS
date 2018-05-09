@@ -143,9 +143,9 @@ class HexapodController(object):
         transform_publisher = OdomPublisher(transform_broadcaster)
         height_publisher = HeightPublisher(transform_broadcaster)
         joint_state_publisher = JointStatePublisher(self.join_state_publisher)
-        self._message_publisher.add_message_sender(transform_publisher.publish())
-        self._message_publisher.add_message_sender(joint_state_publisher.publish())
-        self._message_publisher.add_message_sender(height_publisher.publish())
+        self._message_publisher.add_message_sender(transform_publisher.publish)
+        self._message_publisher.add_message_sender(joint_state_publisher.publish)
+        self._message_publisher.add_message_sender(height_publisher.publish)
         # build controller
         ik_driver = IkDriver(servo_driver, joint_state_publisher)
         tripod_gait = TripodGait(ik_driver, height_publisher)

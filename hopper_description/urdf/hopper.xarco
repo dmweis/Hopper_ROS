@@ -23,14 +23,11 @@
         <parent link="base_link" />
         <child link="body_link" />
     </joint>
-    <!-- <link name="base_stabilized">
-        <visual>
-            <geometry>
-                <box size="1 1 1" />
-            </geometry>
-            <material name="red"/>
-        </visual>
-    </link> -->
+    <link name="base_link"/>
+    <joint name="base_orientation_joint" type="fixed">
+        <parent link="base_stabilized" />
+        <child link="base_link" />
+    </joint>
     <!-- forward arrow -->
     <link name="arrow">
         <visual>

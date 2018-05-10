@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>hopper_emotion_core</name>
+  <name>hopper_emotion</name>
   <version>0.0.0</version>
-  <description>The hopper_emotion_core package</description>
+  <description>The hopper_emotion package</description>
 
   <maintainer email="dweis7@gmail.com">dweis</maintainer>
 

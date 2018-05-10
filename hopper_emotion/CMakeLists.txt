@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(hopper_emotion_core)
+project(hopper_emotion)
 
 find_package(catkin REQUIRED COMPONENTS
   message_generation

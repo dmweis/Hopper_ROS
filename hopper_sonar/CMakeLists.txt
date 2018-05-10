@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(hopper_sonar_driver)
+project(hopper_sonar)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy

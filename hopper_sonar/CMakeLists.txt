@@ -1,25 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(hopper_sonar_web_interface)
+project(hopper_sonar_driver)
 
 find_package(catkin REQUIRED COMPONENTS
+  rospy
   hopper_msgs
 )
 
-
 catkin_package()
 
-###########
-## Build ##
-###########
-
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
-
-#############
-## Install ##
-#############
+include_directories(${catkin_INCLUDE_DIRS})
 
 install(PROGRAMS
    src/app.js

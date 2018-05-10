@@ -68,9 +68,9 @@ class JointStatePublisher(object):
 
 
 class OdomPublisher(object):
-    def __init__(self, transform_brodcaster, parent_link_name="odom", child_link_name="base_footprint"):
+    def __init__(self, transform_broadcaster, parent_link_name="odom", child_link_name="base_footprint"):
         super(OdomPublisher, self).__init__()
-        self._transform_brodcaster = transform_brodcaster
+        self._transform_broadcaster = transform_broadcaster
         self._parent_link_name = parent_link_name
         self._child_link_name = child_link_name
         # initialize default tf transform
@@ -94,7 +94,6 @@ class OdomPublisher(object):
         current_rotation = transformations.euler_from_quaternion(self.odometry_rotation)[2]
         self.odometry_position += direction.rotate_by_angle_rad(current_rotation)
         message = TransformStamped()
-        message.header.stamp = rospy.Time.now()
         message.header.frame_id = self._parent_link_name
         message.child_frame_id = self._child_link_name
         message.transform.translation.x = self.odometry_position.x / 100
@@ -108,28 +107,32 @@ class OdomPublisher(object):
 
     def publish(self):
         self._last_odometry_message.header.stamp = rospy.Time.now()
-        self._transform_brodcaster.sendTransform(self._last_odometry_message)
+        self._transform_broadcaster.sendTransform(self._last_odometry_message)
 
 
 class HeightPublisher(object):
-    def __init__(self, transform_brodcaster, parent_link_name="base_footprint", child_link_name="base_stabilized"):
+    def __init__(self, transform_broadcaster, parent_link_name="base_footprint", child_link_name="base_stabilized"):
         super(HeightPublisher, self).__init__()
-        self._transform_brodcaster = transform_brodcaster
+        self._transform_broadcaster = transform_broadcaster
         self._parent_link_name = parent_link_name
         self._child_link_name = child_link_name
         # initialize default tf transform
         self._last_message = TransformStamped()
-        self._last_message.transform.rotation = transformations.quaternion_from_euler(0, 0, 0)
+        noraml_quaternion = transformations.quaternion_from_euler(0, 0, 0)
+        self._last_message.transform.rotation.x = noraml_quaternion[0]
+        self._last_message.transform.rotation.y = noraml_quaternion[1]
+        self._last_message.transform.rotation.z = noraml_quaternion[2]
+        self._last_message.transform.rotation.w = noraml_quaternion[3]
+        tf2_ros.
         self._last_message.header.frame_id = self._parent_link_name
         self._last_message.child_frame_id = self._child_link_name
-        self.odometry_position = Vector2()
 
     def update_height(self, height):
         self._last_message.transform.translation.z = height / 100
 
     def publish(self):
         self._last_message.header.stamp = rospy.Time.now()
-        self._transform_brodcaster.sendTransform(self._last_message)
+        self._transform_broadcaster.sendTransform(self._last_message)
 
 
 class HexapodController(object):

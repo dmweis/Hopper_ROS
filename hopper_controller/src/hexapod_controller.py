@@ -119,6 +119,7 @@ class HeightPublisher(object):
         self._child_link_name = child_link_name
         # initialize default tf transform
         self._last_message = TransformStamped()
+        self._last_message.transform.rotation = transformations.quaternion_from_euler(0, 0, 0)
         self._last_message.header.frame_id = self._parent_link_name
         self._last_message.child_frame_id = self._child_link_name
         self.odometry_position = Vector2()

@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   hopper_msgs
   sensor_msgs
   tf
+  nav_msgs
 )
 
 catkin_package()

@@ -4,9 +4,10 @@ from __future__ import division
 from threading import Thread
 import math
 import rospy
-from geometry_msgs.msg import Twist, TransformStamped
+from geometry_msgs.msg import Twist, TransformStamped, PoseWithCovariance, TwistWithCovariance
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, WalkingMode, HopperMoveCommand
 from std_msgs.msg import String
+from nav_msgs.msg import Odometry
 from sensor_msgs.msg import JointState
 import tf.transformations as transformations
 import tf2_ros
@@ -15,6 +16,18 @@ import tf2_ros
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
 from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
+
+
+def create_empty_transform_stamped(parent_name, child_name):
+    transform_stamped = TransformStamped()
+    transform_stamped.header.frame_id = parent_name
+    transform_stamped.child_frame_id = child_name
+    quaternion_zero = transformations.quaternion_from_euler(0, 0, 0)
+    transform_stamped.transform.rotation.x = quaternion_zero[0]
+    transform_stamped.transform.rotation.y = quaternion_zero[1]
+    transform_stamped.transform.rotation.z = quaternion_zero[2]
+    transform_stamped.transform.rotation.w = quaternion_zero[3]
+    return transform_stamped
 
 
 class SoundPlayer(object):
@@ -74,15 +87,15 @@ class OdomPublisher(object):
         self._parent_link_name = parent_link_name
         self._child_link_name = child_link_name
         # initialize default tf transform
-        self._last_odometry_message = TransformStamped()
-        self._last_odometry_message.header.frame_id = self._parent_link_name
-        self._last_odometry_message.child_frame_id = self._child_link_name
+        self._last_tf_odometry_message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)
         self.odometry_rotation = transformations.quaternion_from_euler(0, 0, 0)
-        self._last_odometry_message.transform.rotation.x = self.odometry_rotation[0]
-        self._last_odometry_message.transform.rotation.y = self.odometry_rotation[1]
-        self._last_odometry_message.transform.rotation.z = self.odometry_rotation[2]
-        self._last_odometry_message.transform.rotation.w = self.odometry_rotation[3]
         self.odometry_position = Vector2()
+        # init odometry message
+        self._last_odom_msg = Odometry()
+        self._last_odom_msg.header.frame_id = self._parent_link_name
+        self._last_odom_msg.child_frame_id = self._child_link_name
+
+
 
     def update_translation(self, direction, rotation):
         """
@@ -93,21 +106,14 @@ class OdomPublisher(object):
         self.odometry_rotation = transformations.quaternion_multiply(new_rotation, self.odometry_rotation)
         current_rotation = transformations.euler_from_quaternion(self.odometry_rotation)[2]
         self.odometry_position += direction.rotate_by_angle_rad(current_rotation)
-        message = TransformStamped()
-        message.header.frame_id = self._parent_link_name
-        message.child_frame_id = self._child_link_name
+        message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)
         message.transform.translation.x = self.odometry_position.x / 100
         message.transform.translation.y = self.odometry_position.y / 100
-        message.transform.translation.z = 0
-        message.transform.rotation.x = self.odometry_rotation[0]
-        message.transform.rotation.y = self.odometry_rotation[1]
-        message.transform.rotation.z = self.odometry_rotation[2]
-        message.transform.rotation.w = self.odometry_rotation[3]
-        self._last_odometry_message = message
+        self._last_tf_odometry_message = message
 
     def publish(self):
-        self._last_odometry_message.header.stamp = rospy.Time.now()
-        self._transform_broadcaster.sendTransform(self._last_odometry_message)
+        self._last_tf_odometry_message.header.stamp = rospy.Time.now()
+        self._transform_broadcaster.sendTransform(self._last_tf_odometry_message)
 
 
 class HeightPublisher(object):
@@ -117,14 +123,7 @@ class HeightPublisher(object):
         self._parent_link_name = parent_link_name
         self._child_link_name = child_link_name
         # initialize default tf transform
-        self._last_message = TransformStamped()
-        noraml_quaternion = transformations.quaternion_from_euler(0, 0, 0)
-        self._last_message.transform.rotation.x = noraml_quaternion[0]
-        self._last_message.transform.rotation.y = noraml_quaternion[1]
-        self._last_message.transform.rotation.z = noraml_quaternion[2]
-        self._last_message.transform.rotation.w = noraml_quaternion[3]
-        self._last_message.header.frame_id = self._parent_link_name
-        self._last_message.child_frame_id = self._child_link_name
+        self._last_message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)
 
     def update_height(self, height):
         self._last_message.transform.translation.z = height / 100

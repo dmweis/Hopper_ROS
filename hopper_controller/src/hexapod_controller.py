@@ -93,8 +93,9 @@ class JointStatePublisher(object):
 
 
 class OdomPublisher(object):
-    def __init__(self, transform_broadcaster, odom_publisher, parent_link_name="odom", child_link_name="base_footprint"):
+    def __init__(self, transform_broadcaster, odom_publisher, parent_link_name="odom", child_link_name="base_footprint", publish_to_tf=True):
         super(OdomPublisher, self).__init__()
+        self._publish_to_tf = publish_to_tf
         self._transform_broadcaster = transform_broadcaster
         self._odom_publisher = odom_publisher
         self._parent_link_name = parent_link_name
@@ -133,9 +134,11 @@ class OdomPublisher(object):
         self._last_odom_msg = odom_message
 
     def publish(self):
-        self._last_tf_odometry_message.header.stamp = rospy.Time.now()
-        self._last_odom_msg.header.stamp = rospy.Time.now()
-        self._transform_broadcaster.sendTransform(self._last_tf_odometry_message)
+        now = rospy.Time.now()
+        self._last_tf_odometry_message.header.stamp = now
+        self._last_odom_msg.header.stamp = now
+        if self._publish_to_tf:
+            self._transform_broadcaster.sendTransform(self._last_tf_odometry_message)
         self._odom_publisher.publish(self._last_odom_msg)
 
 
@@ -166,7 +169,8 @@ class HexapodController(object):
         # publisher for tf and joint states
         transform_broadcaster = tf2_ros.TransformBroadcaster()
         self._message_publisher = MessagePublisher()
-        transform_publisher = OdomPublisher(transform_broadcaster, self.odometry_publisher)
+        publish_odometry_to_tf = rospy.get_param("~/publish_odometry_to_tf", True)
+        transform_publisher = OdomPublisher(transform_broadcaster, self.odometry_publisher, publish_to_tf=publish_odometry_to_tf)
         height_publisher = HeightPublisher(transform_broadcaster)
         joint_state_publisher = JointStatePublisher(self.join_state_publisher)
         self._message_publisher.add_message_sender(transform_publisher.publish)

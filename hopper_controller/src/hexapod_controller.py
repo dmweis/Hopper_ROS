@@ -123,7 +123,6 @@ class HeightPublisher(object):
         self._last_message.transform.rotation.y = noraml_quaternion[1]
         self._last_message.transform.rotation.z = noraml_quaternion[2]
         self._last_message.transform.rotation.w = noraml_quaternion[3]
-        tf2_ros.
         self._last_message.header.frame_id = self._parent_link_name
         self._last_message.child_frame_id = self._child_link_name
 

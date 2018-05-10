@@ -169,7 +169,7 @@ class HexapodController(object):
         # publisher for tf and joint states
         transform_broadcaster = tf2_ros.TransformBroadcaster()
         self._message_publisher = MessagePublisher()
-        publish_odometry_to_tf = rospy.get_param("~/publish_odometry_to_tf", True)
+        publish_odometry_to_tf = rospy.get_param("~publish_odometry_to_tf", True)
         transform_publisher = OdomPublisher(transform_broadcaster, self.odometry_publisher, publish_to_tf=publish_odometry_to_tf)
         height_publisher = HeightPublisher(transform_broadcaster)
         joint_state_publisher = JointStatePublisher(self.join_state_publisher)

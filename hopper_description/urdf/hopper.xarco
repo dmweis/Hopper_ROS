@@ -3,12 +3,12 @@
     xmlns:xacro="http://ros.org/wiki/xacro" name="Hopper">
     <xacro:property name="coxa_length" value="0.052" />
     <xacro:property name="femur_length" value="0.065" />
-    <xacro:property name="pi" value="3.14159" />
+    <!-- <xacro:property name="pi" value="3.14159" /> -->
     <material name="white">
         <color rgba="1 1 1 1"/>
     </material>
     <material name="red">
-        <color rgba="255 0 0 1"/>
+        <color rgba="1 0 0 1"/>
     </material>
     <!-- main body -->
     <link name="base_link"/>
@@ -24,6 +24,14 @@
         <parent link="base_link" />
         <child link="body_link" />
     </joint>
+    <!-- <link name="base_stabilized">
+        <visual>
+            <geometry>
+                <box size="1 1 1" />
+            </geometry>
+            <material name="red"/>
+        </visual>
+    </link> -->
     <!-- forward arrow -->
     <link name="arrow">
         <visual>

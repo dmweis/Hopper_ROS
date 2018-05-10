@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hopper emotional display</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <img id="viewportImage" src="/image.jpeg">
+    <canvas id="drawBoard" width="1000" height="600"></canvas>
+    <script>
+        const socket = io({
+            transports: ['websocket']
+        });
+        const viewportImage = document.getElementById('viewportImage');
+        const drawCanvas = document.getElementById('drawBoard');
+        const drawContext = drawCanvas.getContext('2d');
+        drawContext.lineWidth = 5;
+        drawContext.strokeStyle = 'green';
+        drawContext.fillStyle = 'red';
+        drawContext.font = '48px courier';
+
+        socket.on('newImage', function (msg) {
+            // refresh image
+            viewportImage.src = "/image.jpeg?" + new Date().getTime();
+            // clear drawingBoard
+            drawContext.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+            // draw each face
+            msg.forEach(face => {
+                const faceRect = face.face_rectangle;
+                const emotions = face.face_attributes.emotions;
+                const name = face.identified_name;
+                let strongestEmotion = Object.keys(emotions).reduce((accumulator, key) => emotions[accumulator] > emotions[key] ? accumulator : key);
+                drawContext.strokeRect(faceRect.left, faceRect.top, faceRect.width, faceRect.height);
+                drawContext.fillText(strongestEmotion, faceRect.left, faceRect.top + faceRect.height + 48);
+                drawContext.fillText(name, faceRect.left, faceRect.top + faceRect.height + 90);
+            });
+        });
+    </script>
+</body>
+
+</html>

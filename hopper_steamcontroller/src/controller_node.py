@@ -9,6 +9,7 @@ from geometry_msgs.msg import Twist, Quaternion, Vector3
 from hopper_msgs.msg import HopperMoveCommand
 from std_msgs.msg import String
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
+import usb1
 
 AXIS_MIN = -32768
 AXIS_MAX = 32767
@@ -45,6 +46,15 @@ def check_button(buttons, button_flag):
     return buttons & button_flag == button_flag
 
 
+class RosSteamController(SteamController):
+    def run(self):
+        while not rospy.is_shutdown() and any(x.isSubmitted() for x in self._transfer_list):
+            self._ctx.handleEvents()
+            if len(self._cmsg) > 0:
+                cmsg = self._cmsg.pop()
+                self._sendControl(cmsg)
+
+
 class SteamControllerRosHandler(object):
     def __init__(self):
         super(SteamControllerRosHandler, self).__init__()
@@ -58,7 +68,7 @@ class SteamControllerRosHandler(object):
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self._static_speed_mode = False
         self._hopper_move_command_msg = HopperMoveCommand()
-        self.sc = SteamController(self.on_controller_data)
+        self.sc = RosSteamController(self.on_controller_data)
         # activate IMU
         self.sc._sendControl(struct.pack('>' + 'I' * 6,
                                         0x87153284,
@@ -72,7 +82,6 @@ class SteamControllerRosHandler(object):
         self.sc_thread.start()
         self.publisher_thread.start()
         rospy.spin()
-        self.sc._close()
         self.sc_thread.join()
 
     def on_controller_data(self, controller, controller_data):

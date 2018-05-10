@@ -30,6 +30,18 @@ def create_empty_transform_stamped(parent_name, child_name):
     return transform_stamped
 
 
+def create_empty_odometry_msg(parent_frame_name, child_frame_name):
+    odom = Odometry()
+    odom.header.frame_id = parent_frame_name
+    odom.child_frame_id = child_frame_name
+    quaternion_zero = transformations.quaternion_from_euler(0, 0, 0)
+    odom.pose.pose.orientation.x = quaternion_zero[0]
+    odom.pose.pose.orientation.y = quaternion_zero[1]
+    odom.pose.pose.orientation.z = quaternion_zero[2]
+    odom.pose.pose.orientation.w = quaternion_zero[3]
+    return odom
+
+
 class SoundPlayer(object):
     def __init__(self, speech_publisher):
         super(SoundPlayer, self).__init__()
@@ -81,9 +93,10 @@ class JointStatePublisher(object):
 
 
 class OdomPublisher(object):
-    def __init__(self, transform_broadcaster, parent_link_name="odom", child_link_name="base_footprint"):
+    def __init__(self, transform_broadcaster, odom_publisher, parent_link_name="odom", child_link_name="base_footprint"):
         super(OdomPublisher, self).__init__()
         self._transform_broadcaster = transform_broadcaster
+        self._odom_publisher = odom_publisher
         self._parent_link_name = parent_link_name
         self._child_link_name = child_link_name
         # initialize default tf transform
@@ -91,11 +104,7 @@ class OdomPublisher(object):
         self.odometry_rotation = transformations.quaternion_from_euler(0, 0, 0)
         self.odometry_position = Vector2()
         # init odometry message
-        self._last_odom_msg = Odometry()
-        self._last_odom_msg.header.frame_id = self._parent_link_name
-        self._last_odom_msg.child_frame_id = self._child_link_name
-
-
+        self._last_odom_msg = create_empty_odometry_msg(self._parent_link_name, self._child_link_name)
 
     def update_translation(self, direction, rotation):
         """
@@ -106,14 +115,28 @@ class OdomPublisher(object):
         self.odometry_rotation = transformations.quaternion_multiply(new_rotation, self.odometry_rotation)
         current_rotation = transformations.euler_from_quaternion(self.odometry_rotation)[2]
         self.odometry_position += direction.rotate_by_angle_rad(current_rotation)
-        message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)
-        message.transform.translation.x = self.odometry_position.x / 100
-        message.transform.translation.y = self.odometry_position.y / 100
-        self._last_tf_odometry_message = message
+        tf_message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)
+        tf_message.transform.translation.x = self.odometry_position.x / 100
+        tf_message.transform.translation.y = self.odometry_position.y / 100
+        tf_message.transform.rotation.x = self.odometry_rotation[0]
+        tf_message.transform.rotation.y = self.odometry_rotation[1]
+        tf_message.transform.rotation.z = self.odometry_rotation[2]
+        tf_message.transform.rotation.w = self.odometry_rotation[3]
+        odom_message = create_empty_odometry_msg(self._parent_link_name, self._child_link_name)
+        odom_message.pose.pose.position.x = self.odometry_position.x / 100
+        odom_message.pose.pose.position.y = self.odometry_position.y / 100
+        odom_message.pose.pose.orientation.x = self.odometry_rotation[0]
+        odom_message.pose.pose.orientation.y = self.odometry_rotation[1]
+        odom_message.pose.pose.orientation.z = self.odometry_rotation[2]
+        odom_message.pose.pose.orientation.w = self.odometry_rotation[3]
+        self._last_tf_odometry_message = tf_message
+        self._last_odom_msg = odom_message
 
     def publish(self):
         self._last_tf_odometry_message.header.stamp = rospy.Time.now()
+        self._last_odom_msg.header.stamp = rospy.Time.now()
         self._transform_broadcaster.sendTransform(self._last_tf_odometry_message)
+        self._odom_publisher.publish(self._last_odom_msg)
 
 
 class HeightPublisher(object):
@@ -139,10 +162,11 @@ class HexapodController(object):
         rospy.init_node('hopper_controller')
         servo_driver = DynamixelDriver(search_usb_2_ax_port())
         self.join_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=10)
+        self.odometry_publisher = rospy.Publisher('Odom', Odometry, queue_size=10)
         # publisher for tf and joint states
         transform_broadcaster = tf2_ros.TransformBroadcaster()
         self._message_publisher = MessagePublisher()
-        transform_publisher = OdomPublisher(transform_broadcaster)
+        transform_publisher = OdomPublisher(transform_broadcaster, self.odometry_publisher)
         height_publisher = HeightPublisher(transform_broadcaster)
         joint_state_publisher = JointStatePublisher(self.join_state_publisher)
         self._message_publisher.add_message_sender(transform_publisher.publish)

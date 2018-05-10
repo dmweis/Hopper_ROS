@@ -72,7 +72,7 @@ class SteamControllerRosHandler(object):
         self.sc_thread.start()
         self.publisher_thread.start()
         rospy.spin()
-        self.sc.addExit()
+        self.sc._close()
         self.sc_thread.join()
 
     def on_controller_data(self, controller, controller_data):

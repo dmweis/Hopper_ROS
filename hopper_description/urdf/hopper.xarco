@@ -3,7 +3,6 @@
     xmlns:xacro="http://ros.org/wiki/xacro" name="Hopper">
     <xacro:property name="coxa_length" value="0.052" />
     <xacro:property name="femur_length" value="0.065" />
-    <!-- <xacro:property name="pi" value="3.14159" /> -->
     <material name="white">
         <color rgba="1 1 1 1"/>
     </material>
@@ -51,7 +50,7 @@
     <joint name="body_laser_joint" type="fixed">
         <parent link="body_link" />
         <child link="laser" />
-        <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
+        <origin xyz="0.025 0 0.11" rpy="0 0 ${pi}"/>
     </joint>
     <!-- xarco macro for leg -->
     <xacro:macro name="leg" params="side position x y angle axis">

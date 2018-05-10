@@ -142,8 +142,8 @@ class Vector2(object):
             return Vector2(self.x * other, self.y * other)
 
     def rotate_by_angle_rad(self, angle):
-        distance = math.hypot(self.y, self.x)
-        corrected_angle = math.atan2(self.y, self.x) + angle
+        distance = math.hypot(self.x, self.y)
+        corrected_angle = math.atan2(self.x, self.y) + angle
         new_vector = Vector2()
         new_vector.x = math.sin(corrected_angle) * distance
         new_vector.y = math.cos(corrected_angle) * distance

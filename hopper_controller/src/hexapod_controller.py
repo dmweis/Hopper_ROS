@@ -204,8 +204,8 @@ class HexapodController(object):
 
     def on_nav_system_move_command(self, move_command):
         # convert directions from meter to cm
-        direction = Vector2(move_command.direction.linear.x, move_command.direction.linear.y) * 100
-        rotation = move_command.direction.angular.x
+        direction = Vector2(move_command.linear.x, move_command.linear.y) * 100
+        rotation = move_command.angular.z
         self.controller.set_move_command(direction,
                                          math.degrees(rotation),
                                          2,

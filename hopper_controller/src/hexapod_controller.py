@@ -196,7 +196,7 @@ class HexapodController(object):
         direction = Vector2(move_command.direction.linear.x, move_command.direction.linear.y) * 100
         rotation = move_command.direction.angular.x
         self.controller.set_move_command(direction,
-                                         rotation,
+                                         math.degrees(rotation),
                                          move_command.lift_height,
                                          move_command.static_speed_mode,
                                          move_command.turbo)

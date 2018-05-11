@@ -182,7 +182,7 @@ class SteamControllerRosHandler(object):
             rot = -rot * 10
         move_command.direction.linear.x = x
         move_command.direction.linear.y = y
-        move_command.direction.angular.x = rot
+        move_command.direction.angular.x = math.radians(rot)
         move_command.lift_height = lift_height
         move_command.turbo = turbo
         move_command.static_speed_mode = static_speed_mode

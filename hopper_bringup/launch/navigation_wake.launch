@@ -7,5 +7,6 @@
         <rosparam file="$(find hopper_navigation)/config/local_costmap_params.yaml" command="load" />
         <rosparam file="$(find hopper_navigation)/config/global_costmap_params.yaml" command="load" />
         <rosparam file="$(find hopper_navigation)/config/base_local_planner_params.yaml" command="load" />
+        <remap from="cmd_vel" to="hopper/cmd_vel"/>
     </node>
 </launch>

@@ -185,6 +185,7 @@ class HexapodController(object):
         self.controller = MovementController(gait_engine, self.sound_player)
         self.telemetrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         rospy.Subscriber("hopper_move_command", Twist, self.update_direction)
+        rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
         rospy.Subscriber("hopper_walking_mode", WalkingMode, self.set_walking_mode)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose)
@@ -200,6 +201,16 @@ class HexapodController(object):
                                          move_command.lift_height,
                                          move_command.static_speed_mode,
                                          move_command.turbo)
+
+    def on_nav_system_move_command(self, move_command):
+        # convert directions from meter to cm
+        direction = Vector2(move_command.direction.linear.x, move_command.direction.linear.y) * 100
+        rotation = move_command.direction.angular.x
+        self.controller.set_move_command(direction,
+                                         math.degrees(rotation),
+                                         2,
+                                         False,
+                                         False)
 
     def set_walking_mode(self, walking_mode):
         static_speed_mode_enabled = walking_mode.selectedMode == WalkingMode.STATIC_SPEED

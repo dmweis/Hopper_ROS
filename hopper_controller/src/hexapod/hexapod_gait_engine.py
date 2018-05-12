@@ -58,6 +58,8 @@ def get_height_for_step(distance, full_step_length, height):
     :type height: float
     :return:
     """
+    if full_step_length == 0:
+        return 0
     distance = distance / full_step_length
     return max(math.sin(distance * math.pi) * height, 0)
 

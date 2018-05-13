@@ -68,6 +68,7 @@ class SteamControllerRosHandler(object):
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self._static_speed_mode = False
         self._hopper_move_command_msg = HopperMoveCommand()
+        self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)
         # activate IMU
         self.sc._sendControl(struct.pack('>' + 'I' * 6,
@@ -170,7 +171,9 @@ class SteamControllerRosHandler(object):
     def publisher_loop(self):
         rate = rospy.Rate(60)
         while not rospy.is_shutdown():
-            self.pub.publish(self._hopper_move_command_msg)
+            if self._new_command_available:
+                self.pub.publish(self._hopper_move_command_msg)
+                self._new_command_available = False
             rate.sleep()
 
     def update_robot_command(self, x, y, rot, lift_height=2, static_speed_mode=False, turbo=False):
@@ -186,7 +189,16 @@ class SteamControllerRosHandler(object):
         move_command.lift_height = lift_height
         move_command.turbo = turbo
         move_command.static_speed_mode = static_speed_mode
-        self._hopper_move_command_msg = move_command
+        # check if message has changed
+        message_changed = (self._hopper_move_command_msg.direction.linear.x != move_command.direction.linear.x or
+        self._hopper_move_command_msg.direction.linear.y != move_command.direction.linear.y or
+        self._hopper_move_command_msg.direction.angular.z != move_command.direction.angular.z or
+        self._hopper_move_command_msg.lift_height != move_command.lift_height or
+        self._hopper_move_command_msg.turbo != move_command.turbo or
+        self._hopper_move_command_msg.static_speed_mode != move_command.static_speed_mode)
+        if message_changed:
+            self._hopper_move_command_msg = move_command
+            self._new_command_available = True
 
 if __name__ == "__main__":
     SteamControllerRosHandler()

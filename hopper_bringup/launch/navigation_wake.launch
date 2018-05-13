@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <include file="$(find hopper_bringup)/launch/display_slam.launch" />
+    <include file="$(find hopper_bringup)/launch/teleop.launch" />
+    <include file="$(find hopper_bringup)/launch/mapping.launch" />
     <node name="move_base" pkg="move_base" type="move_base">
         <rosparam file="$(find hopper_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
         <rosparam file="$(find hopper_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
@@ -9,4 +10,5 @@
         <rosparam file="$(find hopper_navigation)/config/base_local_planner_params.yaml" command="load" />
         <remap from="cmd_vel" to="hopper/cmd_vel"/>
     </node>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find hopper_description)/rviz/navigation.rviz" required="true" />
 </launch>

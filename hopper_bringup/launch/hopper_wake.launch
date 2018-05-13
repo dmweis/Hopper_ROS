@@ -11,4 +11,5 @@
     </node>
     <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py"/>
     <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>
+    <include file="$(find hopper_bringup)/launch/laser_wake.launch" />
 </launch>

@@ -4,6 +4,5 @@
 <launch>
     <node name="steam_controller" pkg="hopper_steamcontroller" type="controller_node.py" />
     <include file="$(find hopper_bringup)/launch/hopper_wake.launch" />
-    <include file="$(find hopper_bringup)/launch/laser_wake.launch" />
 </launch>
 

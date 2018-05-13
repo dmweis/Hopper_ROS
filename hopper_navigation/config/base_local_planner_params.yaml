@@ -1,14 +1,42 @@
 TrajectoryPlannerROS:
   max_vel_x: 0.1
-  min_vel_x: 0.01
+  min_vel_x: 0.05
   max_vel_y: 0.1
-  min_vel_y: 0.01
+  min_vel_y: 0.05
+
   max_vel_theta: 0.17
   min_vel_theta: -0.17
-  min_in_place_vel_theta: 0.01
+  min_in_place_vel_theta: 0.05
 
   acc_lim_theta: 0.17
   acc_lim_x: 0.1
   acc_lim_y: 0.1
 
   holonomic_robot: true
+  escape_velocity: -0.17
+
+  yaw_goal_tolerance: 0.2
+  xy_goal_tolerance: 0.2
+
+  dwa: true
+
+DWAPlannerROS:
+  max_vel_x: 0.1
+  min_vel_x: 0.05
+  max_vel_y: 0.1
+  min_vel_y: 0.05
+
+  max_trans_vel: 0.17
+  min_trans_vel: 0.05
+  max_rot_vel: 0.17
+  min_rot_vel: -0.17
+
+  acc_lim_theta: 0.17
+  acc_lim_x: 0.1
+  acc_lim_y: 0.1
+
+  holonomic_robot: true
+  escape_velocity: -0.17
+
+  yaw_goal_tolerance: 0.2
+  xy_goal_tolerance: 0.2

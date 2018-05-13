@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(hopper_navigation)
 
 find_package(catkin REQUIRED COMPONENTS
+  rospy
   geometry_msgs
   move_base
   nav_msgs

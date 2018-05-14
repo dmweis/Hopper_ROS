@@ -14,6 +14,7 @@ class OdometryMerger(Thread):
         self._slam_subscriber = rospy.Subscriber("poseupdate", PoseWithCovarianceStamped, self._on_slam_odometry)
         self._odometry_subscriber = rospy.Subscriber("robot_odom", Odometry, self._on_robot_odometry)
         self._merged_odometry_publisher = rospy.Publisher("odom", Odometry, queue_size=10)
+        self.start()
 
     def _on_slam_odometry(self, slam_odom):
         self._merged_message.header.frame_id = slam_odom.header.frame_id
@@ -31,3 +32,6 @@ class OdometryMerger(Thread):
             self._merged_message.header.stamp = rospy.Time.now()
             self._merged_odometry_publisher.publish(self._merged_message)
             rate.sleep()
+
+if __name__ == "__main__":
+    OdometryMerger()

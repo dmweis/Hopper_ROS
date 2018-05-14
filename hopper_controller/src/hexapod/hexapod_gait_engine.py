@@ -1,6 +1,7 @@
 from __future__ import division
 from __future__ import absolute_import
 from Queue import Queue
+import traceback
 import rospy
 from hopper_msgs.msg import WalkingMode
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
@@ -95,7 +96,7 @@ class MovementController(threading.Thread):
         except Exception as e:
             self._log_current_state()
             self._speech_service.say("ik_failure")
-            rospy.logfatal("Gait engine loop failed " + str(e))
+            rospy.logfatal("Gait engine loop failed " + str(e) + "\n" + traceback.format_exc())
             rospy.signal_shutdown("Gait engine loop failed " + str(e))
 
     def _main_controller_loop(self):

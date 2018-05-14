@@ -244,6 +244,7 @@ class GaitEngine(object):
             else:
                 # regular walking
                 self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3, leg_lift_height=lift_height)
+        self._transform_publisher.update_translation(Vector2(), 0)
 
     def relax_next_leg(self):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)

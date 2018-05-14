@@ -168,7 +168,7 @@ class HexapodController(object):
         rospy.init_node('hopper_controller')
         servo_driver = DynamixelDriver(search_usb_2_ax_port())
         self.join_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=10)
-        self.odometry_publisher = rospy.Publisher('Odom', Odometry, queue_size=10)
+        self.odometry_publisher = rospy.Publisher('robot_odom', Odometry, queue_size=10)
         # publisher for tf and joint states
         transform_broadcaster = tf2_ros.TransformBroadcaster()
         self._message_publisher = MessagePublisher()

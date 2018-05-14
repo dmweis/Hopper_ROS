@@ -198,7 +198,7 @@ class HexapodController(object):
     def on_move_command(self, move_command):
         # convert directions from meter to cm
         direction = Vector2(move_command.direction.linear.x, move_command.direction.linear.y) * 100
-        rotation = move_command.direction.angular.x
+        rotation = move_command.direction.angular.z
         self.controller.set_move_command(direction,
                                          math.degrees(rotation),
                                          move_command.lift_height,
@@ -227,7 +227,7 @@ class HexapodController(object):
 
     def update_direction(self, twist):
         direction = Vector2(twist.linear.x, twist.linear.y)
-        rotation = twist.angular.x
+        rotation = twist.angular.z
         self.controller.set_direction(direction, rotation)
 
     def update_pose(self, twist):

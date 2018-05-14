@@ -17,14 +17,14 @@ class OdometryMerger(Thread):
         self.start()
 
     def _on_slam_odometry(self, slam_odom):
-        self._merged_message.header.frame_id = slam_odom.header.frame_id
-        self._merged_message.child_frame_id = slam_odom.child_frame_id
         self._merged_message.pose.covariance = slam_odom.pose.covariance
         self._merged_message.pose.pose = slam_odom.pose.pose
 
     def _on_robot_odometry(self, robot_odom):
+        self._merged_message.header.frame_id = robot_odom.header.frame_id
+        self._merged_message.child_frame_id = robot_odom.child_frame_id
         self._merged_message.pose.covariance = robot_odom.twist.covariance
-        self._merged_message.twist.twist = robot_odom.pose.twist.twist
+        self._merged_message.twist.twist = robot_odom.twist.twist
 
     def run(self):
         rate = rospy.Rate(30)

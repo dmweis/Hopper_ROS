@@ -132,7 +132,7 @@ class OdomPublisher(object):
         odom_message.pose.pose.orientation.w = self.odometry_rotation[3]
         odom_message.twist.twist.linear.x = direction.x / 100
         odom_message.twist.twist.linear.y = direction.y / 100
-        odom_message.twist.twist.angular.z = math.radians(rotation.y)
+        odom_message.twist.twist.angular.z = math.radians(rotation)
         self._last_tf_odometry_message = tf_message
         self._last_odom_msg = odom_message
 

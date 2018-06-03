@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Regular web launch file -->
 <launch>
     <node name="rplidarNode" pkg="rplidar_ros" type="rplidarNode" output="screen">
         <param name="serial_port" type="string" value="/dev/ttyUSB0"/>
@@ -9,4 +8,3 @@
         <param name="angle_compensate" type="bool" value="true"/>
     </node>
 </launch>
-

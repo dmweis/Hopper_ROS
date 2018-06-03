@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!-- Regular web launch file -->
 <launch>
     <rosparam command="load" file="$(env HOME)/keys.yaml" />
     <include file="$(find freenect_launch)/launch/freenect.launch" />

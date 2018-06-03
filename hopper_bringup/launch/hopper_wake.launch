@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!-- Regular web launch file -->
 <launch>
     <node name="hopper_controller" pkg="hopper_controller" type="hexapod_controller.py" respawn="true" respawn_delay="5">
         <param name="publish_odometry_to_tf" value="false"/>

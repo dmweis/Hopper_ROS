@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!-- Regular web launch file -->
 <launch>
     <node name="steam_controller" pkg="hopper_steamcontroller" type="controller_node.py" />
     <include file="$(find hopper_bringup)/launch/hopper_wake.launch" />
 </launch>
-

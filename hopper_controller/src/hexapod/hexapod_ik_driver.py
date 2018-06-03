@@ -82,7 +82,7 @@ class Vector3(object):
             return self.clone() / self.length()
         return self.clone()
 
-    def move_towards(self, target, distance):
+    def move_towards_at_speed(self, target, distance):
         """
         Moves vector towards target vector traveling distance each step
         :param target: target vector towards which we are moving
@@ -104,6 +104,22 @@ class Vector3(object):
         self.y = new_position.y
         self.z = new_position.z
         return True
+
+    def get_moved_towards_by_portion(self, target, portion):
+        """
+        calculate position taht is moved towards target by portion between 0.0 and 1.0
+        :param target: target position
+        :param portion: number between 0.0 and 1.0 indicating how far along the line is the desired position
+        :return: position along the line
+        """
+        # if portion is exactly 0.0 or 1.0 return target or start to prevent creation of a new object
+        if portion <= 0.0:
+            return self
+        if portion >= 1.0:
+            return target
+        transform = target - self
+        return self + transform * portion
+
 
     def clone(self):
         return Vector3(self.x, self.y, self.z)
@@ -274,14 +290,35 @@ class LegPositions(object):
                                 self.left_rear * other,
                                 self.right_rear * other)
 
-    def move_towards(self, target, distance):
-        LF = self.left_front.move_towards(target.left_front, distance)
-        RF = self.right_front.move_towards(target.right_front, distance)
-        LM = self.left_middle.move_towards(target.left_middle, distance)
-        RM = self.right_middle.move_towards(target.right_middle, distance)
-        LR = self.left_rear.move_towards(target.left_rear, distance)
-        RR = self.right_rear.move_towards(target.right_rear, distance)
+    def move_towards_at_speed(self, target, distance):
+        LF = self.left_front.move_towards_at_speed(target.left_front, distance)
+        RF = self.right_front.move_towards_at_speed(target.right_front, distance)
+        LM = self.left_middle.move_towards_at_speed(target.left_middle, distance)
+        RM = self.right_middle.move_towards_at_speed(target.right_middle, distance)
+        LR = self.left_rear.move_towards_at_speed(target.left_rear, distance)
+        RR = self.right_rear.move_towards_at_speed(target.right_rear, distance)
         return LF or RF or LM or RM or LR or RR
+
+    def get_moved_towards_by_portion(self, target, portion):
+        """
+        Calculate new legs position moved towards a target by a portion of the transform
+        :param target: target leg positions
+        :param portion: portion of the journey finished
+        :return: new leg position on the transform between start and target
+        """
+        if portion <= 0.0:
+            return self
+        if portion >= 1.0:
+            return target
+        new_position = self.clone()
+        new_position.left_front = self.left_front.get_moved_towards_by_portion(target.left_front, portion)
+        new_position.right_front = self.right_front.get_moved_towards_by_portion(target.right_front, portion)
+        new_position.left_middle = self.left_middle.get_moved_towards_by_portion(target.left_middle, portion)
+        new_position.right_middle = self.right_middle.get_moved_towards_by_portion(target.right_middle, portion)
+        new_position.left_rear = self.left_rear.get_moved_towards_by_portion(target.left_rear, portion)
+        new_position.right_rear = self.right_rear.get_moved_towards_by_portion(target.right_rear, portion)
+        return new_position
+
 
     def transform(self, transform, legs=LegFlags.ALL):
         new_position = self.clone()

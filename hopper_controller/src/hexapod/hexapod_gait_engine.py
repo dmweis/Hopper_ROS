@@ -222,8 +222,8 @@ class GaitEngine(object):
             new_position = self.gait_sequencer.last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
             self.gait_sequencer.execute_move(new_position, 6)
         self.gait_sequencer.execute_move(WIDER_RELAXED_POSITION.clone(), 6)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._cycle_time)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._cycle_time)
         rospy.loginfo("Hexapod ready")
 
     def step(self, direction, rotation, static_speed=False, lift_height=2, turbo=False):
@@ -250,7 +250,7 @@ class GaitEngine(object):
         # self._transform_publisher.update_translation(Vector2(), 0)
 
     def relax_next_leg(self):
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._cycle_time)
 
     def move_to_new_pose(self, pose, speed_override=None):
         """
@@ -271,8 +271,8 @@ class GaitEngine(object):
 
     def sit_down(self):
         self.gait_sequencer.reset_relaxed_body_pose(speed_override=9)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, distance_speed_multiplier=2)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._cycle_time)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._cycle_time)
         self.gait_sequencer.execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
 
     def reset_relaxed_body_pose(self, speed_override=9):
@@ -295,6 +295,7 @@ class TripodGait(object):
         self._ik_driver = ik_driver
         self._height_publisher = height_publisher
         self._velocity_publisher = velocity_publisher
+        self._ros_rate = rospy.Rate(INTERPOLATION_FREQUENCY)
         self._update_delay = 1000 / INTERPOLATION_FREQUENCY
         self.current_relaxed_position = RELAXED_POSITION.clone()
         self._ik_driver.setup()
@@ -351,21 +352,24 @@ class TripodGait(object):
         self._step_to_position(lifted_legs, target_position, velocity.length(), leg_lift_height)
         self._velocity_publisher.update_velocity(Vector2(), 0)
 
-    def go_to_relaxed(self, lifted_legs, target_stance, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
+    def go_to_relaxed(self, lifted_legs, target_stance, cycle_length, leg_lift_height=2):
         start_position = self.last_written_position.clone()
         target_position = start_position.update_from_other(target_stance, lifted_legs)
         transformation_vectors = target_position - start_position
         normalized_transformation_vectors = transformation_vectors.clone()
         normalized_transformation_vectors.normalize_vectors()
         total_distance = transformation_vectors.longest_length()
-        if distance_speed_multiplier is not None:
-            speed = total_distance * distance_speed_multiplier
-        self._step_to_position(lifted_legs, target_position, speed, leg_lift_height)
+        self._step_to_position(lifted_legs, target_position, cycle_length, leg_lift_height)
 
-    def _step_to_position(self, lifted_legs, target_position, speed, leg_lift_height):
+    def _step_to_position(self, lifted_legs, target_position, cycle_length, leg_lift_height):
         start_position = self.last_written_position.clone()
         current_position_on_ground = start_position.clone()
-        while current_position_on_ground.move_towards(target_position, speed / self._update_delay):
+        start_time = rospy.get_time()
+        step_time = 0.0
+        while step_time <= cycle_length:
+            step_time = start_time - rospy.get_time()
+            step_portion = cycle_length / step_time
+            current_position_on_ground = start_position.get_moved_towards_by_portion(target_position, step_portion)
             new_position = current_position_on_ground.clone()
             for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(lifted_legs),
                                                                   start_position.get_legs_as_list(lifted_legs),
@@ -376,16 +380,16 @@ class TripodGait(object):
             self.last_written_position = new_position
             self._ik_driver.move_legs_synced(self.last_written_position)
             self.publish_height()
-            sleep(self._update_delay * 0.001)
+            self._ros_rate.sleep()
 
     def execute_move(self, target_position, speed):
-        while self.last_written_position.move_towards(target_position, speed * 0.001 * self._update_delay):
+        while self.last_written_position.move_towards_at_speed(target_position, speed * 0.001 * self._update_delay):
             self._ik_driver.move_legs_synced(self.last_written_position)
             self.publish_height()
-            sleep(self._update_delay * 0.001)
+            self._ros_rate.sleep()
         self._ik_driver.move_legs_synced(self.last_written_position)
         self.publish_height()
-        sleep(self._update_delay * 0.001)
+        self._ros_rate.sleep()
 
     def publish_height(self):
         heights = [-x.z for x in self.last_written_position.get_legs_as_list(LegFlags.ALL)]

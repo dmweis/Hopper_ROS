@@ -323,7 +323,7 @@ class TripodGait(object):
             .transform(grounded_legs_vector_to_relaxed, grounded_legs) \
             .transform(Vector3(-distance.x / 2, -distance.y / 2, 0), grounded_legs) \
             .turn(-angle / 2, grounded_legs)
-        self._step_to_position(lifted_legs, target_position, velocity.length(), leg_lift_height)
+        self._step_to_position(lifted_legs, target_position, cycle_length, leg_lift_height)
         self._velocity_publisher.update_velocity(Vector2(), 0)
 
     def go_to_relaxed(self, lifted_legs, target_stance, cycle_length, leg_lift_height=2):
@@ -337,7 +337,7 @@ class TripodGait(object):
         step_time = 0.0
         while step_time <= cycle_length:
             step_time = rospy.get_time() - start_time
-            step_portion = cycle_length / step_time
+            step_portion = step_time / cycle_length
             current_position_on_ground = start_position.get_moved_towards_by_portion(target_position, step_portion)
             new_position = current_position_on_ground.clone()
             for new_leg_pos, start_leg_pos, target_leg_pos in zip(new_position.get_legs_as_list(lifted_legs),

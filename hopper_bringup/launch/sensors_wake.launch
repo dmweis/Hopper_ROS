@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <include file="$(find hopper_bringup)/launch/laser_wake.launch" />
+    <include file="$(find hopper_bringup)/launch/raspicam.launch" />
+</launch>

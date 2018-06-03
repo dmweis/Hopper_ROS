@@ -231,20 +231,23 @@ class GaitEngine(object):
         :type direction: Vector2
         :type rotation: float
         """
-        self._transform_publisher.update_translation(direction, rotation)
-        if static_speed:
-            self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed, leg_lift_height=lift_height)
-        else:
-            if direction.is_zero() and abs(rotation) > 8:
-                # just rotation
-                self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6, leg_lift_height=lift_height)
-            elif turbo:
-                # fast walking
-                self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5, leg_lift_height=lift_height)
-            else:
-                # regular walking
-                self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3, leg_lift_height=lift_height)
-        self._transform_publisher.update_translation(Vector2(), 0)
+        self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), self._cycle_time,
+                                         leg_lift_height=lift_height)
+
+        # self._transform_publisher.update_translation(direction, rotation)
+        # if static_speed:
+        #     self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed, leg_lift_height=lift_height)
+        # else:
+        #     if direction.is_zero() and abs(rotation) > 8:
+        #         # just rotation
+        #         self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6, leg_lift_height=lift_height)
+        #     elif turbo:
+        #         # fast walking
+        #         self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5, leg_lift_height=lift_height)
+        #     else:
+        #         # regular walking
+        #         self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3, leg_lift_height=lift_height)
+        # self._transform_publisher.update_translation(Vector2(), 0)
 
     def relax_next_leg(self):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, distance_speed_multiplier=2)

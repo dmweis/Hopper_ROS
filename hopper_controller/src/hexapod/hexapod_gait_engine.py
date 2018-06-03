@@ -367,7 +367,7 @@ class TripodGait(object):
         start_time = rospy.get_time()
         step_time = 0.0
         while step_time <= cycle_length:
-            step_time = start_time - rospy.get_time()
+            step_time = rospy.get_time() - start_time
             step_portion = cycle_length / step_time
             current_position_on_ground = start_position.get_moved_towards_by_portion(target_position, step_portion)
             new_position = current_position_on_ground.clone()

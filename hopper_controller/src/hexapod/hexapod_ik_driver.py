@@ -396,6 +396,16 @@ class LegPositions(object):
         RR = self.right_rear.length()
         return max(map(abs, [LF, RF, LM, RM, LR, RR]))
 
+    def get_center_point(self, legs=LegFlags.ALL):
+        all_legs = self.get_legs_as_list(legs)
+        all_x = map(lambda leg: leg.x, all_legs)
+        x = (min(all_x) + max(all_x)) / 2
+        all_y = map(lambda leg: leg.y, all_legs)
+        y = (min(all_y) + max(all_y)) /2
+        all_z = map(lambda leg: leg.z, all_legs)
+        z = (min(all_z) + max(all_z)) / 2
+        return Vector3(x, y, z)
+
     def __str__(self):
         return 'LF: {} RF: {} LM: {} RM: {} LR: {} RR: {}'.format(self.left_front, self.right_front, self.left_middle, self.right_middle, self.left_rear, self.right_rear)
 

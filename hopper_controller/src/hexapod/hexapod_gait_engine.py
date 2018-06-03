@@ -338,9 +338,12 @@ class TripodGait(object):
         grounded_legs = LegFlags.RIGHT_TRIPOD if lifted_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
         start_position = self.last_written_position.clone()
         # calculate target position
+        grounded_legs_vector_to_relaxed = self.current_relaxed_position.get_center_point(grounded_legs) - start_position.get_center_point(grounded_legs)
         target_position = self.current_relaxed_position.clone() \
             .transform(Vector3(distance.x / 2, distance.y / 2, 0), lifted_legs) \
             .turn(angle / 2, lifted_legs) \
+            .update_from_other(start_position, grounded_legs) \
+            .transform(grounded_legs_vector_to_relaxed, grounded_legs) \
             .transform(Vector3(-distance.x / 2, -distance.y / 2, 0), grounded_legs) \
             .turn(-angle / 2, grounded_legs)
         transformation_vectors = target_position - start_position

@@ -3,11 +3,10 @@ from __future__ import absolute_import
 from Queue import Queue
 import traceback
 import rospy
-from hopper_msgs.msg import WalkingMode
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 from .hexapod_choreographer import execute_choreography
 import threading
-from time import sleep, time
+from time import time
 import math
 
 INTERPOLATION_FREQUENCY = 30
@@ -75,13 +74,12 @@ class MovementController(threading.Thread):
         self._speech_service = speech_service
         self._keep_running = True
         self._relaxed = True
-        self._direction = Vector2()
-        self._rotation = 0
+        self._velocity = Vector2()
+        self._theta = 0
+        self._cycle_time = 1.0
         self._relaxed_transformation = Vector3()
         self._relaxed_rotation = Vector3()
-        self._lift_height = WalkingMode.DEFAULT_LIFT_HEIGHT
-        self._static_speed_mode=False
-        self._turbo = False
+        self._lift_height = 2
         self._pose_update_ready = False
         self._telemetric_subscribers = []
         self._last_telemetrics_update_time = time()
@@ -105,7 +103,7 @@ class MovementController(threading.Thread):
         while self._keep_running:
             if self._should_move():
                 # execute move
-                self._gait_engine.step(self._direction, self._rotation, self._static_speed_mode, self._lift_height, self._turbo)
+                self._gait_engine.step(self._velocity, self._theta, self._cycle_time, self._lift_height)
                 self._relaxed = False
             elif not self._relaxed:
                 # go to relaxed
@@ -140,20 +138,18 @@ class MovementController(threading.Thread):
         self._relaxed_rotation = rotation
         self._pose_update_ready = True
 
-    def set_move_command(self, direction, rotation, lift_height, static_speed_mode, turbo):
+    def set_move_command(self, direction, rotation, cycle_time, lift_height):
         """
         :type direction: Vector2
         :type rotation: float
+        :type cycle_time: float
         :type lift_height: float
-        :type static_speed_mode: bool
-        :type turbo: bool
 
         """
-        self._direction = direction
-        self._rotation = rotation
+        self._velocity = direction
+        self._theta = rotation
         self._lift_height = lift_height
-        self._static_speed_mode = static_speed_mode
-        self._turbo = turbo
+        self._cycle_time = cycle_time
 
     def set_direction(self, direction, rotation):
         """
@@ -161,21 +157,12 @@ class MovementController(threading.Thread):
         :type direction: Vector2
         :type rotation: float
         """
-        self._direction = direction
-        self._rotation = rotation
-
-    def set_walking_mode(self, static_speed_mode_enabled, lift_height):
-        if self._static_speed_mode != static_speed_mode_enabled:
-            if static_speed_mode_enabled:
-                self._speech_service.say("static_speed_mode")
-            else:
-                self._speech_service.say("adjusted_speed_mode")
-        self._static_speed_mode = static_speed_mode_enabled
-        self._lift_height = lift_height
+        self._velocity = direction
+        self._theta = rotation
 
     def stop_moving(self):
-        self._direction = Vector2()
-        self._rotation = 0
+        self._velocity = Vector2()
+        self._theta = 0
 
     def subscribe_to_telemetrics(self, callback):
         self._telemetric_subscribers.append(callback)
@@ -189,7 +176,7 @@ class MovementController(threading.Thread):
         self._gait_engine.stop()
 
     def _should_move(self):
-        return not self._direction.is_zero() or self._rotation != 0
+        return not self._velocity.is_zero() or self._theta != 0
 
     def _check_and_execute_scheduled_move(self):
         while not self._command_queue.empty():
@@ -197,8 +184,8 @@ class MovementController(threading.Thread):
             execute_choreography(self._gait_engine, command)
 
     def _log_current_state(self):
-        data = {'direction': self._direction,
-                'rotation': self._rotation,
+        data = {'direction': self._velocity,
+                'rotation': self._theta,
                 'relaxed_transformation': self._relaxed_transformation,
                 'relaxed_rotation': self._relaxed_rotation}
         rospy.loginfo("Current hexapod state: %s", str(data))
@@ -214,7 +201,7 @@ class GaitEngine(object):
         self._transform_publisher = transform_publisher
         self._last_used_lifted_legs = LegFlags.LEFT_TRIPOD
         # time each step takes in seconds
-        self._cycle_time = 1.0
+        self._default_cycle_time = 1.0
 
     def stand_up(self):
         rospy.loginfo("Hexapod gait engine started")
@@ -222,35 +209,23 @@ class GaitEngine(object):
             new_position = self.gait_sequencer.last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
             self.gait_sequencer.execute_move(new_position, 6)
         self.gait_sequencer.execute_move(WIDER_RELAXED_POSITION.clone(), 6)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._cycle_time)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._cycle_time)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)
         rospy.loginfo("Hexapod ready")
 
-    def step(self, direction, rotation, static_speed=False, lift_height=2, turbo=False):
+    def step(self, direction, rotation, cycle_time, lift_height=2.0):
         """
         :type direction: Vector2
         :type rotation: float
+        :type cycle_time: float
+        :type lift_height: float
         """
-        self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), self._cycle_time,
+        self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(),
+                                         cycle_time,
                                          leg_lift_height=lift_height)
 
-        # self._transform_publisher.update_translation(direction, rotation)
-        # if static_speed:
-        #     self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), speed=self._speed, leg_lift_height=lift_height)
-        # else:
-        #     if direction.is_zero() and abs(rotation) > 8:
-        #         # just rotation
-        #         self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=6, leg_lift_height=lift_height)
-        #     elif turbo:
-        #         # fast walking
-        #         self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=5, leg_lift_height=lift_height)
-        #     else:
-        #         # regular walking
-        #         self.gait_sequencer.execute_step(direction, rotation, self._get_next_leg_combo(), distance_speed_multiplier=3, leg_lift_height=lift_height)
-        # self._transform_publisher.update_translation(Vector2(), 0)
-
     def relax_next_leg(self):
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._cycle_time)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)
 
     def move_to_new_pose(self, pose, speed_override=None):
         """
@@ -261,7 +236,7 @@ class GaitEngine(object):
         self.gait_sequencer.execute_move(pose, speed_override)
 
     def update_relaxed_body_pose(self, transform, rotation, legs=LegFlags.ALL, speed_override=None):
-        speed = self._speed
+        speed = 9
         if speed_override is not None:
             speed = speed_override
         self.gait_sequencer.update_relaxed_body_pose(transform, rotation, speed, legs)
@@ -271,8 +246,8 @@ class GaitEngine(object):
 
     def sit_down(self):
         self.gait_sequencer.reset_relaxed_body_pose(speed_override=9)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._cycle_time)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._cycle_time)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._default_cycle_time)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._default_cycle_time)
         self.gait_sequencer.execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
 
     def reset_relaxed_body_pose(self, speed_override=9):
@@ -322,7 +297,7 @@ class TripodGait(object):
         self.current_relaxed_position = RELAXED_POSITION.clone()
         self.execute_move(self.current_relaxed_position, speed_override)
 
-    def execute_step(self, velocity, theta, lifted_legs, cycle_length, leg_lift_height=2):
+    def execute_step(self, velocity, theta, lifted_legs, cycle_length, leg_lift_height=2.0):
         """
         :param velocity: Velocities in X and Y in cm/s
         :param theta: rotation speed in degrees per second
@@ -348,23 +323,16 @@ class TripodGait(object):
             .transform(grounded_legs_vector_to_relaxed, grounded_legs) \
             .transform(Vector3(-distance.x / 2, -distance.y / 2, 0), grounded_legs) \
             .turn(-angle / 2, grounded_legs)
-        transformation_vectors = target_position - start_position
-        total_distance = transformation_vectors.longest_length()
         self._step_to_position(lifted_legs, target_position, velocity.length(), leg_lift_height)
         self._velocity_publisher.update_velocity(Vector2(), 0)
 
     def go_to_relaxed(self, lifted_legs, target_stance, cycle_length, leg_lift_height=2):
         start_position = self.last_written_position.clone()
         target_position = start_position.update_from_other(target_stance, lifted_legs)
-        transformation_vectors = target_position - start_position
-        normalized_transformation_vectors = transformation_vectors.clone()
-        normalized_transformation_vectors.normalize_vectors()
-        total_distance = transformation_vectors.longest_length()
         self._step_to_position(lifted_legs, target_position, cycle_length, leg_lift_height)
 
     def _step_to_position(self, lifted_legs, target_position, cycle_length, leg_lift_height):
         start_position = self.last_written_position.clone()
-        current_position_on_ground = start_position.clone()
         start_time = rospy.get_time()
         step_time = 0.0
         while step_time <= cycle_length:
@@ -400,4 +368,3 @@ class TripodGait(object):
 
     def read_telemetrics(self):
         return self._ik_driver.read_telemetrics()
-

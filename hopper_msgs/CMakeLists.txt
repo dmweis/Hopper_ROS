@@ -19,7 +19,6 @@ add_message_files(
   ServoTelemetrics.msg
   HexapodTelemetrics.msg
   SonarSweep.msg
-  WalkingMode.msg
   HopperMoveCommand.msg
 )
 

@@ -1,4 +1,5 @@
+float32 DEFAULT_LIFT_HEIGHT=2
+float32 DEFAULT_CYCLE_TIME=1
 geometry_msgs/Twist direction
 float32 lift_height
-bool turbo
-bool static_speed_mode
+float32 cycle_time

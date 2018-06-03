@@ -66,7 +66,6 @@ class SteamControllerRosHandler(object):
 
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
-        self._static_speed_mode = False
         self._hopper_move_command_msg = HopperMoveCommand()
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)
@@ -103,7 +102,7 @@ class SteamControllerRosHandler(object):
         for button in list(SCButtons):
             if button & buttons:
                 if button == SCButtons.LPAD:
-                    turbo = True
+                    pass
                 # button is down
             if button & buttons_pressed:
                 # button was pressed this event
@@ -118,11 +117,7 @@ class SteamControllerRosHandler(object):
                 elif button == SCButtons.RGRIP:
                     self.speech_pub.publish("take_your_paws")
                 elif button == SCButtons.RB:
-                    self._static_speed_mode = not self._static_speed_mode
-                    if self._static_speed_mode:
-                        self.speech_pub.publish("static_speed_mode")
-                    else:
-                        self.speech_pub.publish("adjusted_speed_mode")
+                    pass
             elif button & buttons_lifted:
                 pass
                 # button was released this event
@@ -160,13 +155,15 @@ class SteamControllerRosHandler(object):
             # print "Stick is at X:{0:.3f} Y:{1:.3f}".format(x, y)
         
         lift_height = 2
+        cycle_time = 1
         # triggers
-        # if controller_data.ltrig != 0:
-        #     print "Left trigger at {0:.2f}".format(scale_trigger(controller_data.ltrig))
+        if controller_data.ltrig != 0:
+            lift_height -= 0.5 * scale_trigger(controller_data.ltrig)
+            # print "Left trigger at {0:.2f}".format(scale_trigger(controller_data.ltrig))
         if controller_data.rtrig != 0:
             lift_height += 2 * scale_trigger(controller_data.rtrig)
             # print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
-        self.update_robot_command(robot_x, robot_y, robot_rot, lift_height=lift_height, turbo=turbo, static_speed_mode=self._static_speed_mode)
+        self.update_robot_command(robot_x, robot_y, robot_rot, cycle_time,lift_height=lift_height)
 
     def publisher_loop(self):
         rate = rospy.Rate(60)
@@ -176,7 +173,7 @@ class SteamControllerRosHandler(object):
                 self._new_command_available = False
             rate.sleep()
 
-    def update_robot_command(self, x, y, rot, lift_height=2, static_speed_mode=False, turbo=False):
+    def update_robot_command(self, x, y, rot, cycle_time, lift_height=2):
         move_command = HopperMoveCommand()
         tmp = x
         x = y * 0.1
@@ -187,15 +184,13 @@ class SteamControllerRosHandler(object):
         move_command.direction.linear.y = y
         move_command.direction.angular.z = math.radians(rot)
         move_command.lift_height = lift_height
-        move_command.turbo = turbo
-        move_command.static_speed_mode = static_speed_mode
+        move_command.cycle_time = cycle_time
         # check if message has changed
         message_changed = (self._hopper_move_command_msg.direction.linear.x != move_command.direction.linear.x or
         self._hopper_move_command_msg.direction.linear.y != move_command.direction.linear.y or
         self._hopper_move_command_msg.direction.angular.z != move_command.direction.angular.z or
         self._hopper_move_command_msg.lift_height != move_command.lift_height or
-        self._hopper_move_command_msg.turbo != move_command.turbo or
-        self._hopper_move_command_msg.static_speed_mode != move_command.static_speed_mode)
+        self._hopper_move_command_msg.cycle_time != move_command.cycle_time)
         if message_changed:
             self._hopper_move_command_msg = move_command
             self._new_command_available = True

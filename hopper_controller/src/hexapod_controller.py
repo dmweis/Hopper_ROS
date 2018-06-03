@@ -5,7 +5,7 @@ from threading import Thread
 import math
 import rospy
 from geometry_msgs.msg import Twist, TransformStamped, PoseWithCovariance, TwistWithCovariance
-from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, WalkingMode, HopperMoveCommand
+from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, HopperMoveCommand
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import JointState
@@ -196,10 +196,8 @@ class HexapodController(object):
         self.sound_player = SoundPlayer(self.speech_publisher)
         self.controller = MovementController(gait_engine, self.sound_player)
         self.telemetrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
-        rospy.Subscriber("hopper_move_command", Twist, self.update_direction)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
-        rospy.Subscriber("hopper_walking_mode", WalkingMode, self.set_walking_mode)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose)
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
         self.controller.subscribe_to_telemetrics(self.publish_telemetrics_data)
@@ -210,34 +208,28 @@ class HexapodController(object):
         rotation = move_command.direction.angular.z
         self.controller.set_move_command(direction,
                                          math.degrees(rotation),
-                                         move_command.lift_height,
-                                         move_command.static_speed_mode,
-                                         move_command.turbo)
+                                         move_command.cycle_time,
+                                         move_command.lift_height)
 
     def on_nav_system_move_command(self, move_command):
         # convert directions from meter to cm
-        if abs(move_command.angular.z) > 0.17:
-            move_command.angular.z = math.copysign(0.17, move_command.angular.z)
-        if abs(move_command.linear.x) > 0.1:
-            move_command.linear.x = math.copysign(0.1, move_command.linear.x)
-        if abs(move_command.linear.y) > 0.1:
-            move_command.linear.y = math.copysign(0.1, move_command.linear.y)
-        direction = Vector2(move_command.linear.x, move_command.linear.y) * 100
+        max_theta = 0.2
+        max_vel = 0.1
+        if abs(move_command.angular.z) > max_theta:
+            rospy.logerr("Max angular vel {0:.2f} was breached to {1:.2f}".format(max_theta, move_command.angular.z))
+            move_command.angular.z = math.copysign(max_theta, move_command.angular.z)
+        if abs(move_command.linear.x) > max_vel:
+            rospy.logerr("Max linear x vel {0:.2f} was breached to {1:.2f}".format(max_vel, move_command.linear.x))
+            move_command.linear.x = math.copysign(max_vel, move_command.linear.x)
+        if abs(move_command.linear.y) > max_vel:
+            rospy.logerr("Max linear y vel {0:.2f} was breached to {1:.2f}".format(max_vel, move_command.linear.y))
+            move_command.linear.y = math.copysign(max_vel, move_command.linear.y)
+        velocity = Vector2(move_command.linear.x, move_command.linear.y) * 100
         rotation = move_command.angular.z
-        self.controller.set_move_command(direction,
+        self.controller.set_move_command(velocity,
                                          math.degrees(rotation),
-                                         2,
-                                         False,
-                                         False)
-
-    def set_walking_mode(self, walking_mode):
-        static_speed_mode_enabled = walking_mode.selectedMode == WalkingMode.STATIC_SPEED
-        self.controller.set_walking_mode(static_speed_mode_enabled, walking_mode.liftHeight)
-
-    def update_direction(self, twist):
-        direction = Vector2(twist.linear.x, twist.linear.y)
-        rotation = twist.angular.z
-        self.controller.set_direction(direction, rotation)
+                                         HopperMoveCommand.DEFAULT_CYCLE_TIME,
+                                         HopperMoveCommand.DEFAULT_LIFT_HEIGHT)
 
     def update_pose(self, twist):
         transform = Vector3(twist.linear.x, twist.linear.y, twist.linear.z)
@@ -250,9 +242,9 @@ class HexapodController(object):
     def publish_telemetrics_data(self, telemetrics):
         msg = HexapodTelemetrics()
         msg.servos = []
-        for id, voltage, temperature in telemetrics:
+        for servo_id, voltage, temperature in telemetrics:
             tele = ServoTelemetrics()
-            tele.id = id
+            tele.id = servo_id
             tele.temperature = temperature
             tele.voltage = voltage
             msg.servos.append(tele)

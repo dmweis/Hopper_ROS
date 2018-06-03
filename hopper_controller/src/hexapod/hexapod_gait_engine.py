@@ -214,7 +214,7 @@ class GaitEngine(object):
         self._transform_publisher = transform_publisher
         self._last_used_lifted_legs = LegFlags.LEFT_TRIPOD
         # time each step takes in seconds
-        self._cycle_time = 3
+        self._cycle_time = 1.0
 
     def stand_up(self):
         rospy.loginfo("Hexapod gait engine started")

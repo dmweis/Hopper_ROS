@@ -50,7 +50,6 @@ WIDER_RELAXED_POSITION = LegPositions(
 
 def get_height_for_step(distance, full_step_length, height):
     """
-
     :param distance: distance along the step
     :type distance: float
     :param full_step_length: full length of the step
@@ -214,7 +213,8 @@ class GaitEngine(object):
         self.gait_sequencer = gait_sequencer
         self._transform_publisher = transform_publisher
         self._last_used_lifted_legs = LegFlags.LEFT_TRIPOD
-        self._speed = 9
+        # time each step takes in seconds
+        self._cycle_time = 3
 
     def stand_up(self):
         rospy.loginfo("Hexapod gait engine started")
@@ -287,10 +287,11 @@ class GaitEngine(object):
 
 
 class TripodGait(object):
-    def __init__(self, ik_driver, height_publisher):
+    def __init__(self, ik_driver, height_publisher, velocity_publisher):
         super(TripodGait, self).__init__()
         self._ik_driver = ik_driver
         self._height_publisher = height_publisher
+        self._velocity_publisher = velocity_publisher
         self._update_delay = 1000 / INTERPOLATION_FREQUENCY
         self.current_relaxed_position = RELAXED_POSITION.clone()
         self._ik_driver.setup()
@@ -317,19 +318,32 @@ class TripodGait(object):
         self.current_relaxed_position = RELAXED_POSITION.clone()
         self.execute_move(self.current_relaxed_position, speed_override)
 
-    def execute_step(self, direction, angle, lifted_legs, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
+    def execute_step(self, velocity, theta, lifted_legs, cycle_length, leg_lift_height=2):
+        """
+        :param velocity: Velocities in X and Y in cm/s
+        :param theta: rotation speed in degrees per second
+        :param lifted_legs: combination of legs to lift
+        :param cycle_length: lenght of this step cycle in seconds
+        :param leg_lift_height: height to which legs should be lifted from ground
+        """
+        # calculate traveled distance based on speed and velocity
+        distance = Vector2()
+        distance.x = velocity.x * cycle_length
+        distance.y = velocity.y * cycle_length
+        angle = theta * cycle_length
+        self._velocity_publisher.update_velocity(velocity, theta)
         grounded_legs = LegFlags.RIGHT_TRIPOD if lifted_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
         start_position = self.last_written_position.clone()
+        # calculate target position
         target_position = self.current_relaxed_position.clone() \
-            .transform(Vector3(direction.x / 2, direction.y / 2, 0), lifted_legs) \
+            .transform(Vector3(distance.x / 2, distance.y / 2, 0), lifted_legs) \
             .turn(angle / 2, lifted_legs) \
-            .transform(Vector3(-direction.x / 2, -direction.y / 2, 0), grounded_legs) \
+            .transform(Vector3(-distance.x / 2, -distance.y / 2, 0), grounded_legs) \
             .turn(-angle / 2, grounded_legs)
         transformation_vectors = target_position - start_position
         total_distance = transformation_vectors.longest_length()
-        if distance_speed_multiplier is not None:
-            speed = total_distance * distance_speed_multiplier
-        self._step_to_position(lifted_legs, target_position, speed, leg_lift_height)
+        self._step_to_position(lifted_legs, target_position, velocity.length(), leg_lift_height)
+        self._velocity_publisher.update_velocity(Vector2(), 0)
 
     def go_to_relaxed(self, lifted_legs, target_stance, speed=None, distance_speed_multiplier=None, leg_lift_height=2):
         start_position = self.last_written_position.clone()

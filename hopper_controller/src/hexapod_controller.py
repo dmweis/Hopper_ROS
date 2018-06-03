@@ -130,11 +130,20 @@ class OdomPublisher(object):
         odom_message.pose.pose.orientation.y = self.odometry_rotation[1]
         odom_message.pose.pose.orientation.z = self.odometry_rotation[2]
         odom_message.pose.pose.orientation.w = self.odometry_rotation[3]
-        odom_message.twist.twist.linear.x = direction.x / 100
-        odom_message.twist.twist.linear.y = direction.y / 100
-        odom_message.twist.twist.angular.z = math.radians(rotation)
+        odom_message.twist.twist.linear.x = self._last_odom_msg.twist.twist.linear.x
+        odom_message.twist.twist.linear.y = self._last_odom_msg.twist.twist.linear.y
+        odom_message.twist.twist.angular.z = self._last_odom_msg.twist.twist.angular.z
         self._last_tf_odometry_message = tf_message
         self._last_odom_msg = odom_message
+
+    def update_velocity(self, velocity, theta):
+        """
+        :param velocity: Vector2 for velocity in x and y axis
+        :param theta: rotational speed
+        """
+        self._last_odom_msg.twist.twist.linear.x = velocity.x / 100
+        self._last_odom_msg.twist.twist.linear.y = velocity.y / 100
+        self._last_odom_msg.twist.twist.angular.z = math.radians(theta)
 
     def publish(self):
         now = rospy.Time.now()
@@ -181,7 +190,7 @@ class HexapodController(object):
         self._message_publisher.add_message_sender(height_publisher.publish)
         # build controller
         ik_driver = IkDriver(servo_driver, joint_state_publisher)
-        tripod_gait = TripodGait(ik_driver, height_publisher)
+        tripod_gait = TripodGait(ik_driver, height_publisher, transform_publisher)
         gait_engine = GaitEngine(tripod_gait, transform_publisher)
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.sound_player = SoundPlayer(self.speech_publisher)

@@ -6,7 +6,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist, PoseWithCovarianceStamped
 
 
-class OdometryMerger(Thread):
+class OdometryMerger(object):
     def __init__(self):
         super(OdometryMerger, self).__init__()
         rospy.init_node("odometry_merger")
@@ -14,7 +14,7 @@ class OdometryMerger(Thread):
         self._slam_subscriber = rospy.Subscriber("poseupdate", PoseWithCovarianceStamped, self._on_slam_odometry)
         self._odometry_subscriber = rospy.Subscriber("robot_odom", Odometry, self._on_robot_odometry)
         self._merged_odometry_publisher = rospy.Publisher("odom", Odometry, queue_size=10)
-        self.start()
+        self.run()
 
     def _on_slam_odometry(self, slam_odom):
         self._merged_message.pose.covariance = slam_odom.pose.covariance

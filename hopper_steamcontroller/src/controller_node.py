@@ -158,7 +158,7 @@ class SteamControllerRosHandler(object):
         cycle_time = 1
         # triggers
         if controller_data.ltrig != 0:
-            cycle_time -= 0.5 * scale_trigger(controller_data.ltrig)
+            cycle_time -= 0.75 * scale_trigger(controller_data.ltrig)
             # print "Left trigger at {0:.2f}".format(scale_trigger(controller_data.ltrig))
         if controller_data.rtrig != 0:
             lift_height += 2 * scale_trigger(controller_data.rtrig)
@@ -173,13 +173,17 @@ class SteamControllerRosHandler(object):
                 self._new_command_available = False
             rate.sleep()
 
+    def linear_map(value, inMin, inMax, outMin, outMax):
+        return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+
     def update_robot_command(self, x, y, rot, cycle_time, lift_height=2):
         move_command = HopperMoveCommand()
         tmp = x
-        x = y * 0.1
-        y = tmp * 0.1
+        distance_multiplier = linear_map(cycle_time, 0.25, 1.0, 4.0, 1.0)
+        x = y * 0.13 * distance_multiplier
+        y = tmp * 0.13 * distance_multiplier
         if abs(rot) > 0.2:
-            rot = -rot * 20
+            rot = -rot * 40
         move_command.direction.linear.x = x
         move_command.direction.linear.y = y
         move_command.direction.angular.z = math.radians(rot)

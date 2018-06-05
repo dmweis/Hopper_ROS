@@ -11,6 +11,10 @@ print("Found {0} servos".format(len(servo_ids)))
 for servo_id in servo_ids:
     limits = servo_driver.read_angle_limits(servo_id)
     print("For servo {0} limits are {1} (min, max)".format(servo_id, limits))
+    servo_driver.set_ccw_max_angle_limit(servo_id, 1023)
+    servo_driver.set_cw_min_angle_limit(servo_id, 0)
+    limits = servo_driver.read_angle_limits(servo_id)
+    print("After fix: servo {0} limits are {1} (min, max)".format(servo_id, limits))
 
 servo_driver.close()
 print("Driver closed\nBye!")

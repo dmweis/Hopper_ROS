@@ -11,6 +11,9 @@ from std_msgs.msg import String
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
 import usb1
 
+def linear_map(value, inMin, inMax, outMin, outMax):
+    return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+
 AXIS_MIN = -32768
 AXIS_MAX = 32767
 
@@ -66,6 +69,7 @@ class SteamControllerRosHandler(object):
 
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
+        self.move_pub = rospy.Publisher('hopper_schedule_move', String, queue_size=5)
         self._hopper_move_command_msg = HopperMoveCommand()
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)
@@ -97,30 +101,58 @@ class SteamControllerRosHandler(object):
         buttons_lifted = _xor & previous_data.buttons
         buttons_pressed = _xor & controller_data.buttons
 
-        turbo = False
-        # buttons
-        for button in list(SCButtons):
-            if button & buttons:
-                if button == SCButtons.LPAD:
-                    pass
-                # button is down
-            if button & buttons_pressed:
-                # button was pressed this event
-                if button == SCButtons.A:
-                    self.speech_pub.publish("bender")
-                elif button == SCButtons.B:
-                    self.speech_pub.publish("rick_and_morty")
-                elif button == SCButtons.X:
-                    self.speech_pub.publish("i_am_sorry")
-                elif button == SCButtons.Y:
-                    self.speech_pub.publish("ultron")
-                elif button == SCButtons.RGRIP:
-                    self.speech_pub.publish("take_your_paws")
-                elif button == SCButtons.RB:
-                    pass
-            elif button & buttons_lifted:
-                pass
-                # button was released this event
+        left_grip_down = bool(buttons & SCButtons.LGRIP)
+        right_grip_down = bool(buttons & SCButtons.RGRIP)
+
+        if left_grip_down:
+            if buttons_pressed & SCButtons.A:
+                self.speech_pub.publish("bender")
+            if buttons_pressed & SCButtons.B:
+                self.speech_pub.publish("rick_and_morty")
+            if buttons_pressed & SCButtons.X:
+                self.speech_pub.publish("i_am_sorry")
+            if buttons_pressed & SCButtons.Y:
+                self.speech_pub.publish("take_your_paws")
+            if buttons_pressed & SCButtons.BACK:
+                self.speech_pub.publish("ultron")
+            if buttons_pressed & SCButtons.START:
+                self.speech_pub.publish("take_your_paws")
+        if right_grip_down:
+            if buttons_pressed & SCButtons.A:
+                self.move_pub.publish("happy_hand_dance")
+            if buttons_pressed & SCButtons.B:
+                self.move_pub.publish("happy_dance")
+            if buttons_pressed & SCButtons.X:
+                self.move_pub.publish("happy_spin")
+            if buttons_pressed & SCButtons.Y:
+                self.move_pub.publish("sad_emote")
+            if buttons_pressed & SCButtons.BACK:
+                self.move_pub.publish("wave_hi")
+            if buttons_pressed & SCButtons.START:
+                self.move_pub.publish("lifted_legs")
+        # # buttons
+        # for button in list(SCButtons):
+        #     if button & buttons:
+        #         if button == SCButtons.LPAD:
+        #             pass
+        #         # button is down
+        #     if button & buttons_pressed:
+        #         # button was pressed this event
+        #         if button == SCButtons.A:
+        #             self.speech_pub.publish("bender")
+        #         elif button == SCButtons.B:
+        #             self.speech_pub.publish("rick_and_morty")
+        #         elif button == SCButtons.X:
+        #             self.speech_pub.publish("i_am_sorry")
+        #         elif button == SCButtons.Y:
+        #             self.speech_pub.publish("ultron")
+        #         elif button == SCButtons.RGRIP:
+        #             self.speech_pub.publish("take_your_paws")
+        #         elif button == SCButtons.RB:
+        #             pass
+        #     elif button & buttons_lifted:
+        #         pass
+        #         # button was released this event
 
         # pads
         robot_x = 0
@@ -172,9 +204,6 @@ class SteamControllerRosHandler(object):
                 self.pub.publish(self._hopper_move_command_msg)
                 self._new_command_available = False
             rate.sleep()
-
-    def linear_map(value, inMin, inMax, outMin, outMax):
-        return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
 
     def update_robot_command(self, x, y, rot, cycle_time, lift_height=2):
         move_command = HopperMoveCommand()

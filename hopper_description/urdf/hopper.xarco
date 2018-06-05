@@ -2,7 +2,7 @@
 <robot 
     xmlns:xacro="http://ros.org/wiki/xacro" name="Hopper">
     <xacro:property name="coxa_length" value="0.05" />
-    <xacro:property name="femur_length" value="0.078" />
+    <xacro:property name="femur_length" value="0.067" />
     <material name="white">
         <color rgba="1 1 1 1"/>
     </material>

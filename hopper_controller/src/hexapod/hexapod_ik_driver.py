@@ -620,7 +620,8 @@ def calculate_ik_for_leg(target, leg_config):
 def get_angle_by_a(a, b, c):
     upper = math.pow(b, 2) + math.pow(c, 2) - math.pow(a, 2)
     bottom = 2 * b * c
-    return math.degrees(math.acos(upper / bottom))
+    divident = max(min(1.0, upper / bottom), -1.0)
+    return math.degrees(math.acos(divident))
 
 
 def calculate_fk_for_leg(motor_positions, leg_config):

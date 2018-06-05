@@ -116,6 +116,17 @@ class DynamixelDriver(object):
         load = (load_data & ~(1 << 10)) / 10
         return -load if ccw else load
 
+    def set_ccw_max_angle_limit(self, servo_id, max_angle):
+        self.__write_uint_16(servo_id, CCW_ANGLE_LIMIT, max_angle)
+
+    def set_cw_min_angle_limit(self, servo_id, min_angle):
+        self.__write_uint_16(servo_id, CW_ANGLE_LIMIT, min_angle)
+
+    def read_angle_limits(self, servo_id):
+        max = self.__read_uint_16(servo_id, CCW_ANGLE_LIMIT)
+        min = self.__read_uint_16(servo_id, CW_ANGLE_LIMIT)
+        return min, max
+
     def group_sync_write_goal_degrees(self, commands):
         commands = map(lambda command: (command[0], degrees_to_dynamixel_units(command[1])), commands)
         self.group_sync_write_goal(commands)

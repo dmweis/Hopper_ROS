@@ -4,9 +4,6 @@ import math
 from enum import IntEnum
 from numbers import Number
 
-FEMUR_OFFSET = 13
-TIBIA_OFFSET = 35
-
 
 class Vector3(object):
     def __init__(self, x=0., y=0., z=0.):
@@ -442,6 +439,9 @@ class LegPositions(object):
     def __str__(self):
         return 'LF: {} RF: {} LM: {} RM: {} LR: {} RR: {}'.format(self.left_front, self.right_front, self.left_middle, self.right_middle, self.left_rear, self.right_rear)
 
+
+FEMUR_OFFSET = 13
+TIBIA_OFFSET = 35
 
 LEFT_FRONT = LegConfiguration(1, 3, 5, -45, Vector3(11.5, 5, 0), -240 + FEMUR_OFFSET, -330 + TIBIA_OFFSET)
 RIGHT_FRONT = LegConfiguration(2, 4, 6, 45, Vector3(11.5, -5, 0), 60 + FEMUR_OFFSET, -30 + TIBIA_OFFSET)

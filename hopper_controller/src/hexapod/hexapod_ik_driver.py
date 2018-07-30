@@ -120,7 +120,6 @@ class Vector3(object):
         transform = target - self
         return self + transform * portion
 
-
     def clone(self):
         return Vector3(self.x, self.y, self.z)
 

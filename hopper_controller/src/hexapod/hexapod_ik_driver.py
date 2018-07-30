@@ -319,7 +319,6 @@ class LegPositions(object):
         new_position.right_rear = self.right_rear.get_moved_towards_by_portion(target.right_rear, portion)
         return new_position
 
-
     def transform(self, transform, legs=LegFlags.ALL):
         new_position = self.clone()
         if (legs & LegFlags.LEFT_FRONT) != 0:

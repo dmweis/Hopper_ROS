@@ -3,24 +3,18 @@
   <name>hopper_controller</name>
   <version>0.0.0</version>
   <description>The hopper_controller package</description>
-
   <maintainer email="dweis7@gmail.com">David Weis</maintainer>
-
   <license>MIT</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_export_depend>geometry_msgs</build_export_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
-  <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <depend>hopper_msgs</depend>
+  <build_depend>message_generation</build_depend>
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
-  <depend>tf</depend>
+  <depend>hopper_msgs</depend>
   <depend>nav_msgs</depend>
+  <depend>tf</depend>
+  <exec_depend>message_runtime</exec_depend>
 
 </package>

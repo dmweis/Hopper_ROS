@@ -10,6 +10,8 @@ from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 
 class BodyMotorController(object):
     def __init__(self):
+        super(BodyMotorController, self).__init__()
+        rospy.init_node('hopper_body_controller')
         self.servo_driver = DynamixelDriver(search_usb_2_ax_port())
         self.servo_ids = self.servo_driver.search_servos(0, 20)
         rospy.Subscriber("hopper/body/motor_command", BodyMotorPositions, self.on_motor_command)

@@ -26,7 +26,7 @@ class BodyMotorController(object):
         self.servo_driver.close()
 
     def on_motor_command(self, msg):
-        commands = map(lambda goal_command: (goal_command.servo_id, goal_command.goal_position), msg.goal_postions)
+        commands = map(lambda goal_command: (goal_command.servo_id, goal_command.goal_postion), msg.goal_postions)
         self.servo_driver.group_sync_write_goal_degrees(commands)
 
     def on_compliance_speed_command(self, command):

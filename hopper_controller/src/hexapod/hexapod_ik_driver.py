@@ -483,31 +483,22 @@ JOINT_NAMES = [
 
 
 class IkDriver(object):
-    def __init__(self, servo_driver, joint_state_publisher):
+    def __init__(self, body_controller, joint_state_publisher):
         """
-        :type servo_driver: DynamixelDriver
+        :type body_controller: HexapodBodyController
         :type joint_state_publisher: JointStatePublisher
         """
-        self.__servo_driver = servo_driver
+        self.body_controller = body_controller
         self.joint_state_publisher = joint_state_publisher
 
     def setup(self):
         for servo_id in ALL_SERVOS_IDS:
-            self.__servo_driver.set_compliance_slope(servo_id, 64)
-            self.__servo_driver.set_moving_speed(servo_id, 1023)
-            self.__servo_driver.set_torque(servo_id, False)
+            self.body_controller.set_compliance_movement_speed(servo_id, 64, 1023)
+            self.body_controller.set_torque(servo_id, False)
 
     def disable_motors(self):
         for servo_id in ALL_SERVOS_IDS:
-            self.__servo_driver.set_torque(servo_id, False)
-
-    def read_telemetrics(self):
-        telemetric_data = []
-        for servo_id in ALL_SERVOS_IDS:
-            voltage = self.__servo_driver.read_voltage(servo_id)
-            temperature = self.__servo_driver.read_temperature(servo_id)
-            telemetric_data.append((servo_id, voltage, temperature))
-        return telemetric_data
+            self.body_controller.set_torque(servo_id, False)
 
     def move_legs_synced(self, leg_positions):
         right_front_goal = calculate_ik_for_leg(leg_positions.right_front, RIGHT_FRONT)
@@ -542,7 +533,7 @@ class IkDriver(object):
             (LEFT_REAR.femur_id, left_rear_goal.femur),
             (LEFT_REAR.tibia_id, left_rear_goal.tibia),
         ]
-        self.__servo_driver.group_sync_write_goal_degrees(commands)
+        self.body_controller.set_motors(commands)
         joint_positions = [
             left_front_goal.coxa - 150,
             left_front_goal.femur - 150 + FEMUR_OFFSET,
@@ -581,13 +572,10 @@ class IkDriver(object):
                             right_rear)
 
     def __read_single_current_leg_position(self, leg_configuration):
-        motor_positions = MotorGoalPositions(self.__servo_driver.read_current_position_degrees(leg_configuration.coxa_id),
-                                  self.__servo_driver.read_current_position_degrees(leg_configuration.femur_id),
-                                  self.__servo_driver.read_current_position_degrees(leg_configuration.tibia_id))
+        motor_positions = MotorGoalPositions(self.body_controller.read_motor_position(leg_configuration.coxa_id),
+                                  self.body_controller.read_motor_position(leg_configuration.femur_id),
+                                  self.body_controller.read_motor_position(leg_configuration.tibia_id))
         return calculate_fk_for_leg(motor_positions, leg_configuration)
-
-    def close(self):
-        self.__servo_driver.close()
 
 
 def calculate_ik_for_leg(target, leg_config):

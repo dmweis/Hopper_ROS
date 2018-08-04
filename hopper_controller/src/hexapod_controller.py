@@ -5,7 +5,7 @@ from threading import Thread
 import math
 import rospy
 from geometry_msgs.msg import Twist, TransformStamped, PoseWithCovariance, TwistWithCovariance
-from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics, HopperMoveCommand
+from hopper_msgs.msg import HopperMoveCommand
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import JointState
@@ -15,8 +15,7 @@ import tf2_ros
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
-from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
-
+from ros_abstraction.body_proxy_controller import HexapodBodyController
 
 def create_empty_transform_stamped(parent_name, child_name):
     transform_stamped = TransformStamped()
@@ -175,7 +174,7 @@ class HexapodController(object):
     def __init__(self):
         super(HexapodController, self).__init__()
         rospy.init_node('hopper_controller')
-        servo_driver = DynamixelDriver(search_usb_2_ax_port())
+        body_controller = HexapodBodyController()
         self.join_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=10)
         self.odometry_publisher = rospy.Publisher('robot_odom', Odometry, queue_size=10)
         # publisher for tf and joint states
@@ -189,18 +188,16 @@ class HexapodController(object):
         self._message_publisher.add_message_sender(joint_state_publisher.publish)
         self._message_publisher.add_message_sender(height_publisher.publish)
         # build controller
-        ik_driver = IkDriver(servo_driver, joint_state_publisher)
+        ik_driver = IkDriver(body_controller, joint_state_publisher)
         tripod_gait = TripodGait(ik_driver, height_publisher, transform_publisher)
         gait_engine = GaitEngine(tripod_gait, transform_publisher)
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.sound_player = SoundPlayer(self.speech_publisher)
         self.controller = MovementController(gait_engine, self.sound_player)
-        self.telemetrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose)
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
-        self.controller.subscribe_to_telemetrics(self.publish_telemetrics_data)
 
     def on_move_command(self, move_command):
         # convert directions from meter to cm
@@ -238,17 +235,6 @@ class HexapodController(object):
 
     def schedule_move(self, move_name):
         self.controller.schedule_move(move_name.data)
-
-    def publish_telemetrics_data(self, telemetrics):
-        msg = HexapodTelemetrics()
-        msg.servos = []
-        for servo_id, voltage, temperature in telemetrics:
-            tele = ServoTelemetrics()
-            tele.id = servo_id
-            tele.temperature = temperature
-            tele.voltage = voltage
-            msg.servos.append(tele)
-        self.telemetrics_publisher.publish(msg)
 
     def spin(self):
         rospy.spin()

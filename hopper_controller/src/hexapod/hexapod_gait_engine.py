@@ -81,8 +81,6 @@ class MovementController(threading.Thread):
         self._relaxed_rotation = Vector3()
         self._lift_height = 2
         self._pose_update_ready = False
-        self._telemetric_subscribers = []
-        self._last_telemetrics_update_time = time()
         self._command_queue = Queue()
         self._ros_timer = rospy.Rate(INTERPOLATION_FREQUENCY)
         self.start()
@@ -116,12 +114,6 @@ class MovementController(threading.Thread):
                 self._pose_update_ready = False
                 self._gait_engine.update_relaxed_body_pose(self._relaxed_transformation, self._relaxed_rotation)
             else:
-                # check diagnostics and sleep
-                if time() - self._last_telemetrics_update_time > 1:
-                    self._last_telemetrics_update_time = time()
-                    telemetrics = self._gait_engine.read_telemetrics()
-                    for sub in self._telemetric_subscribers:
-                        sub(telemetrics)
                 # execute any scheduled moves
                 self._check_and_execute_scheduled_move()
                 # this will sleep enough to maintain correct frequency
@@ -163,9 +155,6 @@ class MovementController(threading.Thread):
     def stop_moving(self):
         self._velocity = Vector2()
         self._theta = 0
-
-    def subscribe_to_telemetrics(self, callback):
-        self._telemetric_subscribers.append(callback)
 
     def schedule_move(self, move_name):
         self._command_queue.put_nowait(move_name)
@@ -241,9 +230,6 @@ class GaitEngine(object):
             speed = speed_override
         self.gait_sequencer.update_relaxed_body_pose(transform, rotation, speed, legs)
 
-    def read_telemetrics(self):
-        return self.gait_sequencer.read_telemetrics()
-
     def sit_down(self):
         self.gait_sequencer.reset_relaxed_body_pose(speed_override=9)
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._default_cycle_time)
@@ -279,7 +265,6 @@ class TripodGait(object):
     def stop(self, disable_motors=True):
         if disable_motors:
             self._ik_driver.disable_motors()
-        self._ik_driver.close()
 
     def update_relaxed_body_pose(self, transform, rotation, speed, legs=LegFlags.ALL):
         """
@@ -365,6 +350,3 @@ class TripodGait(object):
         tallest = sorted(heights, reverse=True)[:3]
         average_height = sum(tallest) / len(tallest)
         self._height_publisher.update_height(average_height)
-
-    def read_telemetrics(self):
-        return self._ik_driver.read_telemetrics()

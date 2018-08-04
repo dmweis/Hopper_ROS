@@ -20,6 +20,11 @@ add_message_files(
   TorqueCommand.msg
 )
 
+add_service_files(
+  FILES
+  ReadMotorPosition.srv
+)
+
 generate_messages(
   DEPENDENCIES
   geometry_msgs

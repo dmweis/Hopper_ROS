@@ -1,7 +1,10 @@
+#!/usr/bin/env python
+
 import rospy
 
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
 from hopper_controller.msg import BodyMotorPositions, MotorCompSpeedCommand, TorqueCommand
+from hopper_controller.srv import ReadMotorPosition, ReadMotorPositionResponse
 from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 
 
@@ -12,11 +15,13 @@ class BodyMotorController(object):
         rospy.Subscriber("hopper/body/motor_command", BodyMotorPositions, self.on_motor_command)
         rospy.Subscriber("hopper/body/compliance_speed", MotorCompSpeedCommand, self.on_compliance_speed_command)
         rospy.Subscriber("hopper/body/torque_command", TorqueCommand, self.on_torque_command)
+        self.motor_positions_reader_service_id = rospy.Service("hopper/read_motor_position", ReadMotorPosition, self.read_motor_position)
         self.telementrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         duration = rospy.Duration(4)
         while not rospy.is_shutdown():
             rospy.sleep(duration)
             self.read_motor_telemetrics()
+        self.servo_driver.close()
 
     def on_motor_command(self, msg):
         commands = map(lambda goal_command: (goal_command.servo_id, goal_command.goal_position), msg.goal_postions)
@@ -28,6 +33,10 @@ class BodyMotorController(object):
 
     def on_torque_command(self, command):
         self.servo_driver.set_torque(command.servo_id, command.toruqe_on)
+
+    def read_motor_psotion(self, read_command):
+        pos = self.servo_driver.read_current_position_degrees(read_command.servo_id)
+        return ReadMotorPositionResponse(pos)
 
     def read_motor_telemetrics(self):
         robot_telemetrics = HexapodTelemetrics()

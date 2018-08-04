@@ -34,7 +34,7 @@ class BodyMotorController(object):
     def on_torque_command(self, command):
         self.servo_driver.set_torque(command.servo_id, command.toruqe_on)
 
-    def read_motor_psotion(self, read_command):
+    def read_motor_position(self, read_command):
         pos = self.servo_driver.read_current_position_degrees(read_command.servo_id)
         return ReadMotorPositionResponse(pos)
 

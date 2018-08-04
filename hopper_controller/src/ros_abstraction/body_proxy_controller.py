@@ -5,6 +5,8 @@ from hopper_controller.srv import *
 
 class HexapodBodyController(object):
     def __init__(self):
+        super(HexapodBodyController, self).__init__()
+        rospy.init_node('hopper_body_controller')
         rospy.wait_for_service("hopper/read_motor_position")
         self.motor_commands = rospy.Publisher("hopper/body/motor_command", BodyMotorPositions, queue_size=5)
         self.compliance_speed = rospy.Publisher("hopper/body/compliance_speed", MotorCompSpeedCommand, queue_size=5)

@@ -500,6 +500,9 @@ class IkDriver(object):
         for servo_id in ALL_SERVOS_IDS:
             self.body_controller.set_torque(servo_id, False)
 
+    def stop(self):
+        self.body_controller.halt_body_controller()
+
     def move_legs_synced(self, leg_positions):
         right_front_goal = calculate_ik_for_leg(leg_positions.right_front, RIGHT_FRONT)
         right_rear_goal = calculate_ik_for_leg(leg_positions.right_rear, RIGHT_REAR)

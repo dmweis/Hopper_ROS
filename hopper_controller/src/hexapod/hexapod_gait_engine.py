@@ -265,6 +265,7 @@ class TripodGait(object):
     def stop(self, disable_motors=True):
         if disable_motors:
             self._ik_driver.disable_motors()
+        self._ik_driver.stop()
 
     def update_relaxed_body_pose(self, transform, rotation, speed, legs=LegFlags.ALL):
         """

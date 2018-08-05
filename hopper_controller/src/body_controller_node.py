@@ -49,8 +49,8 @@ class BodyMotorController(object):
 
     def on_compliance_speed_command(self, command):
         self.driver_lock.acquire()
-        self.servo_driver.set_compliance_slope(command.id, command.compliance_slope)
-        self.servo_driver.set_moving_speed(command.id, command.movement_speed)
+        self.servo_driver.set_compliance_slope(command.servo_id, command.compliance_slope)
+        self.servo_driver.set_moving_speed(command.servo_id, command.movement_speed)
         self.driver_lock.release()
 
     def on_torque_command(self, command):

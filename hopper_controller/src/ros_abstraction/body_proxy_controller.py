@@ -8,9 +8,9 @@ class HexapodBodyController(object):
     def __init__(self):
         super(HexapodBodyController, self).__init__()
         rospy.wait_for_service("hopper/read_motor_position")
-        self.motor_commands = rospy.Publisher("hopper/body/motor_command", BodyMotorPositions, queue_size=5)
-        self.compliance_speed = rospy.Publisher("hopper/body/compliance_speed", MotorCompSpeedCommand, queue_size=5)
-        self.torque_command = rospy.Publisher("hopper/body/torque_command", TorqueCommand, queue_size=5)
+        self.motor_commands = rospy.Publisher("hopper/body/motor_command", BodyMotorPositions, queue_size=5, latch=True)
+        self.compliance_speed = rospy.Publisher("hopper/body/compliance_speed", MotorCompSpeedCommand, queue_size=5, latch=True)
+        self.torque_command = rospy.Publisher("hopper/body/torque_command", TorqueCommand, queue_size=5, latch=True)
         self.halt_command = rospy.Publisher("hopper/halt", HaltCommand, queue_size=1)
         self.read_motor_position_proxy = rospy.ServiceProxy("hopper/read_motor_position", ReadMotorPosition, persistent=True)
 

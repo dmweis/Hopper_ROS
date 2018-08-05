@@ -173,7 +173,7 @@ class HeightPublisher(object):
 class HexapodController(object):
     def __init__(self):
         super(HexapodController, self).__init__()
-        rospy.init_node('hopper_controller')
+        rospy.init_node('hopper_controller', disable_signals=True)
         body_controller = HexapodBodyController()
         self.join_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=10)
         self.odometry_publisher = rospy.Publisher('robot_odom', Odometry, queue_size=10)
@@ -237,7 +237,11 @@ class HexapodController(object):
         self.controller.schedule_move(move_name.data)
 
     def spin(self):
-        rospy.spin()
+        try:
+            rospy.spin()
+        except KeyboardInterrupt:
+            pass
+            # we want to stop if spin returns or throws exception
         self.controller.stop()
 
 

@@ -13,7 +13,7 @@ from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 class BodyMotorController(object):
     def __init__(self):
         super(BodyMotorController, self).__init__()
-        rospy.init_node('hopper_body_controller')
+        rospy.init_node('hopper_body_controller', disable_signals=True)
         self.keep_running = True
         self.driver_lock = Lock()
         self.servo_driver = DynamixelDriver(search_usb_2_ax_port())
@@ -26,13 +26,6 @@ class BodyMotorController(object):
         self.telementrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         duration = rospy.Duration(4)
         while self.keep_running:
-            if rospy.is_shutdown():
-                rospy.sleep(5)
-                if not self.keep_running:
-                    break
-                else:
-                    rospy.logerr("ROS exited but body controller didn't get HALT message.\nExiting body controller...")
-                    break
             rospy.sleep(duration)
             self.read_motor_telemetrics()
         self.driver_lock.acquire()

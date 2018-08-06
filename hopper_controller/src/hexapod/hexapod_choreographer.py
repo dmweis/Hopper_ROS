@@ -98,15 +98,16 @@ def lift_legs(gait_engine):
 
 
 def roar(gait_engine):
-    speed = 12
-    gait_engine.reset_relaxed_body_pose(speed)
+    slow_speed = 12
+    fast_speed = 20
+    gait_engine.reset_relaxed_body_pose(slow_speed)
     normal_pose = gait_engine.get_relaxed_pose()
     lifted_middle = normal_pose \
         .transform(Vector3(x=4, z=4), LegFlags.MIDDLE)
     grounded_middle_front = normal_pose \
         .transform(Vector3(x=4), LegFlags.MIDDLE)
     lifted_front = grounded_middle_front \
-        .transform(Vector3(z=6, x=6), LegFlags.FRONT) \
+        .transform(Vector3(z=6, x=8), LegFlags.FRONT) \
         .rotate(Vector3(y=-10)) \
         .transform(Vector3(y=2), LegFlags.LEFT_FRONT) \
         .transform(Vector3(y=-2), LegFlags.RIGHT_FRONT)
@@ -114,17 +115,17 @@ def roar(gait_engine):
         .transform(Vector3(z=-2), LegFlags.LEFT_FRONT) \
         .transform(Vector3(z=2), LegFlags.RIGHT_FRONT)
     lifted_right = lifted_front \
-        .transform(Vector3(z=2), LegFlags.LEFT_FRONT) \
-        .transform(Vector3(z=-2), LegFlags.RIGHT_FRONT)
-    gait_engine.move_to_new_pose(lifted_middle, speed)
-    gait_engine.move_to_new_pose(grounded_middle_front, speed)
-    gait_engine.move_to_new_pose(lifted_front, speed)
+        .transform(Vector3(z=4), LegFlags.LEFT_FRONT) \
+        .transform(Vector3(z=-4), LegFlags.RIGHT_FRONT)
+    gait_engine.move_to_new_pose(lifted_middle, slow_speed)
+    gait_engine.move_to_new_pose(grounded_middle_front, slow_speed)
+    gait_engine.move_to_new_pose(lifted_front, slow_speed)
     for i in range(4):
-        gait_engine.move_to_new_pose(lifted_left, speed)
-        gait_engine.move_to_new_pose(lifted_right, speed)
-    gait_engine.move_to_new_pose(lifted_front, speed)
-    gait_engine.move_to_new_pose(grounded_middle_front, speed)
-    gait_engine.move_to_new_pose(lifted_middle, speed)
+        gait_engine.move_to_new_pose(lifted_left, fast_speed)
+        gait_engine.move_to_new_pose(lifted_right, fast_speed)
+    gait_engine.move_to_new_pose(lifted_front, slow_speed)
+    gait_engine.move_to_new_pose(grounded_middle_front, slow_speed)
+    gait_engine.move_to_new_pose(lifted_middle, slow_speed)
     gait_engine.reset_relaxed_body_pose()
 
 

@@ -148,8 +148,10 @@ def hump(gait_engine):
         gait_engine.move_to_new_pose(backwards_hump, speed)
         speed = speed + 1
     gait_engine.move_to_new_pose(forward_hump, speed)
-    rospy.sleep(2)
-    gait_engine.move_to_new_pose(backwards_hump, 13)
+    for i in range(5):
+        gait_engine.move_to_new_pose(forward_hump.transform(Vector3(z=-1)), speed)
+        gait_engine.move_to_new_pose(forward_hump.transform(Vector3(z=1)), speed)
+    gait_engine.move_to_new_pose(backwards_hump, 9)
     gait_engine.reset_relaxed_body_pose()
 
 

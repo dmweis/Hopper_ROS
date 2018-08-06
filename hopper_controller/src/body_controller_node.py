@@ -6,7 +6,6 @@ import rospy
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
 from hopper_controller.msg import BodyMotorPositions, MotorCompSpeedCommand, TorqueCommand
 from hopper_controller.srv import ReadMotorPosition, ReadMotorPositionResponse
-from hopper_msgs.msg import HaltCommand
 from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 
 
@@ -14,23 +13,18 @@ class BodyMotorController(object):
     def __init__(self):
         super(BodyMotorController, self).__init__()
         rospy.init_node('hopper_body_controller', disable_signals=True)
-        self.keep_running = True
         self.driver_lock = Lock()
         self.servo_driver = DynamixelDriver(search_usb_2_ax_port())
         self.servo_ids = self.servo_driver.search_servos(0, 20)
         rospy.Subscriber("hopper/body/motor_command", BodyMotorPositions, self.on_motor_command)
         rospy.Subscriber("hopper/body/compliance_speed", MotorCompSpeedCommand, self.on_compliance_speed_command)
         rospy.Subscriber("hopper/body/torque_command", TorqueCommand, self.on_torque_command)
-        rospy.Subscriber("hopper/halt", HaltCommand, self.on_halt_command)
         self.motor_positions_reader_service_id = rospy.Service("hopper/read_motor_position", ReadMotorPosition, self.read_motor_position)
         self.telementrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         duration = rospy.Duration(4)
-        while self.keep_running:
-            try:
-                rospy.sleep(duration)
-                self.read_motor_telemetrics()
-            except KeyboardInterrupt:
-                rospy.logerr("caught keyboard")
+        while not rospy.is_shutdown():
+            rospy.sleep(duration)
+            self.read_motor_telemetrics()
         self.driver_lock.acquire()
         for servo_id in self.servo_ids:
             self.servo_driver.set_torque(servo_id, False)
@@ -69,10 +63,6 @@ class BodyMotorController(object):
             self.driver_lock.release()
             robot_telemetrics.servos.append(ServoTelemetrics(servo_id, temperature, voltage))
         self.telementrics_publisher.publish(robot_telemetrics)
-
-    def on_halt_command(self, msg):
-        rospy.loginfo("Halting body controller " + msg.reason)
-        self.keep_running = False
 
 
 if __name__ == '__main__':

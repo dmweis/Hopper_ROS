@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
+    <node name="keep_alive_node" pkg="hopper_keep_alive" type="keep_alive_node.py" required="true"/>
     <node name="hopper_body_controller" pkg="hopper_controller" type="body_controller_node.py"/>
     <node name="hopper_controller" pkg="hopper_controller" type="hexapod_controller.py" respawn="true" respawn_delay="5">
         <param name="publish_odometry_to_tf" value="false"/>
@@ -10,5 +11,4 @@
     </node>
     <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py"/>
     <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>
-    <include file="$(find hopper_bringup)/launch/sensors_wake.launch" />
 </launch>

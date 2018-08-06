@@ -15,6 +15,7 @@
   <depend>hopper_msgs</depend>
   <depend>nav_msgs</depend>
   <depend>tf</depend>
+  <depend>hopper_keep_alive</depend>
   <exec_depend>message_runtime</exec_depend>
 
 </package>

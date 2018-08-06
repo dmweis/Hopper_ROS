@@ -5,7 +5,8 @@ from threading import Thread
 import math
 import rospy
 from geometry_msgs.msg import Twist, TransformStamped, PoseWithCovariance, TwistWithCovariance
-from hopper_msgs.msg import HopperMoveCommand
+from hopper_msgs.msg import HopperMoveCommand, HaltCommand
+from hopper_keep_alive.srv import Halt
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import JointState
@@ -16,6 +17,7 @@ import tf2_ros
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
 from ros_abstraction.body_proxy_controller import HexapodBodyController
+
 
 def create_empty_transform_stamped(parent_name, child_name):
     transform_stamped = TransformStamped()
@@ -173,7 +175,7 @@ class HeightPublisher(object):
 class HexapodController(object):
     def __init__(self):
         super(HexapodController, self).__init__()
-        rospy.init_node('hopper_controller', disable_signals=True)
+        rospy.init_node('hopper_controller')
         body_controller = HexapodBodyController()
         self.join_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=10)
         self.odometry_publisher = rospy.Publisher('robot_odom', Odometry, queue_size=10)
@@ -194,10 +196,16 @@ class HexapodController(object):
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.sound_player = SoundPlayer(self.speech_publisher)
         self.controller = MovementController(gait_engine, self.sound_player)
+        self.halt_service = rospy.ServiceProxy("halt", Halt)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose)
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
+        rospy.Subscriber("hopper/halt", HaltCommand, self.on_halt_command)
+
+    def on_halt_command(self, reason_msg):
+        self.controller.stop()
+        self.halt_service()
 
     def on_move_command(self, move_command):
         # convert directions from meter to cm
@@ -237,12 +245,8 @@ class HexapodController(object):
         self.controller.schedule_move(move_name.data)
 
     def spin(self):
-        try:
-            rospy.spin()
-        except KeyboardInterrupt:
-            pass
-            # we want to stop if spin returns or throws exception
-        self.controller.stop()
+        rospy.spin()
+        rospy.loginfo("Hexapod controller is shutting down")
 
 
 if __name__ == '__main__':

@@ -4,8 +4,6 @@ from .hexapod_ik_driver import Vector3, Vector2, LegFlags
 from std_msgs.msg import String
 import rospy
 
-sound_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
-
 
 def happy_hand_dance(gait_engine):
     speed = 22
@@ -134,6 +132,7 @@ def roar(gait_engine):
 
 def hump(gait_engine):
     speed = 13
+    sound_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
     gait_engine.reset_relaxed_body_pose(speed)
     normal_pose = gait_engine.get_relaxed_pose()
     forward_hump = normal_pose \

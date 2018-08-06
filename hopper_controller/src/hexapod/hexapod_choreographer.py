@@ -1,7 +1,10 @@
 from __future__ import division
 from __future__ import absolute_import
 from .hexapod_ik_driver import Vector3, Vector2, LegFlags
+from std_msgs.msg import String
 import rospy
+
+sound_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
 
 
 def happy_hand_dance(gait_engine):
@@ -139,6 +142,7 @@ def hump(gait_engine):
     backwards_hump = normal_pose \
         .transform(Vector3(x=3))
     for i in range(10):
+        sound_publisher.publish("windows_usbin")
         gait_engine.move_to_new_pose(forward_hump, speed)
         speed = speed + 1
         gait_engine.move_to_new_pose(backwards_hump, speed)

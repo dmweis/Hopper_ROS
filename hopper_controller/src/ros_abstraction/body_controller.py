@@ -6,7 +6,6 @@ from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
 class HexapodBodyController(object):
     def __init__(self, servo_driver):
         super(HexapodBodyController, self).__init__()
-        self.last_servo_update = rospy.get_rostime()
         self.telementrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         self.servo_driver = servo_driver
         self.servo_ids = self.servo_driver.search_servos(0, 20)
@@ -19,9 +18,6 @@ class HexapodBodyController(object):
         self.servo_driver.set_torque(servo_id, value)
 
     def set_motors(self, positions):
-        now = rospy.get_rostime()
-        rospy.logerr(now - self.last_servo_update)
-        self.last_servo_update = now
         self.servo_driver.group_sync_write_goal_degrees(positions)
 
     def read_motor_position(self, servo_id):

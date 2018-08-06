@@ -129,12 +129,28 @@ def roar(gait_engine):
     gait_engine.reset_relaxed_body_pose()
 
 
+def hump(gait_engine):
+    speed = 15
+    gait_engine.reset_relaxed_body_pose(speed)
+    normal_pose = gait_engine.get_relaxed_pose()
+    forward_hump = normal_pose \
+        .transform(Vector3(x=4)) \
+        .rotate(Vector3(x=6))
+    backwards_hump = normal_pose \
+        .transform(Vector3(x=-4)) \
+        .rotate(Vector3(x=-6))
+    for i in range(6):
+        gait_engine.move_to_new_pose(forward_hump, speed)
+        gait_engine.move_to_new_pose(backwards_hump, speed)
+    gait_engine.reset_relaxed_body_pose()
+
+
 moves = {
     "happy_hand_dance": happy_hand_dance,
     "happy_dance": happy_dance,
     "happy_spin": happy_spin,
     "sad_emote": sad_emote,
-    "wave_hi": wave_hi,
+    "wave_hi": hump,
     "lifted_legs": roar
 }
 

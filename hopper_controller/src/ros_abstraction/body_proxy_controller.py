@@ -1,7 +1,6 @@
 import rospy
 from hopper_controller.msg import *
 from hopper_controller.srv import *
-from hopper_msgs.msg import HaltCommand
 
 
 class HexapodBodyController(object):

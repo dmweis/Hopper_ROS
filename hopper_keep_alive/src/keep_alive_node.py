@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import rospy
-from hopper_keep_alive.srv import Halt
+from hopper_keep_alive.srv import Halt, HaltResponse
+
 
 class KeepAliveNode(object):
     def __init__(self):
@@ -13,6 +14,7 @@ class KeepAliveNode(object):
     def on_halt(self, _):
         rospy.loginfo("keep alive node shutting down")
         rospy.signal_shutdown("Halt command received")
+        return HaltResponse()
 
 if __name__ == '__main__':
     KeepAliveNode()

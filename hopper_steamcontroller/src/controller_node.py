@@ -6,7 +6,7 @@ import struct
 from threading import Thread
 import rospy
 from geometry_msgs.msg import Twist, Quaternion, Vector3
-from hopper_msgs.msg import HopperMoveCommand
+from hopper_msgs.msg import HopperMoveCommand, HaltCommand
 from std_msgs.msg import String
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
 import usb1
@@ -70,6 +70,7 @@ class SteamControllerRosHandler(object):
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.move_pub = rospy.Publisher('hopper_schedule_move', String, queue_size=5)
+        self.halt_command = rospy.Publisher('halt', HaltCommand, queue_size=1)
         self._hopper_move_command_msg = HopperMoveCommand()
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)
@@ -81,12 +82,9 @@ class SteamControllerRosHandler(object):
                                         0x07000707,
                                         0x00301400,
                                         0x2f010000))
-        self.sc_thread = Thread(target=self.sc.run)
         self.publisher_thread = Thread(target=self.publisher_loop)
-        self.sc_thread.start()
         self.publisher_thread.start()
-        rospy.spin()
-        self.sc_thread.join()
+        self.sc.run()
 
     def on_controller_data(self, controller, controller_data):
 
@@ -130,6 +128,8 @@ class SteamControllerRosHandler(object):
                 self.move_pub.publish("wave_hi")
             if buttons_pressed & SCButtons.START:
                 self.move_pub.publish("lifted_legs")
+        if buttons_pressed & SCButtons.STEAM:
+            self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))
         # # buttons
         # for button in list(SCButtons):
         #     if button & buttons:

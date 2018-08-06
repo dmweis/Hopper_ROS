@@ -16,7 +16,7 @@ import tf2_ros
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
-from ros_abstraction.body_proxy_controller import HexapodBodyController
+from ros_abstraction.body_controller import HexapodBodyController
 
 
 def create_empty_transform_stamped(parent_name, child_name):

@@ -65,7 +65,10 @@ class MessagePublisher(Thread):
     def run(self):
         while not rospy.is_shutdown():
             for callback in self._callbacks:
-                callback()
+                try:
+                    callback()
+                except rospy.ROSException as e:
+                    rospy.logdebug("Hexapod controller failed to send data: " + str(e))
             self._rate.sleep()
 
 

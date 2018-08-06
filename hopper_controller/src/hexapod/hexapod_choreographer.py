@@ -102,12 +102,17 @@ def roar(gait_engine):
     gait_engine.reset_relaxed_body_pose(speed)
     normal_pose = gait_engine.get_relaxed_pose()
     lifted_middle = normal_pose \
-        .transform(Vector3(x=2, z=2), LegFlags.MIDDLE)
+        .transform(Vector3(x=4, z=4), LegFlags.MIDDLE)
     grounded_middle_front = normal_pose \
-        .transform(Vector3(x=2), LegFlags.MIDDLE)
+        .transform(Vector3(x=4), LegFlags.MIDDLE)
+    lifted_front = grounded_middle_front \
+        .transform(Vector3(x=6), LegFlags.FRONT) \
+        .rotate(Vector3(x=-5))
     gait_engine.move_to_new_pose(lifted_middle, speed)
     gait_engine.move_to_new_pose(grounded_middle_front, speed)
-    rospy.sleep(4)
+    gait_engine.move_to_new_pose(lifted_front, speed)
+    rospy.sleep(2)
+    gait_engine.move_to_new_pose(grounded_middle_front, speed)
     gait_engine.move_to_new_pose(lifted_middle, speed)
     gait_engine.reset_relaxed_body_pose()
 

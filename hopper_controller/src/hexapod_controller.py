@@ -4,7 +4,7 @@ from __future__ import division
 from threading import Thread
 import math
 import rospy
-from geometry_msgs.msg import Twist, TransformStamped, PoseWithCovariance, TwistWithCovariance
+from geometry_msgs.msg import Twist, TransformStamped
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
 from hopper_keep_alive.srv import Halt
 from std_msgs.msg import String
@@ -16,7 +16,7 @@ import tf2_ros
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
-from ros_abstraction.body_controller import HexapodBodyController
+from body_controller import HexapodBodyController
 
 
 def create_empty_transform_stamped(parent_name, child_name):

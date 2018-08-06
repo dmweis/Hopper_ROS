@@ -1,6 +1,8 @@
+from __future__ import absolute_import
 import rospy
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
-from src.dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
+
+from .dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 
 
 class HexapodBodyController(object):

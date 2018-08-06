@@ -130,18 +130,22 @@ def roar(gait_engine):
 
 
 def hump(gait_engine):
-    speed = 20
+    speed = 13
     gait_engine.reset_relaxed_body_pose(speed)
     normal_pose = gait_engine.get_relaxed_pose()
     forward_hump = normal_pose \
-        .transform(Vector3(x=4)) \
+        .transform(Vector3(x=-3)) \
         .rotate(Vector3(y=-10))
     backwards_hump = normal_pose \
-        .transform(Vector3(x=-4)) \
-        .rotate(Vector3(y=-10))
-    for i in range(4):
+        .transform(Vector3(x=3))
+    for i in range(10):
         gait_engine.move_to_new_pose(forward_hump, speed)
+        speed = speed + 1
         gait_engine.move_to_new_pose(backwards_hump, speed)
+        speed = speed + 1
+    gait_engine.move_to_new_pose(forward_hump, speed)
+    rospy.sleep(2)
+    gait_engine.move_to_new_pose(backwards_hump, 13)
     gait_engine.reset_relaxed_body_pose()
 
 

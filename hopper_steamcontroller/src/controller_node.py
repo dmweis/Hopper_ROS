@@ -70,7 +70,7 @@ class SteamControllerRosHandler(object):
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.move_pub = rospy.Publisher('hopper_schedule_move', String, queue_size=5)
-        self.halt_command = rospy.Publisher('halt', HaltCommand, queue_size=1)
+        self.halt_command = rospy.Publisher('hopper/halt', HaltCommand, queue_size=1)
         self._hopper_move_command_msg = HopperMoveCommand()
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)

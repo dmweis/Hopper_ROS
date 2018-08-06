@@ -16,7 +16,8 @@ import tf2_ros
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
-from body_controller import HexapodBodyController
+from ros_abstraction.body_controller import HexapodBodyController
+from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 
 
 def create_empty_transform_stamped(parent_name, child_name):
@@ -179,7 +180,7 @@ class HexapodController(object):
     def __init__(self):
         super(HexapodController, self).__init__()
         rospy.init_node('hopper_controller')
-        body_controller = HexapodBodyController()
+        body_controller = HexapodBodyController(DynamixelDriver(search_usb_2_ax_port()))
         self.join_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=10)
         self.odometry_publisher = rospy.Publisher('robot_odom', Odometry, queue_size=10)
         # publisher for tf and joint states

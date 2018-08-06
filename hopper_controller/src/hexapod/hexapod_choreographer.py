@@ -1,6 +1,6 @@
 from __future__ import division
 from __future__ import absolute_import
-from .hexapod_ik_driver import  Vector3, Vector2, LegFlags
+from .hexapod_ik_driver import Vector3, Vector2, LegFlags
 import rospy
 
 
@@ -97,13 +97,28 @@ def lift_legs(gait_engine):
     gait_engine.reset_relaxed_body_pose()
 
 
+def roar(gait_engine):
+    speed = 12
+    gait_engine.reset_relaxed_body_pose(speed)
+    normal_pose = gait_engine.get_relaxed_pose()
+    lifted_middle = normal_pose \
+        .transform(Vector3(x=2, z=-2), LegFlags.MIDDLE)
+    grounded_middle_front = normal_pose \
+        .transform(Vector3(x=2), LegFlags.MIDDLE)
+    gait_engine.move_to_new_pose(lifted_middle, speed)
+    gait_engine.move_to_new_pose(grounded_middle_front, speed)
+    rospy.sleep(4)
+    gait_engine.move_to_new_pose(lifted_middle, speed)
+    gait_engine.reset_relaxed_body_pose()
+
+
 moves = {
     "happy_hand_dance": happy_hand_dance,
     "happy_dance": happy_dance,
     "happy_spin": happy_spin,
     "sad_emote": sad_emote,
     "wave_hi": wave_hi,
-    "lifted_legs": lift_legs
+    "lifted_legs": roar
 }
 
 

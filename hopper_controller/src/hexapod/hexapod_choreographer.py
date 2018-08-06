@@ -107,10 +107,10 @@ def roar(gait_engine):
     grounded_middle_front = normal_pose \
         .transform(Vector3(x=4), LegFlags.MIDDLE)
     lifted_front = grounded_middle_front \
-        .transform(Vector3(z=6, x=8), LegFlags.FRONT) \
-        .rotate(Vector3(y=-10)) \
-        .transform(Vector3(y=2), LegFlags.LEFT_FRONT) \
-        .transform(Vector3(y=-2), LegFlags.RIGHT_FRONT)
+        .transform(Vector3(z=8, x=8), LegFlags.FRONT) \
+        .rotate(Vector3(y=-14)) \
+        .transform(Vector3(y=-6), LegFlags.LEFT_FRONT) \
+        .transform(Vector3(y=6), LegFlags.RIGHT_FRONT)
     lifted_left = lifted_front \
         .transform(Vector3(z=-2), LegFlags.LEFT_FRONT) \
         .transform(Vector3(z=2), LegFlags.RIGHT_FRONT)
@@ -119,8 +119,8 @@ def roar(gait_engine):
         .transform(Vector3(z=-2), LegFlags.RIGHT_FRONT)
     gait_engine.move_to_new_pose(lifted_middle, slow_speed)
     gait_engine.move_to_new_pose(grounded_middle_front, slow_speed)
-    gait_engine.move_to_new_pose(lifted_front, slow_speed)
-    for i in range(4):
+    gait_engine.move_to_new_pose(lifted_front, fast_speed)
+    for i in range(6):
         gait_engine.move_to_new_pose(lifted_left, fast_speed)
         gait_engine.move_to_new_pose(lifted_right, fast_speed)
     gait_engine.move_to_new_pose(lifted_front, slow_speed)

@@ -125,11 +125,11 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.X:
                 self.move_pub.publish("happy_spin")
             if buttons_pressed & SCButtons.Y:
-                self.move_pub.publish("sad_emote")
+                self.move_pub.publish("hump")
             if buttons_pressed & SCButtons.BACK:
                 self.move_pub.publish("wave_hi")
             if buttons_pressed & SCButtons.START:
-                self.move_pub.publish("lifted_legs")
+                self.move_pub.publish("roar")
         if buttons_pressed & SCButtons.STEAM:
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))
         # # buttons

@@ -150,8 +150,10 @@ moves = {
     "happy_dance": happy_dance,
     "happy_spin": happy_spin,
     "sad_emote": sad_emote,
-    "wave_hi": hump,
-    "lifted_legs": roar
+    "wave_hi": wave_hi,
+    "lifted_legs": lift_legs,
+    "hump": hump,
+    "roar": roar
 }
 
 

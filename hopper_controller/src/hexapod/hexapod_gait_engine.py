@@ -5,8 +5,6 @@ import traceback
 import rospy
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 from .hexapod_choreographer import execute_choreography
-import threading
-from time import time
 import math
 
 INTERPOLATION_FREQUENCY = 30
@@ -63,16 +61,15 @@ def get_height_for_step(distance, full_step_length, height):
     return max(math.sin(distance * math.pi) * height, 0)
 
 
-class MovementController(threading.Thread):
+class MovementController(object):
     def __init__(self, gait_engine, speech_service):
         """
-
         :type gait_engine: GaitEngine
         """
         super(MovementController, self).__init__()
+        self.keep_running = True
         self._gait_engine = gait_engine
         self._speech_service = speech_service
-        self._keep_running = True
         self._relaxed = True
         self._velocity = Vector2()
         self._theta = 0
@@ -83,9 +80,8 @@ class MovementController(threading.Thread):
         self._pose_update_ready = False
         self._command_queue = Queue()
         self._ros_timer = rospy.Rate(INTERPOLATION_FREQUENCY)
-        self.start()
 
-    def run(self):
+    def spin(self):
         try:
             self._main_controller_loop()
         except Exception as e:
@@ -98,7 +94,7 @@ class MovementController(threading.Thread):
         rospy.loginfo("Hexapod gait engine started")
         self._gait_engine.stand_up()
         self._speech_service.say("initialized_successfully")
-        while self._keep_running:
+        while not rospy.is_shutdown() and self.keep_running:
             if self._should_move():
                 # execute move
                 self._gait_engine.step(self._velocity, self._theta, self._cycle_time, self._lift_height)
@@ -119,10 +115,10 @@ class MovementController(threading.Thread):
                 # this will sleep enough to maintain correct frequency
                 self._ros_timer.sleep()
         self._gait_engine.sit_down()
+        self._gait_engine.stop()
 
     def set_relaxed_pose(self, transform, rotation):
         """
-
         :type transform: Vector3
         :type rotation: Vector3
         """
@@ -159,11 +155,6 @@ class MovementController(threading.Thread):
     def schedule_move(self, move_name):
         self._command_queue.put_nowait(move_name)
 
-    def stop(self):
-        self._keep_running = False
-        self.join()
-        self._gait_engine.stop()
-
     def _should_move(self):
         return not self._velocity.is_zero() or self._theta != 0
 
@@ -181,13 +172,12 @@ class MovementController(threading.Thread):
 
 
 class GaitEngine(object):
-    def __init__(self, gait_sequencer, transform_publisher):
+    def __init__(self, gait_sequencer):
         """
         :type gait_sequencer: TripodGait
         """
         super(GaitEngine, self).__init__()
         self.gait_sequencer = gait_sequencer
-        self._transform_publisher = transform_publisher
         self._last_used_lifted_legs = LegFlags.LEFT_TRIPOD
         # time each step takes in seconds
         self._default_cycle_time = 1.0

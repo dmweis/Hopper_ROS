@@ -3,6 +3,8 @@ from __future__ import absolute_import
 import math
 from enum import IntEnum
 from numbers import Number
+import rospy
+from hopper_controller.msg import HopperMotorPositions
 
 
 class Vector3(object):
@@ -104,7 +106,7 @@ class Vector3(object):
 
     def get_moved_towards_by_portion(self, target, portion):
         """
-        calculate position taht is moved towards target by portion between 0.0 and 1.0
+        calculate position that is moved towards target by portion between 0.0 and 1.0
         :param target: target position
         :param portion: number between 0.0 and 1.0 indicating how far along the line is the desired position
         :return: position along the line
@@ -170,17 +172,6 @@ class Vector2(object):
 
     def __str__(self):
         return '<{:.2f} {:.2f}>'.format(self.x, self.y)
-
-
-class LegConfiguration(object):
-    def __init__(self, coxa_id, femur_id, tibia_id, angle_offset, coxa_position, femur_correction, tibia_correction):
-        self.coxa_id = coxa_id
-        self.femur_id = femur_id
-        self.tibia_id = tibia_id
-        self.angle_offset = angle_offset
-        self.coxa_position = coxa_position
-        self.femur_correction = femur_correction
-        self.tibia_correction = tibia_correction
 
 
 class MotorGoalPositions(object):
@@ -440,26 +431,6 @@ class LegPositions(object):
         return 'LF: {} RF: {} LM: {} RM: {} LR: {} RR: {}'.format(self.left_front, self.right_front, self.left_middle, self.right_middle, self.left_rear, self.right_rear)
 
 
-FEMUR_OFFSET = 13
-TIBIA_OFFSET = 35
-
-LEFT_FRONT = LegConfiguration(1, 3, 5, -45, Vector3(11.5, 5, 0), -240 + FEMUR_OFFSET, -330 + TIBIA_OFFSET)
-RIGHT_FRONT = LegConfiguration(2, 4, 6, 45, Vector3(11.5, -5, 0), 60 + FEMUR_OFFSET, -30 + TIBIA_OFFSET)
-LEFT_MIDDLE = LegConfiguration(13, 15, 17, -90, Vector3(0, 10, 0), -240 + FEMUR_OFFSET, -330 + TIBIA_OFFSET)
-RIGHT_MIDDLE = LegConfiguration(14, 16, 18, 90, Vector3(0, -10, 0), 60 + FEMUR_OFFSET, -30 + TIBIA_OFFSET)
-LEFT_REAR = LegConfiguration(7, 9, 11, -135, Vector3(-11.5, 5, 0), -240 + FEMUR_OFFSET, -330 + TIBIA_OFFSET)
-RIGHT_REAR = LegConfiguration(8, 10, 12, 135, Vector3(-11.5, -5, 0), 60 + FEMUR_OFFSET, -30 + TIBIA_OFFSET)
-
-COXAS = [LEFT_FRONT.coxa_id, RIGHT_FRONT.coxa_id, RIGHT_MIDDLE.coxa_id, LEFT_MIDDLE.coxa_id, LEFT_REAR.coxa_id, RIGHT_REAR.coxa_id]
-FEMURS = [LEFT_FRONT.femur_id, RIGHT_FRONT.femur_id, RIGHT_MIDDLE.femur_id, LEFT_MIDDLE.femur_id, LEFT_REAR.femur_id, RIGHT_REAR.femur_id]
-TIBIAS = [LEFT_FRONT.tibia_id, RIGHT_FRONT.tibia_id, RIGHT_MIDDLE.tibia_id, LEFT_MIDDLE.tibia_id, LEFT_REAR.tibia_id, RIGHT_REAR.tibia_id]
-
-ALL_SERVOS_IDS = COXAS + FEMURS + TIBIAS
-
-COXA_LENGTH = 5.0
-FEMUR_LENGTH = 6.7
-TIBIA_LENGTH = 14.0
-
 JOINT_NAMES = [
     "left_front_coxa_joint",
     "left_front_femur_joint",
@@ -490,80 +461,84 @@ class IkDriver(object):
         """
         self.body_controller = body_controller
         self.joint_state_publisher = joint_state_publisher
+        self.coxa_length = rospy.get_param("coxa_length")
+        self.femur_length = rospy.get_param("femur_length")
+        self.tibia_length = rospy.get_param("tibia_length")
+        self.femur_offset = rospy.get_param("femur_offset")
+        self.tibia_offset = rospy.get_param("tibia_offset")
+        self.legs = rospy.get_param("legs")
 
     def setup(self):
-        for servo_id in ALL_SERVOS_IDS:
-            self.body_controller.set_compliance_movement_speed(servo_id, 64, 1023)
-            self.body_controller.set_torque(servo_id, False)
+        self.body_controller.set_motor_compliance(64)
+        self.body_controller.set_motor_speed(1023)
 
     def disable_motors(self):
-        for servo_id in ALL_SERVOS_IDS:
-            self.body_controller.set_torque(servo_id, False)
+        self.body_controller.set_torque(False)
 
     def move_legs_synced(self, leg_positions):
-        right_front_goal = calculate_ik_for_leg(leg_positions.right_front, RIGHT_FRONT)
-        right_rear_goal = calculate_ik_for_leg(leg_positions.right_rear, RIGHT_REAR)
-        left_middle_goal = calculate_ik_for_leg(leg_positions.left_middle, LEFT_MIDDLE)
-        right_middle_goal = calculate_ik_for_leg(leg_positions.right_middle, RIGHT_MIDDLE)
-        left_front_goal = calculate_ik_for_leg(leg_positions.left_front, LEFT_FRONT)
-        left_rear_goal = calculate_ik_for_leg(leg_positions.left_rear, LEFT_REAR)
-        commands = [
-            # right front
-            (RIGHT_FRONT.coxa_id, right_front_goal.coxa),
-            (RIGHT_FRONT.femur_id, right_front_goal.femur),
-            (RIGHT_FRONT.tibia_id, right_front_goal.tibia),
-            # right rear
-            (RIGHT_REAR.coxa_id, right_rear_goal.coxa),
-            (RIGHT_REAR.femur_id, right_rear_goal.femur),
-            (RIGHT_REAR.tibia_id, right_rear_goal.tibia),
-            # left middle
-            (LEFT_MIDDLE.coxa_id, left_middle_goal.coxa),
-            (LEFT_MIDDLE.femur_id, left_middle_goal.femur),
-            (LEFT_MIDDLE.tibia_id, left_middle_goal.tibia),
-            # right middle
-            (RIGHT_MIDDLE.coxa_id, right_middle_goal.coxa),
-            (RIGHT_MIDDLE.femur_id, right_middle_goal.femur),
-            (RIGHT_MIDDLE.tibia_id, right_middle_goal.tibia),
-            # left front
-            (LEFT_FRONT.coxa_id, left_front_goal.coxa),
-            (LEFT_FRONT.femur_id, left_front_goal.femur),
-            (LEFT_FRONT.tibia_id, left_front_goal.tibia),
-            # left rear
-            (LEFT_REAR.coxa_id, left_rear_goal.coxa),
-            (LEFT_REAR.femur_id, left_rear_goal.femur),
-            (LEFT_REAR.tibia_id, left_rear_goal.tibia),
-        ]
-        self.body_controller.set_motors(commands)
+        right_front_goal = self.calculate_ik_for_leg(leg_positions.right_front, self.legs["right_front"])
+        right_rear_goal = self.calculate_ik_for_leg(leg_positions.right_rear, self.legs["right_rear"])
+        left_middle_goal = self.calculate_ik_for_leg(leg_positions.left_middle, self.legs["left_middle"])
+        right_middle_goal = self.calculate_ik_for_leg(leg_positions.right_middle, self.legs["right_middle"])
+        left_front_goal = self.calculate_ik_for_leg(leg_positions.left_front, self.legs["left_front"])
+        left_rear_goal = self.calculate_ik_for_leg(leg_positions.left_rear, self.legs["left_rear"])
+
+        motor_positions = HopperMotorPositions()
+        motor_positions.left_front_coxa = left_front_goal.coxa
+        motor_positions.left_front_femur = left_front_goal.femur
+        motor_positions.left_front_tibia = left_front_goal.tibia
+
+        motor_positions.right_front_coxa = right_front_goal.coxa
+        motor_positions.right_front_femur = right_front_goal.femur
+        motor_positions.right_front_tibia = right_front_goal.tibia
+
+        motor_positions.left_middle_coxa = left_middle_goal.coxa
+        motor_positions.left_middle_femur = left_middle_goal.femur
+        motor_positions.left_middle_tibia = left_middle_goal.tibia
+
+        motor_positions.right_middle_coxa = right_middle_goal.coxa
+        motor_positions.right_middle_femur = right_middle_goal.femur
+        motor_positions.right_middle_tibia = right_middle_goal.tibia
+
+        motor_positions.left_rear_coxa = left_rear_goal.coxa
+        motor_positions.left_rear_femur = left_rear_goal.femur
+        motor_positions.left_rear_tibia = left_rear_goal.tibia
+
+        motor_positions.right_rear_coxa = right_rear_goal.coxa
+        motor_positions.right_rear_femur = right_rear_goal.femur
+        motor_positions.right_rear_tibia = right_rear_goal.tibia
+        self.body_controller.set_motors(motor_positions)
+
         joint_positions = [
             left_front_goal.coxa - 150,
-            left_front_goal.femur - 150 + FEMUR_OFFSET,
-            left_front_goal.tibia - 150 - TIBIA_OFFSET,
+            left_front_goal.femur - 150 + self.femur_offset,
+            left_front_goal.tibia - 150 - self.tibia_offset,
             right_front_goal.coxa - 150,
-            right_front_goal.femur - 150 - FEMUR_OFFSET,
-            right_front_goal.tibia - 150 + TIBIA_OFFSET,
+            right_front_goal.femur - 150 - self.femur_offset,
+            right_front_goal.tibia - 150 + self.tibia_offset,
             left_middle_goal.coxa - 150,
-            left_middle_goal.femur - 150 + FEMUR_OFFSET,
-            left_middle_goal.tibia - 150 - TIBIA_OFFSET,
+            left_middle_goal.femur - 150 + self.femur_offset,
+            left_middle_goal.tibia - 150 - self.tibia_offset,
 
             right_middle_goal.coxa - 150,
-            right_middle_goal.femur - 150 - FEMUR_OFFSET,
-            right_middle_goal.tibia - 150 + TIBIA_OFFSET,
+            right_middle_goal.femur - 150 - self.femur_offset,
+            right_middle_goal.tibia - 150 + self.tibia_offset,
             left_rear_goal.coxa - 150,
-            left_rear_goal.femur - 150 + FEMUR_OFFSET,
-            left_rear_goal.tibia - 150 - TIBIA_OFFSET,
+            left_rear_goal.femur - 150 + self.femur_offset,
+            left_rear_goal.tibia - 150 - self.tibia_offset,
             right_rear_goal.coxa - 150,
-            right_rear_goal.femur - 150 - FEMUR_OFFSET,
-            right_rear_goal.tibia - 150 + TIBIA_OFFSET
+            right_rear_goal.femur - 150 - self.femur_offset,
+            right_rear_goal.tibia - 150 + self.tibia_offset
         ]
         self.joint_state_publisher.update_joint_states(JOINT_NAMES, map(math.radians, joint_positions))
 
     def read_current_leg_positions(self):
-        left_front = self.__read_single_current_leg_position(LEFT_FRONT)
-        right_front = self.__read_single_current_leg_position(RIGHT_FRONT)
-        left_middle = self.__read_single_current_leg_position(LEFT_MIDDLE)
-        right_middle = self.__read_single_current_leg_position(RIGHT_MIDDLE)
-        left_rear = self.__read_single_current_leg_position(LEFT_REAR)
-        right_rear = self.__read_single_current_leg_position(RIGHT_REAR)
+        left_front = self.__read_single_current_leg_position(self.legs["left_front"])
+        right_front = self.__read_single_current_leg_position(self.legs["right_front"])
+        left_middle = self.__read_single_current_leg_position(self.legs["left_middle"])
+        right_middle = self.__read_single_current_leg_position(self.legs["right_middle"])
+        left_rear = self.__read_single_current_leg_position(self.legs["left_rear"])
+        right_rear = self.__read_single_current_leg_position(self.legs["right_rear"])
         return LegPositions(left_front,
                             right_front,
                             left_middle,
@@ -572,33 +547,52 @@ class IkDriver(object):
                             right_rear)
 
     def __read_single_current_leg_position(self, leg_configuration):
-        motor_positions = MotorGoalPositions(self.body_controller.read_motor_position(leg_configuration.coxa_id),
-                                  self.body_controller.read_motor_position(leg_configuration.femur_id),
-                                  self.body_controller.read_motor_position(leg_configuration.tibia_id))
-        return calculate_fk_for_leg(motor_positions, leg_configuration)
+        motor_positions = MotorGoalPositions(self.body_controller.read_motor_position(leg_configuration["coxa_id"]),
+                                  self.body_controller.read_motor_position(leg_configuration["femur_id"]),
+                                  self.body_controller.read_motor_position(leg_configuration["tibia_id"]))
+        return self.calculate_fk_for_leg(motor_positions, leg_configuration)
 
+    def calculate_ik_for_leg(self, target, leg_config):
+        relative_vector = target - leg_config["coxa_position"]
+        target_angle = math.degrees(math.atan2(relative_vector.y, relative_vector.x)) + leg_config["angle_offset"]
+        horizontal_distance_to_target = math.sqrt(math.pow(relative_vector.x, 2) + math.pow(relative_vector.y, 2))
+        horizontal_distance_to_target_without_coxa = horizontal_distance_to_target - self.coxa_length
+        absolute_distance_to_target = math.sqrt(math.pow(horizontal_distance_to_target_without_coxa, 2) + math.pow(relative_vector.z, 2))
+        # use sss triangle solution to calculate angles
+        # use law of cosinus to get angles in two corners
+        angle_by_tibia = get_angle_by_a(absolute_distance_to_target, self.femur_length, self.tibia_length)
+        angle_by_femur = get_angle_by_a(self.tibia_length, self.femur_length, absolute_distance_to_target)
+        # we have angles of the SSS triangle. now we need angle for the servos
+        ground_to_target_angle_size = math.degrees(math.atan2(horizontal_distance_to_target_without_coxa, -relative_vector.z))
+        if target_angle >= 90 or target_angle <= -90:
+            # target is behind me
+            # can still happen if target is right bellow me
+            raise ArithmeticError("Target angle is " + str(target_angle))
+        femur_angle = angle_by_femur + ground_to_target_angle_size
+        corrected_femur = math.fabs(leg_config["femur_correction"] + femur_angle)
+        corrected_tibia = math.fabs(leg_config["tibia_correction"] + angle_by_tibia)
+        corrected_coxa = 150 + target_angle
+        return MotorGoalPositions(corrected_coxa, corrected_femur, corrected_tibia)
 
-def calculate_ik_for_leg(target, leg_config):
-    relative_vector = target - leg_config.coxa_position
-    target_angle = math.degrees(math.atan2(relative_vector.y, relative_vector.x)) + leg_config.angle_offset
-    horizontal_distance_to_target = math.sqrt(math.pow(relative_vector.x, 2) + math.pow(relative_vector.y, 2))
-    horizontal_distance_to_target_without_coxa = horizontal_distance_to_target - COXA_LENGTH
-    absolute_distance_to_target = math.sqrt(math.pow(horizontal_distance_to_target_without_coxa, 2) + math.pow(relative_vector.z, 2))
-    # use sss triangle solution to calculate angles
-    # use law of cosinus to get angles in two corners
-    angle_by_tibia = get_angle_by_a(absolute_distance_to_target, FEMUR_LENGTH, TIBIA_LENGTH)
-    angle_by_femur = get_angle_by_a(TIBIA_LENGTH, FEMUR_LENGTH, absolute_distance_to_target)
-    # we have angles of the SSS triangle. now we need angle for the servos
-    ground_to_target_angle_size = math.degrees(math.atan2(horizontal_distance_to_target_without_coxa, -relative_vector.z))
-    if target_angle >= 90 or target_angle <= -90:
-        # target is behind me
-        # can still happen if target is right bellow me
-        raise ArithmeticError("Target angle is " + str(target_angle))
-    femur_angle = angle_by_femur + ground_to_target_angle_size
-    corrected_femur = math.fabs(leg_config.femur_correction + femur_angle)
-    corrected_tibia = math.fabs(leg_config.tibia_correction + angle_by_tibia)
-    corrected_coxa = 150 + target_angle
-    return MotorGoalPositions(corrected_coxa, corrected_femur, corrected_tibia)
+    def calculate_fk_for_leg(self, motor_positions, leg_config):
+        femur_angle = abs(motor_positions.femur - abs(leg_config["femur_correction"]))
+        tibia_angle = abs(motor_positions.tibia - abs(leg_config["tibia_correction"]))
+        coxa_angle = motor_positions.coxa - 150 - leg_config["angle_offset"]
+        base_x = math.cos(math.radians(coxa_angle))
+        base_y = math.sin(math.radians(coxa_angle))
+        coxa_vector = Vector3(base_x, base_y, 0) * self.coxa_length
+        femur_x = math.sin(math.radians(femur_angle - 90)) * self.femur_length
+        femur_y = math.cos(math.radians(femur_angle - 90)) * self.femur_length
+        femur_vector = Vector3(base_x * femur_y, base_y * femur_y, femur_x)
+        # to calculate tibia we need angle between tibia and a vertical line
+        # we get this by calculating the angles formed by a horizontal line from femur
+        # femur and part of tibia by knowing that the sum of angles is 180
+        # than we just remove this from teh tibia angle and done
+        angle_for_tibia_vector = tibia_angle - (180 - 90 - (femur_angle - 90))
+        tibia_x = math.sin(math.radians(angle_for_tibia_vector)) * self.tibia_length
+        tibia_y = math.cos(math.radians(angle_for_tibia_vector)) * self.tibia_length
+        tibia_vector = Vector3(base_x * tibia_x, base_y * tibia_x, -tibia_y)
+        return leg_config["coxa_position"] + coxa_vector + femur_vector + tibia_vector
 
 
 def get_angle_by_a(a, b, c):
@@ -606,24 +600,3 @@ def get_angle_by_a(a, b, c):
     bottom = 2 * b * c
     divident = max(min(1.0, upper / bottom), -1.0)
     return math.degrees(math.acos(divident))
-
-
-def calculate_fk_for_leg(motor_positions, leg_config):
-    femur_angle = abs(motor_positions.femur - abs(leg_config.femur_correction))
-    tibia_angle = abs(motor_positions.tibia - abs(leg_config.tibia_correction))
-    coxa_angle = motor_positions.coxa - 150 - leg_config.angle_offset
-    base_x = math.cos(math.radians(coxa_angle))
-    base_y = math.sin(math.radians(coxa_angle))
-    coxa_vector = Vector3(base_x, base_y, 0) * COXA_LENGTH
-    femur_x = math.sin(math.radians(femur_angle - 90)) * FEMUR_LENGTH
-    femur_y = math.cos(math.radians(femur_angle - 90)) * FEMUR_LENGTH
-    femur_vector = Vector3(base_x * femur_y, base_y * femur_y, femur_x)
-    # to calculate tibia we need angle between tibia and a vertical line
-    # we get this by calculating the angles formed by a horizontal line from femur
-    # femur and part of fibia by knowing that the sum of angles is 180
-    # than we just remove this from teh tibia angle and done
-    angle_for_tibia_vector = tibia_angle - (180 - 90 - (femur_angle - 90))
-    tibia_x = math.sin(math.radians(angle_for_tibia_vector)) * TIBIA_LENGTH
-    tibia_y = math.cos(math.radians(angle_for_tibia_vector)) * TIBIA_LENGTH
-    tibia_vector = Vector3(base_x * tibia_x, base_y * tibia_x, -tibia_y)
-    return leg_config.coxa_position + coxa_vector + femur_vector + tibia_vector

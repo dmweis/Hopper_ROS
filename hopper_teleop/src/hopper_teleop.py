@@ -24,13 +24,13 @@ class HopperTeleop(pyglet.window.Window):
         if symbol == pyglet.window.key.S:
             self.x -= 1
         if symbol == pyglet.window.key.A:
-            self.y -= 1
-        if symbol == pyglet.window.key.D:
             self.y += 1
+        if symbol == pyglet.window.key.D:
+            self.y -= 1
         if symbol == pyglet.window.key.Q:
-            self.rotation -= 1
-        if symbol == pyglet.window.key.E:
             self.rotation += 1
+        if symbol == pyglet.window.key.E:
+            self.rotation -= 1
         self.send_new_message()
 
     def on_key_release(self, symbol, modifiers):
@@ -39,13 +39,13 @@ class HopperTeleop(pyglet.window.Window):
         if symbol == pyglet.window.key.S:
             self.x += 1
         if symbol == pyglet.window.key.A:
-            self.y += 1
-        if symbol == pyglet.window.key.D:
             self.y -= 1
+        if symbol == pyglet.window.key.D:
+            self.y += 1
         if symbol == pyglet.window.key.Q:
-            self.rotation += 1
-        if symbol == pyglet.window.key.E:
             self.rotation -= 1
+        if symbol == pyglet.window.key.E:
+            self.rotation += 1
         self.send_new_message()
 
     def send_new_message(self):

@@ -1,1 +1,0 @@
-MotorGoalPosition[] goal_postions

@@ -1,3 +1,0 @@
-int32 servo_id
-int32 compliance_slope
-int32 movement_speed

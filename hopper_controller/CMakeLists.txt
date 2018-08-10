@@ -17,10 +17,10 @@ catkin_python_setup()
 
 add_message_files(
   FILES
-  BodyMotorPositions.msg
-  MotorCompSpeedCommand.msg
-  MotorGoalPosition.msg
-  TorqueCommand.msg
+  HopperMotorPositions.msg
+  MotorCompliance.msg
+  MotorSpeed.msg
+  MotorTorque.msg
 )
 
 add_service_files(

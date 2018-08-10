@@ -7,7 +7,7 @@ from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 from .hexapod_choreographer import execute_choreography
 import math
 
-INTERPOLATION_FREQUENCY = 30
+INTERPOLATION_FREQUENCY = 400
 
 LEG_HEIGHT = -9
 LEG_DISTANCE_LONGITUDAL = 15

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
+from src.dynamixel.dynamixel_driver import DynamixelDriver, search_usb_2_ax_port
 
 servo_driver = DynamixelDriver(search_usb_2_ax_port())
 print("Starting search")

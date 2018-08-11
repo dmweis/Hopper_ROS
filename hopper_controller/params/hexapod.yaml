@@ -63,7 +63,7 @@ legs:
     tibia_correction: -295
   right_rear:
     coxa_id: 8
-    femur1w_id: 10
+    femur_id: 10
     tibia_id: 12
     angle_offset: 135
     position:

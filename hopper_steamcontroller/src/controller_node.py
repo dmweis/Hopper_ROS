@@ -11,9 +11,6 @@ from std_msgs.msg import String
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
 import usb1
 
-def linear_map(value, inMin, inMax, outMin, outMax):
-    return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
-
 AXIS_MIN = -32768
 AXIS_MAX = 32767
 
@@ -51,14 +48,14 @@ def check_button(buttons, button_flag):
 
 class RosSteamController(SteamController):
     def run(self):
-        while not rospy.is_shutdown() and any(x.isSubmitted() for x in self._transfer_list):
-            try:
+        try:
+            while not rospy.is_shutdown() and any(x.isSubmitted() for x in self._transfer_list):
                 self._ctx.handleEvents()
                 if len(self._cmsg) > 0:
                     cmsg = self._cmsg.pop()
                     self._sendControl(cmsg)
-            except usb1.USBError as e:
-                rospy.logerr("USB comm erro " + str(e))
+        except usb1.USBError as e:
+            rospy.logerr("USB comm erro " + str(e))
 
 class SteamControllerRosHandler(object):
     def __init__(self):

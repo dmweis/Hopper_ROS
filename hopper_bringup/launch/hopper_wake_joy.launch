@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<launch>
-    <node name="Xbox_gamepad" pkg="joy" type="joy_node" />
-    <node name="joy_translator" pkg="hopper_joy_translator" type="joyTranslator.py" />
-    <include file="$(find hopper_bringup)/launch/hopper_wake.launch" />
-</launch>

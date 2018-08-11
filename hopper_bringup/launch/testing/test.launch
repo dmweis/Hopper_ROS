@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
+    <rosparam command="load" file="$(find hopper_controller)/params/hexapod.yaml" />
     <node name="hopper_teleop" pkg="hopper_teleop" type="hopper_teleop.py"/>
     <node name="keep_alive_node" pkg="hopper_keep_alive" type="keep_alive_node.py" required="true"/>
     <node name="hopper_controller" pkg="hopper_controller" type="hexapod_controller.py" respawn="true" respawn_delay="5">
@@ -10,6 +11,6 @@
     <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py">
         <env name="AUDIODEV" value="/dev/audio1"/>
     </node>
-    <include file="$(find hopper_bringup)/launch/teleop.launch" />
+    <include file="$(find hopper_bringup)/launch/remote/teleop.launch" />
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find hopper_description)/rviz/urdf.rviz"/>
 </launch>

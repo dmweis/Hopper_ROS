@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <include file="$(find hopper_bringup)/launch/teleop.launch" />
-    <include file="$(find hopper_bringup)/launch/mapping.launch" />
+    <include file="$(find hopper_bringup)/launch/remote/teleop.launch" />
+    <include file="$(find hopper_bringup)/launch/remote/mapping.launch" />
     <node name="odometry_merger" pkg="hopper_navigation" type="odometry_merger.py"/>
     <node name="move_base" pkg="move_base" type="move_base">
         <rosparam file="$(find hopper_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />

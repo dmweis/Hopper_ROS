@@ -553,7 +553,11 @@ class IkDriver(object):
         return self.calculate_fk_for_leg(motor_positions, leg_configuration)
 
     def calculate_ik_for_leg(self, target, leg_config):
-        relative_vector = target - leg_config["coxa_position"]
+        coxa_position = Vector3()
+        coxa_position.x = leg_config["position"]["x"]
+        coxa_position.y = leg_config["position"]["y"]
+        coxa_position.z = leg_config["position"]["z"]
+        relative_vector = target - coxa_position
         target_angle = math.degrees(math.atan2(relative_vector.y, relative_vector.x)) + leg_config["angle_offset"]
         horizontal_distance_to_target = math.sqrt(math.pow(relative_vector.x, 2) + math.pow(relative_vector.y, 2))
         horizontal_distance_to_target_without_coxa = horizontal_distance_to_target - self.coxa_length
@@ -592,7 +596,11 @@ class IkDriver(object):
         tibia_x = math.sin(math.radians(angle_for_tibia_vector)) * self.tibia_length
         tibia_y = math.cos(math.radians(angle_for_tibia_vector)) * self.tibia_length
         tibia_vector = Vector3(base_x * tibia_x, base_y * tibia_x, -tibia_y)
-        return leg_config["coxa_position"] + coxa_vector + femur_vector + tibia_vector
+        coxa_position = Vector3()
+        coxa_position.x = leg_config["position"]["x"]
+        coxa_position.y = leg_config["position"]["y"]
+        coxa_position.z = leg_config["position"]["z"]
+        return coxa_position + coxa_vector + femur_vector + tibia_vector
 
 
 def get_angle_by_a(a, b, c):

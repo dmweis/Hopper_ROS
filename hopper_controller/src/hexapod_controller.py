@@ -31,10 +31,10 @@ class HexapodController(object):
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
         rospy.Subscriber("hopper/halt", HaltCommand, self.on_halt_command)
         self.controller.spin()
+        self.halt_service()
 
     def on_halt_command(self, _):
         self.controller.keep_running = False
-        self.halt_service()
 
     def on_move_command(self, move_command):
         # convert directions from meter to cm

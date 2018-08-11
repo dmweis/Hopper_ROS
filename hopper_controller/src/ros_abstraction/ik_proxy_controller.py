@@ -1,5 +1,5 @@
 import rospy
-from hopper_controller.msg import HexapodLegPositions, TorqueCommand
+from hopper_controller.msg import HexapodLegPositions, MotorTorque
 from hopper_controller.srv import ReadHexapodLegPositions
 from hexapod import LegPositions
 
@@ -13,7 +13,7 @@ class IkController(object):
         self.torque_publisher = rospy.Publisher("hopper/body/motor_torque", MotorTorque, queue_size=5, latch=True)
 
     def disable_motors(self):
-        self.torque_publisher.publish(TorqueCommand(False))
+        self.torque_publisher.publish(MotorTorque(False))
 
     def move_legs_synced(self, leg_positions):
         self.move_legs_pub.publish(leg_positions)

@@ -277,7 +277,7 @@ class TripodGait(object):
         :param velocity: Velocities in X and Y in cm/s
         :param theta: rotation speed in degrees per second
         :param lifted_legs: combination of legs to lift
-        :param cycle_length: lenght of this step cycle in seconds
+        :param cycle_length: length of this step cycle in seconds
         :param leg_lift_height: height to which legs should be lifted from ground
         """
         # calculate traveled distance based on speed and velocity

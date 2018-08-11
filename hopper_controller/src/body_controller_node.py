@@ -52,9 +52,9 @@ class BodyMotorController(object):
             (self.leg_data["left_middle"]["femur_id"], msg.left_middle_femur),
             (self.leg_data["left_middle"]["coxa_id"], msg.left_middle_tibia),
             # right middle
-            (self.leg_data["right_front"]["coxa_id"], msg.right_front_coxa),
-            (self.leg_data["right_front"]["femur_id"], msg.right_front_femur),
-            (self.leg_data["right_front"]["coxa_id"], msg.right_front_tibia),
+            (self.leg_data["right_middle"]["coxa_id"], msg.right_front_coxa),
+            (self.leg_data["right_middle"]["femur_id"], msg.right_front_femur),
+            (self.leg_data["right_middle"]["coxa_id"], msg.right_front_tibia),
             # left rear
             (self.leg_data["left_rear"]["coxa_id"], msg.left_rear_coxa),
             (self.leg_data["left_rear"]["femur_id"], msg.left_rear_femur),

@@ -4,14 +4,14 @@ import math
 from enum import IntEnum
 from numbers import Number
 import rospy
+import geometry_msgs.msg
+import hopper_controller.msg
 from hopper_controller.msg import HexapodMotorPositions, LegMotorPositions
 
 
-class Vector3(object):
+class Vector3(geometry_msgs.msg.Vector3):
     def __init__(self, x=0., y=0., z=0.):
-        self.x = x
-        self.y = y
-        self.z = z
+        super(Vector3, self).__init__(x, y, z)
 
     def __add__(self, other):
         if isinstance(other, Vector3):
@@ -125,6 +125,10 @@ class Vector3(object):
     def __str__(self):
         return '<{:.2f} {:.2f} {:.2f}>'.format(self.x, self.y, self.z)
 
+    @staticmethod
+    def ros_vector3_to_overload_vector(vector):
+        return Vector3(vector.x, vector.y, vector.z)
+
 
 class Vector2(object):
     def __init__(self, x=0., y=0.):
@@ -217,8 +221,9 @@ class LegFlags(IntEnum):
         return selected_legs
 
 
-class LegPositions(object):
+class LegPositions(hopper_controller.msg.HexapodLegPositions):
     def __init__(self, left_front, right_front, left_middle, right_middle, left_rear, right_rear):
+        super(LegPositions, self).__init__()
         self.left_front = left_front
         self.right_front = right_front
         self.left_middle = left_middle
@@ -429,6 +434,18 @@ class LegPositions(object):
 
     def __str__(self):
         return 'LF: {} RF: {} LM: {} RM: {} LR: {} RR: {}'.format(self.left_front, self.right_front, self.left_middle, self.right_middle, self.left_rear, self.right_rear)
+
+    @staticmethod
+    def ros_leg_positions_to_leg_positions(ros_leg_positions):
+        leg_position = LegPositions(
+            Vector3.ros_vector3_to_overload_vector(ros_leg_positions.left_front),
+            Vector3.ros_vector3_to_overload_vector(ros_leg_positions.right_front),
+            Vector3.ros_vector3_to_overload_vector(ros_leg_positions.left_middle),
+            Vector3.ros_vector3_to_overload_vector(ros_leg_positions.right_middle),
+            Vector3.ros_vector3_to_overload_vector(ros_leg_positions.left_rear),
+            Vector3.ros_vector3_to_overload_vector(ros_leg_positions.right_rear)
+        )
+        return leg_position
 
 
 JOINT_NAMES = [

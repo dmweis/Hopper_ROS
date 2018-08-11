@@ -1,0 +1,6 @@
+geometry_msgs/Vector3 left_front
+geometry_msgs/Vector3 right_front
+geometry_msgs/Vector3 left_middle
+geometry_msgs/Vector3 right_middle
+geometry_msgs/Vector3 left_rear
+geometry_msgs/Vector3 right_rear

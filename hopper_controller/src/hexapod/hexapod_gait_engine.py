@@ -249,7 +249,6 @@ class TripodGait(object):
         self._ros_rate = rospy.Rate(INTERPOLATION_FREQUENCY)
         self._update_delay = 1000 / INTERPOLATION_FREQUENCY
         self.current_relaxed_position = RELAXED_POSITION.clone()
-        self._ik_driver.setup()
         self.last_written_position = self._ik_driver.read_current_leg_positions()
 
     def stop(self, disable_motors=True):

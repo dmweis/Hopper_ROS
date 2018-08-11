@@ -10,7 +10,7 @@ from std_msgs.msg import String
 
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
-from hexapod.hexapod_ik_driver import IkDriver, Vector2, Vector3
+from hexapod.hexapod_ik_driver import Vector2, Vector3
 import ros_abstraction
 
 
@@ -18,9 +18,8 @@ class HexapodController(object):
     def __init__(self):
         super(HexapodController, self).__init__()
         rospy.init_node('hopper_controller')
-        body_controller = ros_abstraction.HexapodBodyController()
         # build controller
-        ik_driver = IkDriver(body_controller, ros_abstraction.JointStatePublisher())
+        ik_driver = ros_abstraction.IkController()
         tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(), ros_abstraction.OdomPublisher())
         gait_engine = GaitEngine(tripod_gait)
         self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer())

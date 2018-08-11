@@ -17,9 +17,9 @@ class BodyMotorController(object):
         self.leg_data = rospy.get_param("legs")
         self.servo_ids = []
         for leg in self.leg_data:
-            self.servo_ids.append(int(leg["coxa_id"]))
-            self.servo_ids.append(int(leg["femur_id"]))
-            self.servo_ids.append(int(leg["tibia_id"]))
+            self.servo_ids.append(leg["coxa_id"])
+            self.servo_ids.append(leg["femur_id"])
+            self.servo_ids.append(leg["tibia_id"])
         self.servo_driver = DynamixelDriver(search_usb_2_ax_port())
         rospy.Subscriber("hopper/body/motor_command", HopperMotorPositions, self.on_motor_command, queue_size=20)
         rospy.Subscriber("hopper/body/motor_compliance", MotorCompliance, self.on_compliance_command, queue_size=25)
@@ -40,29 +40,29 @@ class BodyMotorController(object):
     def on_motor_command(self, msg):
         commands = [
             # left front
-            (int(self.leg_data["left_front"]["coxa_id"]), msg.left_front_coxa),
-            (int(self.leg_data["left_front"]["femur_id"]), msg.left_front_femur),
-            (int(self.leg_data["left_front"]["coxa_id"]), msg.left_front_tibia),
+            (self.leg_data["left_front"]["coxa_id"], msg.left_front_coxa),
+            (self.leg_data["left_front"]["femur_id"], msg.left_front_femur),
+            (self.leg_data["left_front"]["coxa_id"], msg.left_front_tibia),
             # right front
-            (int(self.leg_data["right_front"]["coxa_id"]), msg.right_front_coxa),
-            (int(self.leg_data["right_front"]["femur_id"]), msg.right_front_femur),
-            (int(self.leg_data["right_front"]["coxa_id"]), msg.right_front_tibia),
+            (self.leg_data["right_front"]["coxa_id"], msg.right_front_coxa),
+            (self.leg_data["right_front"]["femur_id"], msg.right_front_femur),
+            (self.leg_data["right_front"]["coxa_id"], msg.right_front_tibia),
             # left middle
-            (int(self.leg_data["left_middle"]["coxa_id"]), msg.left_middle_coxa),
-            (int(self.leg_data["left_middle"]["femur_id"]), msg.left_middle_femur),
-            (int(self.leg_data["left_middle"]["coxa_id"]), msg.left_middle_tibia),
+            (self.leg_data["left_middle"]["coxa_id"], msg.left_middle_coxa),
+            (self.leg_data["left_middle"]["femur_id"], msg.left_middle_femur),
+            (self.leg_data["left_middle"]["coxa_id"], msg.left_middle_tibia),
             # right middle
-            (int(self.leg_data["right_front"]["coxa_id"]), msg.right_front_coxa),
-            (int(self.leg_data["right_front"]["femur_id"]), msg.right_front_femur),
-            (int(self.leg_data["right_front"]["coxa_id"]), msg.right_front_tibia),
+            (self.leg_data["right_front"]["coxa_id"], msg.right_front_coxa),
+            (self.leg_data["right_front"]["femur_id"], msg.right_front_femur),
+            (self.leg_data["right_front"]["coxa_id"], msg.right_front_tibia),
             # left rear
-            (int(self.leg_data["left_rear"]["coxa_id"]), msg.left_rear_coxa),
-            (int(self.leg_data["left_rear"]["femur_id"]), msg.left_rear_femur),
-            (int(self.leg_data["left_rear"]["coxa_id"]), msg.left_rear_tibia),
+            (self.leg_data["left_rear"]["coxa_id"], msg.left_rear_coxa),
+            (self.leg_data["left_rear"]["femur_id"], msg.left_rear_femur),
+            (self.leg_data["left_rear"]["coxa_id"], msg.left_rear_tibia),
             # right rear
-            (int(self.leg_data["right_rear"]["coxa_id"]), msg.right_rear_coxa),
-            (int(self.leg_data["right_rear"]["femur_id"]), msg.right_rear_femur),
-            (int(self.leg_data["right_rear"]["coxa_id"]), msg.right_rear_tibia)
+            (self.leg_data["right_rear"]["coxa_id"], msg.right_rear_coxa),
+            (self.leg_data["right_rear"]["femur_id"], msg.right_rear_femur),
+            (self.leg_data["right_rear"]["coxa_id"], msg.right_rear_tibia)
         ]
         self.driver_lock.acquire()
         self.servo_driver.group_sync_write_goal_degrees(commands)

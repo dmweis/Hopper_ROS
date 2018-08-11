@@ -19,5 +19,5 @@ class IkController(object):
         self.move_legs_pub.publish(leg_positions)
 
     def read_current_leg_positions(self):
-        leg_positions_msg = self.read_current_leg_positions()
+        leg_positions_msg = self.read_legs_service_proxy()
         return LegPositions.ros_leg_positions_to_leg_positions(leg_positions_msg)

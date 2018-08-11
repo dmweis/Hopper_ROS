@@ -42,27 +42,27 @@ class BodyMotorController(object):
             # left front
             (self.leg_data["left_front"]["coxa_id"], msg.left_front_coxa),
             (self.leg_data["left_front"]["femur_id"], msg.left_front_femur),
-            (self.leg_data["left_front"]["coxa_id"], msg.left_front_tibia),
+            (self.leg_data["left_front"]["tibia_id"], msg.left_front_tibia),
             # right front
             (self.leg_data["right_front"]["coxa_id"], msg.right_front_coxa),
             (self.leg_data["right_front"]["femur_id"], msg.right_front_femur),
-            (self.leg_data["right_front"]["coxa_id"], msg.right_front_tibia),
+            (self.leg_data["right_front"]["tibia_id"], msg.right_front_tibia),
             # left middle
             (self.leg_data["left_middle"]["coxa_id"], msg.left_middle_coxa),
             (self.leg_data["left_middle"]["femur_id"], msg.left_middle_femur),
-            (self.leg_data["left_middle"]["coxa_id"], msg.left_middle_tibia),
+            (self.leg_data["left_middle"]["tibia_id"], msg.left_middle_tibia),
             # right middle
-            (self.leg_data["right_middle"]["coxa_id"], msg.right_front_coxa),
-            (self.leg_data["right_middle"]["femur_id"], msg.right_front_femur),
-            (self.leg_data["right_middle"]["coxa_id"], msg.right_front_tibia),
+            (self.leg_data["right_middle"]["coxa_id"], msg.right_middle_coxa),
+            (self.leg_data["right_middle"]["femur_id"], msg.right_middle_femur),
+            (self.leg_data["right_middle"]["tibia_id"], msg.right_middle_tibia),
             # left rear
             (self.leg_data["left_rear"]["coxa_id"], msg.left_rear_coxa),
             (self.leg_data["left_rear"]["femur_id"], msg.left_rear_femur),
-            (self.leg_data["left_rear"]["coxa_id"], msg.left_rear_tibia),
+            (self.leg_data["left_rear"]["tibia_id"], msg.left_rear_tibia),
             # right rear
             (self.leg_data["right_rear"]["coxa_id"], msg.right_rear_coxa),
             (self.leg_data["right_rear"]["femur_id"], msg.right_rear_femur),
-            (self.leg_data["right_rear"]["coxa_id"], msg.right_rear_tibia)
+            (self.leg_data["right_rear"]["tibia_id"], msg.right_rear_tibia)
         ]
         self.driver_lock.acquire()
         self.servo_driver.group_sync_write_goal_degrees(commands)

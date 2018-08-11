@@ -1,7 +1,7 @@
 import rospy
 from hopper_controller.msg import HexapodLegPositions, TorqueCommand
 from hopper_controller.srv import ReadHexapodLegPositions
-from hopper_controller.hexapod import LegPositions
+from hexapod import LegPositions
 
 
 class IkController(object):

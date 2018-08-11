@@ -17,9 +17,9 @@ class BodyMotorController(object):
         self.leg_data = rospy.get_param("legs")
         self.servo_ids = []
         for leg in self.leg_data:
-            self.servo_ids.append(leg["coxa_id"])
-            self.servo_ids.append(leg["femur_id"])
-            self.servo_ids.append(leg["tibia_id"])
+            self.servo_ids.append(self.leg_data[leg]["coxa_id"])
+            self.servo_ids.append(self.leg_data[leg]["femur_id"])
+            self.servo_ids.append(self.leg_data[leg]["tibia_id"])
         self.servo_driver = DynamixelDriver(search_usb_2_ax_port())
         rospy.Subscriber("hopper/body/motor_command", HopperMotorPositions, self.on_motor_command, queue_size=20)
         rospy.Subscriber("hopper/body/motor_compliance", MotorCompliance, self.on_compliance_command, queue_size=25)

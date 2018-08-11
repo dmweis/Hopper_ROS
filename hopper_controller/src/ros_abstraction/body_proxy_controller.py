@@ -8,13 +8,13 @@ class HexapodBodyController(object):
         super(HexapodBodyController, self).__init__()
         self.fk_disabled = rospy.get_param("~fk_demo_mode", False)
         if not self.fk_disabled:
-            rospy.wait_for_service("hopper/read_motor_position")
-        self.motor_commands = rospy.Publisher("hopper/body/motor_command", HopperMotorPositions, queue_size=10)
+            rospy.wait_for_service("hopper/read_hexapod_motor_positions")
+        self.motor_commands = rospy.Publisher("hopper/body/motor_command", HexapodMotorPositions, queue_size=10)
         self.compliance_publisher = rospy.Publisher("hopper/body/motor_compliance", MotorCompliance, queue_size=5, latch=True)
         self.speed_publisher = rospy.Publisher("hopper/body/motor_speed", MotorSpeed, queue_size=5, latch=True)
         self.torque_publisher = rospy.Publisher("hopper/body/motor_torque", MotorTorque, queue_size=5, latch=True)
         if not self.fk_disabled:
-            self.read_motor_position_proxy = rospy.ServiceProxy("hopper/read_motor_position", ReadMotorPosition, persistent=True)
+            self.read_hexapod_motor_positions_proxy = rospy.ServiceProxy("hopper/read_hexapod_motor_positions", ReadHexapodMotorPositions, persistent=True)
 
     def set_motor_compliance(self, compliance):
         self.compliance_publisher.publish(MotorCompliance(compliance))
@@ -28,7 +28,8 @@ class HexapodBodyController(object):
     def set_motors(self, positions):
         self.motor_commands.publish(positions)
 
-    def read_motor_position(self, servo_id):
+    def read_hexapod_motor_positions(self):
         if self.fk_disabled:
-            return 150
-        return self.read_motor_position_proxy(servo_id).servo_position
+            leg_motors = LegMotorPositions(150, 150, 150)
+            return HexapodMotorPositions(leg_motors, leg_motors, leg_motors, leg_motors, leg_motors, leg_motors)
+        return self.read_hexapod_motor_positions_proxy().motor_positions

@@ -4,7 +4,7 @@ import math
 from enum import IntEnum
 from numbers import Number
 import rospy
-from hopper_controller.msg import HopperMotorPositions
+from hopper_controller.msg import HexapodMotorPositions, LegMotorPositions
 
 
 class Vector3(object):
@@ -483,30 +483,30 @@ class IkDriver(object):
         left_front_goal = self.calculate_ik_for_leg(leg_positions.left_front, self.legs["left_front"])
         left_rear_goal = self.calculate_ik_for_leg(leg_positions.left_rear, self.legs["left_rear"])
 
-        motor_positions = HopperMotorPositions()
-        motor_positions.left_front_coxa = left_front_goal.coxa
-        motor_positions.left_front_femur = left_front_goal.femur
-        motor_positions.left_front_tibia = left_front_goal.tibia
+        motor_positions = HexapodMotorPositions()
+        motor_positions.left_front.coxa = left_front_goal.coxa
+        motor_positions.left_front.femur = left_front_goal.femur
+        motor_positions.left_front.tibia = left_front_goal.tibia
 
-        motor_positions.right_front_coxa = right_front_goal.coxa
-        motor_positions.right_front_femur = right_front_goal.femur
-        motor_positions.right_front_tibia = right_front_goal.tibia
+        motor_positions.right_front.coxa = right_front_goal.coxa
+        motor_positions.right_front.femur = right_front_goal.femur
+        motor_positions.right_front.tibia = right_front_goal.tibia
 
-        motor_positions.left_middle_coxa = left_middle_goal.coxa
-        motor_positions.left_middle_femur = left_middle_goal.femur
-        motor_positions.left_middle_tibia = left_middle_goal.tibia
+        motor_positions.left_middle.coxa = left_middle_goal.coxa
+        motor_positions.left_middle.femur = left_middle_goal.femur
+        motor_positions.left_middle.tibia = left_middle_goal.tibia
 
-        motor_positions.right_middle_coxa = right_middle_goal.coxa
-        motor_positions.right_middle_femur = right_middle_goal.femur
-        motor_positions.right_middle_tibia = right_middle_goal.tibia
+        motor_positions.right_middle.coxa = right_middle_goal.coxa
+        motor_positions.right_middle.femur = right_middle_goal.femur
+        motor_positions.right_middle.tibia = right_middle_goal.tibia
 
-        motor_positions.left_rear_coxa = left_rear_goal.coxa
-        motor_positions.left_rear_femur = left_rear_goal.femur
-        motor_positions.left_rear_tibia = left_rear_goal.tibia
+        motor_positions.left_rear.coxa = left_rear_goal.coxa
+        motor_positions.left_rear.femur = left_rear_goal.femur
+        motor_positions.left_rear.tibia = left_rear_goal.tibia
 
-        motor_positions.right_rear_coxa = right_rear_goal.coxa
-        motor_positions.right_rear_femur = right_rear_goal.femur
-        motor_positions.right_rear_tibia = right_rear_goal.tibia
+        motor_positions.right_rear.coxa = right_rear_goal.coxa
+        motor_positions.right_rear.femur = right_rear_goal.femur
+        motor_positions.right_rear.tibia = right_rear_goal.tibia
         self.body_controller.set_motors(motor_positions)
 
         joint_positions = [
@@ -533,24 +533,15 @@ class IkDriver(object):
         self.joint_state_publisher.update_joint_states(JOINT_NAMES, map(math.radians, joint_positions))
 
     def read_current_leg_positions(self):
-        left_front = self.__read_single_current_leg_position(self.legs["left_front"])
-        right_front = self.__read_single_current_leg_position(self.legs["right_front"])
-        left_middle = self.__read_single_current_leg_position(self.legs["left_middle"])
-        right_middle = self.__read_single_current_leg_position(self.legs["right_middle"])
-        left_rear = self.__read_single_current_leg_position(self.legs["left_rear"])
-        right_rear = self.__read_single_current_leg_position(self.legs["right_rear"])
-        return LegPositions(left_front,
-                            right_front,
-                            left_middle,
-                            right_middle,
-                            left_rear,
-                            right_rear)
-
-    def __read_single_current_leg_position(self, leg_configuration):
-        motor_positions = MotorGoalPositions(self.body_controller.read_motor_position(leg_configuration["coxa_id"]),
-                                  self.body_controller.read_motor_position(leg_configuration["femur_id"]),
-                                  self.body_controller.read_motor_position(leg_configuration["tibia_id"]))
-        return self.calculate_fk_for_leg(motor_positions, leg_configuration)
+        motor_positions = self.body_controller.read_hexapod_motor_positions()
+        return LegPositions(
+            self.calculate_fk_for_leg(motor_positions.left_front, self.legs["left_front"]),
+            self.calculate_fk_for_leg(motor_positions.right_front, self.legs["right_front"]),
+            self.calculate_fk_for_leg(motor_positions.left_middle, self.legs["left_middle"]),
+            self.calculate_fk_for_leg(motor_positions.right_middle, self.legs["right_middle"]),
+            self.calculate_fk_for_leg(motor_positions.left_rear, self.legs["left_rear"]),
+            self.calculate_fk_for_leg(motor_positions.right_rear, self.legs["right_rear"])
+        )
 
     def calculate_ik_for_leg(self, target, leg_config):
         coxa_position = Vector3()

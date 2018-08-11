@@ -17,7 +17,8 @@ catkin_python_setup()
 
 add_message_files(
   FILES
-  HopperMotorPositions.msg
+  HexapodMotorPositions.msg
+  LegMotorPositions.msg
   MotorCompliance.msg
   MotorSpeed.msg
   MotorTorque.msg
@@ -25,7 +26,7 @@ add_message_files(
 
 add_service_files(
   FILES
-  ReadMotorPosition.srv
+  ReadHexapodMotorPositions.srv
 )
 
 generate_messages(

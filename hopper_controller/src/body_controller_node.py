@@ -4,8 +4,8 @@ from threading import Lock
 import rospy
 
 from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
-from hopper_controller.msg import HopperMotorPositions, MotorCompliance, MotorSpeed, MotorTorque
-from hopper_controller.srv import ReadMotorPosition, ReadMotorPositionResponse
+from hopper_controller.msg import HexapodMotorPositions, LegMotorPositions, MotorCompliance, MotorSpeed, MotorTorque
+from hopper_controller.srv import ReadHexapodMotorPositions, ReadHexapodMotorPositionsResponse
 from dynamixel import DynamixelDriver, search_usb_2_ax_port
 
 
@@ -21,11 +21,11 @@ class BodyMotorController(object):
             self.servo_ids.append(self.leg_data[leg]["femur_id"])
             self.servo_ids.append(self.leg_data[leg]["tibia_id"])
         self.servo_driver = DynamixelDriver(search_usb_2_ax_port())
-        rospy.Subscriber("hopper/body/motor_command", HopperMotorPositions, self.on_motor_command, queue_size=20)
+        rospy.Subscriber("hopper/body/motor_command", HexapodMotorPositions, self.on_motor_command, queue_size=20)
         rospy.Subscriber("hopper/body/motor_compliance", MotorCompliance, self.on_compliance_command, queue_size=25)
         rospy.Subscriber("hopper/body/motor_speed", MotorSpeed, self.on_speed_command, queue_size=5)
         rospy.Subscriber("hopper/body/motor_torque", MotorTorque, self.on_torque_command, queue_size=20)
-        self.motor_positions_reader_service_id = rospy.Service("hopper/read_motor_position", ReadMotorPosition, self.read_motor_position)
+        self.body_motor_positions_service = rospy.Service("hopper/read_hexapod_motor_positions", ReadHexapodMotorPositions, self.read_hexapod_motor_positions)
         self.telementrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
         duration = rospy.Duration(4)
         while not rospy.is_shutdown():
@@ -40,29 +40,29 @@ class BodyMotorController(object):
     def on_motor_command(self, msg):
         commands = [
             # left front
-            (self.leg_data["left_front"]["coxa_id"], msg.left_front_coxa),
-            (self.leg_data["left_front"]["femur_id"], msg.left_front_femur),
-            (self.leg_data["left_front"]["tibia_id"], msg.left_front_tibia),
+            (self.leg_data["left_front"]["coxa_id"], msg.left_front.coxa),
+            (self.leg_data["left_front"]["femur_id"], msg.left_front.femur),
+            (self.leg_data["left_front"]["tibia_id"], msg.left_front.tibia),
             # right front
-            (self.leg_data["right_front"]["coxa_id"], msg.right_front_coxa),
-            (self.leg_data["right_front"]["femur_id"], msg.right_front_femur),
-            (self.leg_data["right_front"]["tibia_id"], msg.right_front_tibia),
+            (self.leg_data["right_front"]["coxa_id"], msg.right_front.coxa),
+            (self.leg_data["right_front"]["femur_id"], msg.right_front.femur),
+            (self.leg_data["right_front"]["tibia_id"], msg.right_front.tibia),
             # left middle
-            (self.leg_data["left_middle"]["coxa_id"], msg.left_middle_coxa),
-            (self.leg_data["left_middle"]["femur_id"], msg.left_middle_femur),
-            (self.leg_data["left_middle"]["tibia_id"], msg.left_middle_tibia),
+            (self.leg_data["left_middle"]["coxa_id"], msg.left_middle.coxa),
+            (self.leg_data["left_middle"]["femur_id"], msg.left_middle.femur),
+            (self.leg_data["left_middle"]["tibia_id"], msg.left_middle.tibia),
             # right middle
-            (self.leg_data["right_middle"]["coxa_id"], msg.right_middle_coxa),
-            (self.leg_data["right_middle"]["femur_id"], msg.right_middle_femur),
-            (self.leg_data["right_middle"]["tibia_id"], msg.right_middle_tibia),
+            (self.leg_data["right_middle"]["coxa_id"], msg.right_middle.coxa),
+            (self.leg_data["right_middle"]["femur_id"], msg.right_middle.femur),
+            (self.leg_data["right_middle"]["tibia_id"], msg.right_middle.tibia),
             # left rear
-            (self.leg_data["left_rear"]["coxa_id"], msg.left_rear_coxa),
-            (self.leg_data["left_rear"]["femur_id"], msg.left_rear_femur),
-            (self.leg_data["left_rear"]["tibia_id"], msg.left_rear_tibia),
+            (self.leg_data["left_rear"]["coxa_id"], msg.left_rear.coxa),
+            (self.leg_data["left_rear"]["femur_id"], msg.left_rear.femur),
+            (self.leg_data["left_rear"]["tibia_id"], msg.left_rear.tibia),
             # right rear
-            (self.leg_data["right_rear"]["coxa_id"], msg.right_rear_coxa),
-            (self.leg_data["right_rear"]["femur_id"], msg.right_rear_femur),
-            (self.leg_data["right_rear"]["tibia_id"], msg.right_rear_tibia)
+            (self.leg_data["right_rear"]["coxa_id"], msg.right_rear.coxa),
+            (self.leg_data["right_rear"]["femur_id"], msg.right_rear.femur),
+            (self.leg_data["right_rear"]["tibia_id"], msg.right_rear.tibia)
         ]
         self.driver_lock.acquire()
         self.servo_driver.group_sync_write_goal_degrees(commands)
@@ -86,11 +86,26 @@ class BodyMotorController(object):
             self.servo_driver.set_torque(servo_id, command.torque)
         self.driver_lock.release()
 
-    def read_motor_position(self, read_command):
+    def read_hexapod_motor_positions(self, _):
+        def read_pos(servo_id):
+            return self.servo_driver.read_current_position_degrees(servo_id)
+
+        def read_leg(leg_config):
+            return LegMotorPositions(
+                read_pos(leg_config["coxa_id"]),
+                read_pos(leg_config["femur_id"]),
+                read_pos(leg_config["tibia_id"])
+            )
+        msg = HexapodMotorPositions()
         self.driver_lock.acquire()
-        pos = self.servo_driver.read_current_position_degrees(read_command.servo_id)
+        msg.left_front = read_leg(self.leg_data["left_front"])
+        msg.right_front = read_leg(self.leg_data["right_front"])
+        msg.left_middle = read_leg(self.leg_data["left_middle"])
+        msg.right_middle = read_leg(self.leg_data["right_middle"])
+        msg.left_rear = read_leg(self.leg_data["left_rear"])
+        msg.right_rear = read_leg(self.leg_data["right_rear"])
         self.driver_lock.release()
-        return ReadMotorPositionResponse(pos)
+        return ReadHexapodMotorPositionsResponse(msg)
 
     def read_motor_telemetrics(self):
         robot_telemetrics = HexapodTelemetrics()

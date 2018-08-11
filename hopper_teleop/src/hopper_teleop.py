@@ -31,6 +31,8 @@ class HopperTeleop(pyglet.window.Window):
             self.rotation += 1
         if symbol == pyglet.window.key.E:
             self.rotation -= 1
+        if symbol == pyglet.window.key.ESCAPE:
+            pyglet.app.exit()
         self.send_new_message()
 
     def on_key_release(self, symbol, modifiers):
@@ -54,7 +56,7 @@ class HopperTeleop(pyglet.window.Window):
         new_message.cycle_time = 1
         new_message.direction.linear.x = self.x * 0.1
         new_message.direction.linear.y = self.y * 0.1
-        new_message.direction.angular.z = math.radians(self.rotation * 10)
+        new_message.direction.angular.z = math.radians(self.rotation * 30)
         self.publisher.publish(new_message)
 
 if __name__ == '__main__':

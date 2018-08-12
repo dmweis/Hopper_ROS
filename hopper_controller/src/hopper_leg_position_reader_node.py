@@ -10,7 +10,7 @@ from visualization_msgs.msg import Marker
 
 def create_marker_for_feet(leg_positions):
     marker = Marker()
-    marker.header.frame_id = "base_link"
+    marker.header.frame_id = "body_link"
     marker.header.stamp = rospy.Time.now()
     marker.type = Marker.POINTS
     marker.action = Marker.ADD

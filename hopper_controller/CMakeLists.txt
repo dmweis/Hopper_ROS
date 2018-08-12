@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
   nav_msgs
+  visualization_msgs
   hopper_msgs
   hopper_keep_alive
   tf

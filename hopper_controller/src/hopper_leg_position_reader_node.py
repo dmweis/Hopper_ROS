@@ -1,3 +1,5 @@
+#!/usr/env/dev python
+
 import rospy
 from ros_abstraction import IkController
 

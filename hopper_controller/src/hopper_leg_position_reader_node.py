@@ -8,27 +8,14 @@ from std_msgs.msg import ColorRGBA
 from visualization_msgs.msg import Marker
 
 
-def create_marker_for_feet(leg_positions, counter):
+def create_marker_for_feet(leg_positions):
     marker = Marker()
     marker.header.frame_id = "base_link"
     marker.header.stamp = rospy.Time.now()
-    marker.header.seq = counter
-    marker.ns = ""
-    marker.id = 0
-    marker.type = Marker.points
+    marker.type = Marker.POINTS
     marker.action = Marker.ADD
-    marker.pose.position.x = 0
-    marker.pose.position.y = 0
-    marker.pose.position.z = 0
-    marker.pose.orientation.x = 0.
-    marker.pose.orientation.y = 0.
-    marker.pose.orientation.z = 0.
     marker.pose.orientation.w = 1.
-    marker.scale = Vector3(0.1, 0.1, 0.1)
-    marker.color.a = 1
-    marker.color.r = 0
-    marker.color.g = 0
-    marker.color.b = 1
+    marker.scale = Vector3(0.02, 0.02, 0.02)
     marker.lifetime = rospy.Duration(0)
     marker.frame_locked = True
 
@@ -41,7 +28,7 @@ def create_marker_for_feet(leg_positions, counter):
     marker.points.append(vector_to_point(leg_positions.left_rear))
     marker.points.append(vector_to_point(leg_positions.right_rear))
     for i in range(6):
-        marker.colors.append(ColorRGBA(1, 0, 0, 1))
+        marker.colors.append(ColorRGBA(0, 1, 0, 1))
     return marker
 
 
@@ -53,12 +40,10 @@ class LegPositionReader(object):
         ik_controller = IkController()
         ik_controller.disable_motors()
         loop_rate = rospy.Rate(30)
-        counter = 0
         while not rospy.is_shutdown():
             leg_positions = ik_controller.read_current_leg_positions()
             markers = create_marker_for_feet(leg_positions)
             marker_publisher.publish(markers)
-            counter += 1
             loop_rate.sleep()
 
 

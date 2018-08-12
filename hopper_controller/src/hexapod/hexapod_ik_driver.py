@@ -471,12 +471,12 @@ class IkDriver(object):
         motor_positions.right_middle = self.calculate_ik_for_leg(leg_positions.right_middle, self.legs["right_middle"])
         motor_positions.left_rear = self.calculate_ik_for_leg(leg_positions.left_rear, self.legs["left_rear"])
         motor_positions.right_rear = self.calculate_ik_for_leg(leg_positions.right_rear, self.legs["right_rear"])
-
         self.body_controller.set_motors(motor_positions)
         self.joint_state_publisher.update_joint_states(motor_positions)
 
     def read_current_leg_positions(self):
         motor_positions = self.body_controller.read_hexapod_motor_positions()
+        self.joint_state_publisher.update_joint_states(motor_positions)
         return LegPositions(
             self.calculate_fk_for_leg(motor_positions.left_front, self.legs["left_front"]),
             self.calculate_fk_for_leg(motor_positions.right_front, self.legs["right_front"]),

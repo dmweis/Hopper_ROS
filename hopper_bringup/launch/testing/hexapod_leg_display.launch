@@ -5,8 +5,6 @@
     <node name="hopper_leg_position_reader_node" pkg="hopper_controller" type="hopper_leg_position_reader_node.py"/>
     <node name="hopper_ik_controller" pkg="hopper_controller" type="ik_controller_node.py"/>
     <node name="hopper_body_controller" pkg="hopper_controller" type="body_controller_node.py"/>
-        <param name="publish_odometry_to_tf" value="false"/>
-    </node>
     <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py">
         <env name="AUDIODEV" value="/dev/audio1"/>
     </node>

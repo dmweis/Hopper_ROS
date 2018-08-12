@@ -37,6 +37,7 @@ generate_messages(
   sensor_msgs
   std_msgs
   nav_msgs
+  visualization_msgs
   hopper_keep_alive
 )
 

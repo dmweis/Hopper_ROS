@@ -8,6 +8,7 @@
         <param name="video_device" value="/dev/video0" />
         <param name="image_width" value="640" />
         <param name="image_height" value="480" />
+        <param name="framerate" value="15" />
         <param name="camera_frame_id" value="left_camera" />
         <param name="camera_name" value="left_camera" />
         <remap from="left/image_raw" to="left/image_original"/>
@@ -17,6 +18,7 @@
         <param name="video_device" value="/dev/video1" />
         <param name="image_width" value="640" />
         <param name="image_height" value="480" />
+        <param name="framerate" value="15" />
         <param name="camera_frame_id" value="right_camera" />
         <param name="camera_name" value="right_camera" />
         <remap from="right/image_raw" to="right/image_original"/>

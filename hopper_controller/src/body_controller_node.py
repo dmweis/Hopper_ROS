@@ -30,7 +30,10 @@ class BodyMotorController(object):
         duration = rospy.Duration(4)
         while not rospy.is_shutdown():
             rospy.sleep(duration)
-            self.read_motor_telemetrics()
+            try:
+                self.read_motor_telemetrics()
+            except IOError as e:
+                rospy.logerr(e)
         self.driver_lock.acquire()
         for servo_id in self.servo_ids:
             self.servo_driver.set_torque(servo_id, False)

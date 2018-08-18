@@ -26,7 +26,8 @@ class HexapodController(object):
         self.halt_service = rospy.ServiceProxy("halt", Halt)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
-        rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose)
+        rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose_centimeters)
+        rospy.Subscriber("hopper/stance_translate", Twist, self.update_pose)
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
         rospy.Subscriber("hopper/halt", HaltCommand, self.on_halt_command)
         self.controller.spin()
@@ -65,6 +66,11 @@ class HexapodController(object):
                                          HopperMoveCommand.DEFAULT_LIFT_HEIGHT)
 
     def update_pose(self, twist):
+        transform = Vector3(twist.linear.x / 100, twist.linear.y / 100, twist.linear.z / 100)
+        rotation = Vector3(math.degrees(twist.angular.x), math.degrees(twist.angular.y), math.degrees(twist.angular.z))
+        self.controller.set_relaxed_pose(transform, rotation)
+
+    def update_pose_centimeters(self, twist):
         transform = Vector3(twist.linear.x, twist.linear.y, twist.linear.z)
         rotation = Vector3(twist.angular.x, twist.angular.y, twist.angular.z)
         self.controller.set_relaxed_pose(transform, rotation)

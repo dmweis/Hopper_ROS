@@ -200,7 +200,7 @@ class SteamControllerRosHandler(object):
         if controller_data.rtrig != 0:
             lift_height += 2 * scale_trigger(controller_data.rtrig)
             # print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
-        self.update_robot_command(robot_x, robot_y, robot_rot, cycle_time, lift_height=lift_height)
+        self.update_robot_command(robot_x, robot_y, robot_rot, cycle_time, stance, lift_height=lift_height)
 
     def publisher_loop(self):
         rate = rospy.Rate(60)

@@ -211,7 +211,7 @@ class SteamControllerRosHandler(object):
                 self._new_command_available = False
             rate.sleep()
 
-    def update_robot_command(self, x, y, rot, cycle_time, stance, lift_height=2):
+    def update_robot_command(self, x, y, rot, cycle_time, stance_pose, lift_height=2):
         move_command = HopperMoveCommand()
         tmp = x
         distance_multiplier = linear_map(cycle_time, 0.25, 1.0, 4.0, 1.0)

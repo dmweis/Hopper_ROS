@@ -34,11 +34,10 @@ class BodyMotorController(object):
                 self.read_motor_telemetrics()
             except IOError as e:
                 rospy.logerr("IOError on telemetrics read " + str(e))
-        self.driver_lock.acquire()
-        for servo_id in self.servo_ids:
-            self.servo_driver.set_torque(servo_id, False)
-        self.servo_driver.close()
-        self.driver_lock.release()
+        with self.driver_lock:
+            for servo_id in self.servo_ids:
+                self.servo_driver.set_torque(servo_id, False)
+            self.servo_driver.close()
 
     def on_motor_command(self, msg):
         commands = [
@@ -67,27 +66,23 @@ class BodyMotorController(object):
             (self.leg_data["right_rear"]["femur_id"], msg.right_rear.femur),
             (self.leg_data["right_rear"]["tibia_id"], msg.right_rear.tibia)
         ]
-        self.driver_lock.acquire()
-        self.servo_driver.group_sync_write_goal_degrees(commands)
-        self.driver_lock.release()
+        with self.driver_lock:
+            self.servo_driver.group_sync_write_goal_degrees(commands)
 
     def on_compliance_command(self, command):
-        self.driver_lock.acquire()
-        for servo_id in self.servo_ids:
-            self.servo_driver.set_compliance_slope(servo_id, command.compliance)
-        self.driver_lock.release()
+        with self.driver_lock.:
+            for servo_id in self.servo_ids:
+                self.servo_driver.set_compliance_slope(servo_id, command.compliance)
 
     def on_speed_command(self, command):
-        self.driver_lock.acquire()
-        for servo_id in self.servo_ids:
-            self.servo_driver.set_moving_speed(servo_id, command.speed)
-        self.driver_lock.release()
+        with self.driver_lock:
+            for servo_id in self.servo_ids:
+                self.servo_driver.set_moving_speed(servo_id, command.speed)
 
     def on_torque_command(self, command):
-        self.driver_lock.acquire()
-        for servo_id in self.servo_ids:
-            self.servo_driver.set_torque(servo_id, command.torque)
-        self.driver_lock.release()
+        with self.driver_lock:
+            for servo_id in self.servo_ids:
+                self.servo_driver.set_torque(servo_id, command.torque)
 
     def read_hexapod_motor_positions(self, _):
         def read_pos(servo_id):
@@ -100,24 +95,22 @@ class BodyMotorController(object):
                 read_pos(leg_config["tibia_id"])
             )
         msg = HexapodMotorPositions()
-        self.driver_lock.acquire()
-        msg.left_front = read_leg(self.leg_data["left_front"])
-        msg.right_front = read_leg(self.leg_data["right_front"])
-        msg.left_middle = read_leg(self.leg_data["left_middle"])
-        msg.right_middle = read_leg(self.leg_data["right_middle"])
-        msg.left_rear = read_leg(self.leg_data["left_rear"])
-        msg.right_rear = read_leg(self.leg_data["right_rear"])
-        self.driver_lock.release()
+        with self.driver_lock:
+            msg.left_front = read_leg(self.leg_data["left_front"])
+            msg.right_front = read_leg(self.leg_data["right_front"])
+            msg.left_middle = read_leg(self.leg_data["left_middle"])
+            msg.right_middle = read_leg(self.leg_data["right_middle"])
+            msg.left_rear = read_leg(self.leg_data["left_rear"])
+            msg.right_rear = read_leg(self.leg_data["right_rear"])
         return ReadHexapodMotorPositionsResponse(msg)
 
     def read_motor_telemetrics(self):
         robot_telemetrics = HexapodTelemetrics()
-        for servo_id in self.servo_ids:
-            self.driver_lock.acquire()
-            voltage = self.servo_driver.read_voltage(servo_id)
-            temperature = self.servo_driver.read_temperature(servo_id)
-            self.driver_lock.release()
-            robot_telemetrics.servos.append(ServoTelemetrics(servo_id, temperature, voltage))
+        with self.driver_lock:
+            for servo_id in self.servo_ids:
+                voltage = self.servo_driver.read_voltage(servo_id)
+                temperature = self.servo_driver.read_temperature(servo_id)
+                robot_telemetrics.servos.append(ServoTelemetrics(servo_id, temperature, voltage))
         self.telementrics_publisher.publish(robot_telemetrics)
 
 

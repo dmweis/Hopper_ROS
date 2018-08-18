@@ -141,7 +141,7 @@ class DynamixelDriver(object):
         dxl_comm_result = dynamixel.getLastTxRxResult(self.__port_num, PROTOCOL)
         if dxl_comm_result != 0:
             dynamixel.printTxRxResult(PROTOCOL, dxl_comm_result)
-            raise IOError()
+            raise IOError("dxl_comm_result: " + str(dxl_comm_result))
         dynamixel.groupSyncWriteClearParam(sync_group_num)
 
     def set_compliance_slope(self, servo_id, compliance_slope):
@@ -171,10 +171,10 @@ class DynamixelDriver(object):
         dxl_error = dynamixel.getLastRxPacketError(self.__port_num, 1)
         if dxl_comm_result != 0:
             dynamixel.printTxRxResult(PROTOCOL, dxl_comm_result)
-            raise IOError()
+            raise IOError("dxl_comm_result: " + str(dxl_comm_result))
         if dxl_error != 0:
             dynamixel.printRxPacketError(PROTOCOL, dxl_error)
-            raise IOError()
+            raise IOError("dxl_error: " + str(dxl_error))
 
     def close(self):
         dynamixel.closePort(self.__port_num)

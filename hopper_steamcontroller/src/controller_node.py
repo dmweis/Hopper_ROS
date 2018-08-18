@@ -229,8 +229,8 @@ class SteamControllerRosHandler(object):
         self._hopper_move_command_msg.direction.linear.y != move_command.direction.linear.y or
         self._hopper_move_command_msg.direction.angular.z != move_command.direction.angular.z or
         self._hopper_move_command_msg.lift_height != move_command.lift_height or
-        self._hopper_move_command_msg.cycle_time != move_command.cycle_time) or
-        self.hopper_stance_command != stance
+        self._hopper_move_command_msg.cycle_time != move_command.cycle_time or
+        self.hopper_stance_command != stance)
         if message_changed:
             self._hopper_move_command_msg = move_command
             self.hopper_stance_command = stance

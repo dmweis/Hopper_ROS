@@ -66,7 +66,7 @@ class HexapodController(object):
                                          HopperMoveCommand.DEFAULT_LIFT_HEIGHT)
 
     def update_pose(self, twist):
-        transform = Vector3(twist.linear.x / 100, twist.linear.y / 100, twist.linear.z / 100)
+        transform = Vector3(twist.linear.x * 100, twist.linear.y * 100, twist.linear.z * 100)
         rotation = Vector3(math.degrees(twist.angular.x), math.degrees(twist.angular.y), math.degrees(twist.angular.z))
         self.controller.set_relaxed_pose(transform, rotation)
 

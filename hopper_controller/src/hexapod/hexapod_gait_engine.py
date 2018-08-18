@@ -215,7 +215,7 @@ class GaitEngine(object):
         self.gait_sequencer.execute_move(pose, speed_override)
 
     def update_relaxed_body_pose(self, transform, rotation, legs=LegFlags.ALL, speed_override=None):
-        speed = 9
+        speed = 15
         if speed_override is not None:
             speed = speed_override
         self.gait_sequencer.update_relaxed_body_pose(transform, rotation, speed, legs)

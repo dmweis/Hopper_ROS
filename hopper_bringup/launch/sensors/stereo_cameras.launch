@@ -10,7 +10,7 @@
         <param name="image_height" value="480" />
         <param name="camera_frame_id" value="left_camera" />
         <param name="camera_name" value="left_camera" />
-        <remap from="left/image_raw" to="left/image_compressed"/>
+        <remap from="left/image_raw" to="left/image_original"/>
     </node>
     <node name="right" pkg="usb_cam" type="usb_cam_node" output="screen" >
         <param name="pixel_format" value="yuyv" />
@@ -19,8 +19,6 @@
         <param name="image_height" value="480" />
         <param name="camera_frame_id" value="right_camera" />
         <param name="camera_name" value="right_camera" />
-        <remap from="right/image_raw" to="right/image_compressed"/>
+        <remap from="right/image_raw" to="right/image_original"/>
     </node>
-    <!-- <node name="left_republish_sender" pkg="image_transport" type="republish" args="raw in:=left/image_uncompressed compressed out:=left/image_compressed"/> -->
-    <!-- <node name="right_republish_sender" pkg="image_transport" type="republish" args="raw in:=right/image_uncompressed compressed out:=right/image_compressed"/> -->
 </launch>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <node name="left_republish_receiver" pkg="image_transport" type="republish" args="compressed in:=left/image_compressed raw out:=left/image_raw"/>
-    <node name="right_republish_receiver" pkg="image_transport" type="republish" args="compressed in:=right/image_compressed raw out:=right/image_raw"/>
+    <node name="left_republish_receiver" pkg="image_transport" type="republish" args="compressed in:=left/image_original raw out:=left/image_raw"/>
+    <node name="right_republish_receiver" pkg="image_transport" type="republish" args="compressed in:=right/image_original raw out:=right/image_raw"/>
 </launch>

@@ -185,10 +185,10 @@ class SteamControllerRosHandler(object):
 
         if not check_button(buttons, SCButtons.LPADTOUCH) and (controller_data.lpad_x != 0 or controller_data.lpad_y != 0):
             x, y = remap_axis(controller_data.lpad_x, controller_data.lpad_y)
-            stance_pose.linear.z = x * 0.05
-            stance_pose.linear.y = y * 0.05
-            stance_pose.angular.z = math.radians(x * 5)
-            stance_pose.angular.z = math.radians(x * 5)
+            stance_pose.linear.z = y * 0.02
+            stance_pose.linear.y = x * 0.03
+            stance_pose.angular.z = math.radians(x * 10)
+            stance_pose.angular.y = math.radians(x * 8)
             # print "Stick is at X:{0:.3f} Y:{1:.3f}".format(x, y)
         
         lift_height = 2

@@ -70,7 +70,9 @@ class SteamControllerRosHandler(object):
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.move_pub = rospy.Publisher('hopper_schedule_move', String, queue_size=5)
         self.halt_command = rospy.Publisher('hopper/halt', HaltCommand, queue_size=1)
+        self.stance_translate = rospy.Publisher('v', Twist, queue_size=1)
         self._hopper_move_command_msg = HopperMoveCommand()
+        self.hopper_stance_command = Twist()
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)
         # activate IMU
@@ -158,6 +160,8 @@ class SteamControllerRosHandler(object):
         robot_y = 0
         robot_rot = 0
 
+        stance_pose = Twist()
+
         if check_button(buttons, SCButtons.LPADTOUCH):
             x, y = remap_axis(controller_data.lpad_x, controller_data.lpad_y, left_pad=True)
             xp, yp = remap_axis(previous_data.lpad_x, previous_data.lpad_y, left_pad=True)
@@ -181,8 +185,10 @@ class SteamControllerRosHandler(object):
 
         if not check_button(buttons, SCButtons.LPADTOUCH) and (controller_data.lpad_x != 0 or controller_data.lpad_y != 0):
             x, y = remap_axis(controller_data.lpad_x, controller_data.lpad_y)
-            robot_x = -x
-            robot_y = y
+            stance_pose.linear.z = x * 0.05
+            stance_pose.linear.y = y * 0.05
+            stance_pose.angular.z = math.radians(x * 5)
+            stance_pose.angular.z = math.radians(x * 5)
             # print "Stick is at X:{0:.3f} Y:{1:.3f}".format(x, y)
         
         lift_height = 2
@@ -201,10 +207,11 @@ class SteamControllerRosHandler(object):
         while not rospy.is_shutdown():
             if self._new_command_available:
                 self.pub.publish(self._hopper_move_command_msg)
+                self.stance_translate.publish(self.stance_translate)
                 self._new_command_available = False
             rate.sleep()
 
-    def update_robot_command(self, x, y, rot, cycle_time, lift_height=2):
+    def update_robot_command(self, x, y, rot, cycle_time, stance, lift_height=2):
         move_command = HopperMoveCommand()
         tmp = x
         distance_multiplier = linear_map(cycle_time, 0.25, 1.0, 4.0, 1.0)
@@ -222,9 +229,11 @@ class SteamControllerRosHandler(object):
         self._hopper_move_command_msg.direction.linear.y != move_command.direction.linear.y or
         self._hopper_move_command_msg.direction.angular.z != move_command.direction.angular.z or
         self._hopper_move_command_msg.lift_height != move_command.lift_height or
-        self._hopper_move_command_msg.cycle_time != move_command.cycle_time)
+        self._hopper_move_command_msg.cycle_time != move_command.cycle_time) or
+        self.hopper_stance_command != stance
         if message_changed:
             self._hopper_move_command_msg = move_command
+            self.hopper_stance_command = stance
             self._new_command_available = True
 
 if __name__ == "__main__":

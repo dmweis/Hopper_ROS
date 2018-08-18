@@ -70,7 +70,7 @@ class BodyMotorController(object):
             self.servo_driver.group_sync_write_goal_degrees(commands)
 
     def on_compliance_command(self, command):
-        with self.driver_lock.:
+        with self.driver_lock:
             for servo_id in self.servo_ids:
                 self.servo_driver.set_compliance_slope(servo_id, command.compliance)
 

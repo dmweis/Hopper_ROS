@@ -200,7 +200,7 @@ class SteamControllerRosHandler(object):
         if controller_data.rtrig != 0:
             lift_height += 2 * scale_trigger(controller_data.rtrig)
             # print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
-        self.update_robot_command(robot_x, robot_y, robot_rot, cycle_time, stance, lift_height=lift_height)
+        self.update_robot_command(robot_x, robot_y, robot_rot, cycle_time, stance_pose, lift_height=lift_height)
 
     def publisher_loop(self):
         rate = rospy.Rate(60)
@@ -211,7 +211,7 @@ class SteamControllerRosHandler(object):
                 self._new_command_available = False
             rate.sleep()
 
-    def update_robot_command(self, x, y, rot, cycle_time, stance_pose, lift_height=2):
+    def update_robot_command(self, x, y, rot, cycle_time, stance, lift_height=2):
         move_command = HopperMoveCommand()
         tmp = x
         distance_multiplier = linear_map(cycle_time, 0.25, 1.0, 4.0, 1.0)

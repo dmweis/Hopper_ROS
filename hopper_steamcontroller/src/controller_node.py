@@ -72,7 +72,7 @@ class SteamControllerRosHandler(object):
         self.halt_command = rospy.Publisher('hopper/halt', HaltCommand, queue_size=1)
         self.stance_translate = rospy.Publisher('hopper_stance_translate', Twist, queue_size=1)
         self._hopper_move_command_msg = HopperMoveCommand()
-        self.hopper_stance_command = Twist()
+        self.last_stance_msg = Twist()
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)
         # activate IMU
@@ -207,7 +207,7 @@ class SteamControllerRosHandler(object):
         while not rospy.is_shutdown():
             if self._new_command_available:
                 self.pub.publish(self._hopper_move_command_msg)
-                self.stance_translate.publish(self.stance_translate)
+                self.stance_translate.publish(self.last_stance_msg)
                 self._new_command_available = False
             rate.sleep()
 
@@ -233,7 +233,7 @@ class SteamControllerRosHandler(object):
         self.hopper_stance_command != stance)
         if message_changed:
             self._hopper_move_command_msg = move_command
-            self.hopper_stance_command = stance
+            self.last_stance_msg = stance
             self._new_command_available = True
 
 if __name__ == "__main__":

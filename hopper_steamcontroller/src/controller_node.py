@@ -70,7 +70,7 @@ class SteamControllerRosHandler(object):
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.move_pub = rospy.Publisher('hopper_schedule_move', String, queue_size=5)
         self.halt_command = rospy.Publisher('hopper/halt', HaltCommand, queue_size=1)
-        self.stance_translate = rospy.Publisher('v', Twist, queue_size=1)
+        self.stance_translate = rospy.Publisher('hopper_stance_translate', Twist, queue_size=1)
         self._hopper_move_command_msg = HopperMoveCommand()
         self.hopper_stance_command = Twist()
         self._new_command_available = True
@@ -218,7 +218,7 @@ class SteamControllerRosHandler(object):
         x = y * 0.13 * distance_multiplier
         y = tmp * 0.13 * distance_multiplier
         if abs(rot) > 0.2:
-            rot = -rot * 40
+            rot = -rot * 40 * linear_map(cycle_time, 0.25, 1, 4, 1)
         move_command.direction.linear.x = x
         move_command.direction.linear.y = y
         move_command.direction.angular.z = math.radians(rot)

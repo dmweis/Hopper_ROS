@@ -18,12 +18,13 @@ class HexapodController(object):
         super(HexapodController, self).__init__()
         rospy.init_node('hopper_controller')
         # build controller
+        self.sound_on = rospy.get_param("~sound_on", True)
         ik_driver = ros_abstraction.IkController()
         message_publisher = ros_abstraction.MessagePublisher()
         tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
                                  ros_abstraction.OdomPublisher(message_publisher))
         gait_engine = GaitEngine(tripod_gait)
-        self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer())
+        self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer(self.sound_on))
         self.halt_publisher = rospy.Publisher("halt", Empty, queue_size=1, latch=True)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)

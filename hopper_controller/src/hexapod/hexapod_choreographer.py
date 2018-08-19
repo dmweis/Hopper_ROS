@@ -130,7 +130,6 @@ def roar(gait_engine):
 
 def hump(gait_engine):
     speed = 13
-    sound_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
     gait_engine.reset_relaxed_body_pose(speed)
     normal_pose = gait_engine.get_relaxed_pose()
     forward_hump = normal_pose \
@@ -139,7 +138,6 @@ def hump(gait_engine):
     backwards_hump = normal_pose \
         .transform(Vector3(x=3))
     for i in range(10):
-        sound_publisher.publish("windows_usbin")
         gait_engine.move_to_new_pose(forward_hump, speed)
         speed = speed + 1
         gait_engine.move_to_new_pose(backwards_hump, speed)

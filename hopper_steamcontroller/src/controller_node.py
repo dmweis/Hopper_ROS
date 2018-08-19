@@ -46,8 +46,7 @@ def scale_trigger(value):
 def check_button(buttons, button_flag):
     return buttons & button_flag == button_flag
 
-def get_next_selected_leg():
-    legs = [
+ALL_LEGS = [
         SingleLegCommand.LEFT_FRONT,
         SingleLegCommand.RIGHT_FRONT,
         SingleLegCommand.RIGHT_MIDDLE,
@@ -55,9 +54,14 @@ def get_next_selected_leg():
         SingleLegCommand.LEFT_REAR,
         SingleLegCommand.LEFT_MIDDLE
         ]
-    while True:
-        for leg in legs:
-            yield leg
+
+selected_leg_index = 0
+
+def get_next_selected_leg():
+    selected_leg_index += 1
+    if selected_leg_index > len(ALL_LEGS) - 1:
+        selected_leg_index = 0
+    return ALL_LEGS[selected_leg_index]
 
 
 class RosSteamController(SteamController):

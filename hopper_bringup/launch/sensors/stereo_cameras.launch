@@ -3,22 +3,22 @@
     <arg name="model" default="$(find hopper_description)/urdf/hopper.xarco"/>
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
-    <node name="left" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <node name="left" pkg="usb_cam" type="usb_cam_node" output="screen" respawn="true" respawn_delay="5">
         <param name="pixel_format" value="yuyv" />
         <param name="video_device" value="/dev/video0" />
         <param name="image_width" value="640" />
         <param name="image_height" value="480" />
-        <param name="framerate" value="15" />
+        <param name="framerate" value="10" />
         <param name="camera_frame_id" value="left_camera" />
         <param name="camera_name" value="left_camera" />
         <remap from="left/image_raw" to="left/image_original"/>
     </node>
-    <node name="right" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <node name="right" pkg="usb_cam" type="usb_cam_node" output="screen" respawn="true" respawn_delay="5">
         <param name="pixel_format" value="yuyv" />
         <param name="video_device" value="/dev/video1" />
         <param name="image_width" value="640" />
         <param name="image_height" value="480" />
-        <param name="framerate" value="15" />
+        <param name="framerate" value="10" />
         <param name="camera_frame_id" value="right_camera" />
         <param name="camera_name" value="right_camera" />
         <remap from="right/image_raw" to="right/image_original"/>

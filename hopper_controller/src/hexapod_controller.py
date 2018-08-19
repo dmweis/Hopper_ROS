@@ -5,8 +5,7 @@ import math
 import rospy
 from geometry_msgs.msg import Twist
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
-from hopper_keep_alive.srv import Halt
-from std_msgs.msg import String
+from std_msgs.msg import String, Empty
 
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
@@ -23,7 +22,7 @@ class HexapodController(object):
         tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(), ros_abstraction.OdomPublisher())
         gait_engine = GaitEngine(tripod_gait)
         self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer())
-        self.halt_service = rospy.ServiceProxy("halt", Halt)
+        self.halt_publisher = rospy.Publisher("halt", Empty, queue_size=1, latch=True)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose_centimeters)
@@ -31,7 +30,7 @@ class HexapodController(object):
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
         rospy.Subscriber("hopper/halt", HaltCommand, self.on_halt_command)
         self.controller.spin()
-        self.halt_service()
+        self.halt_publisher.publish(Empty())
 
     def on_halt_command(self, _):
         self.controller.keep_running = False

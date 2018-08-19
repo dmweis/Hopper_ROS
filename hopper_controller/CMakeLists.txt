@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   visualization_msgs
   hopper_msgs
-  hopper_keep_alive
   tf
   message_generation
 )
@@ -39,7 +38,6 @@ generate_messages(
   std_msgs
   nav_msgs
   visualization_msgs
-  hopper_keep_alive
 )
 
 catkin_package(

@@ -1,7 +1,6 @@
 import math
 import rospy
 from sensor_msgs.msg import JointState
-from .telemetric_updater import get_default_message_publisher
 
 JOINT_NAMES = [
     "left_front_coxa_joint",

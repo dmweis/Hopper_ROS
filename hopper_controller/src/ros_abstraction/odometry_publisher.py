@@ -6,7 +6,6 @@ from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
 import tf2_ros
 from hexapod import Vector3, Vector2
-from .telemetric_updater import get_default_message_publisher
 
 
 def create_empty_transform_stamped(parent_name, child_name):

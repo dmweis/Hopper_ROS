@@ -76,8 +76,8 @@ class HexapodController(object):
         self.controller.set_relaxed_pose(transform, rotation)
 
     def update_single_leg(self, msg):
-        msg.position = Vector3(msg.position.x * 100, msg.position.y * 100, msg.position.z * 100)
-        self.controller.update_single_leg_command(msg)
+        position = Vector3(msg.position.x * 100, msg.position.y * 100, msg.position.z * 100)
+        self.controller.update_single_leg_command(msg.selected_leg, position, msg.single_leg_mode_on)
 
     def update_pose_centimeters(self, twist):
         transform = Vector3(twist.linear.x, twist.linear.y, twist.linear.z)

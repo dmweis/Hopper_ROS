@@ -80,6 +80,7 @@ class MovementController(object):
         self._pose_update_ready = False
         # single leg mode
         self.single_leg_mode_on = False
+        self.selected_leg_switched = False
         self.selected_single_leg = int(LegFlags.LEFT_FRONT)
         self.single_leg_position = Vector3()
         self._command_queue = Queue(maxsize=1)
@@ -101,7 +102,9 @@ class MovementController(object):
         while not rospy.is_shutdown() and self.keep_running:
             if self.single_leg_mode_on:
                 self.handle_single_leg_mode()
-                self._relaxed = False
+            if self.selected_leg_switched:
+                self.selected_leg_switched = False
+                self._gait_engine.move_to_new_pose(self._gait_engine.get_relaxed_pose(), 15)
             elif self._should_move():
                 # execute move
                 self._gait_engine.step(self._velocity, self._theta, self._cycle_time, self._lift_height)
@@ -163,10 +166,15 @@ class MovementController(object):
         if not self._command_queue.full():
             self._command_queue.put_nowait(move_name)
 
-    def update_single_leg_command(self, command):
-        self.selected_single_leg = LegFlags(command.selected_leg)
-        self.single_leg_position = Vector3.ros_vector3_to_overload_vector(command.position)
-        self.single_leg_mode_on = command.single_leg_mode_on
+    def update_single_leg_command(self, selected_leg, position, single_leg_mode_on):
+        new_selected_leg = LegFlags(selected_leg)
+        if new_selected_leg != self.selected_single_leg:
+            self.selected_leg_switched = True
+        self.selected_single_leg = new_selected_leg
+        self.single_leg_position = position
+        if self.single_leg_mode_on and not single_leg_mode_on:
+            self.selected_leg_switched = True
+        self.single_leg_mode_on = single_leg_mode_on
 
     def handle_single_leg_mode(self):
         leg_dict = {
@@ -183,6 +191,9 @@ class MovementController(object):
         new_lifted_leg_pos = self._gait_engine.get_relaxed_pose()\
             .transform(lifted_vector, self.selected_single_leg)\
             .transform(translation_vector, self.selected_single_leg)
+        if self.selected_leg_switched:
+            self.selected_leg_switched = False
+            self._gait_engine.move_to_new_pose(self._gait_engine.get_relaxed_pose(), 15)
         self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
 
     def _should_move(self):
@@ -236,9 +247,8 @@ class GaitEngine(object):
     def relax_next_leg(self):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)
 
-    def move_to_new_pose(self, pose, speed_override=None):
+    def move_to_new_pose(self, pose, speed_override):
         """
-
         :type pose: LegPositions
         :type speed_override: float
         """

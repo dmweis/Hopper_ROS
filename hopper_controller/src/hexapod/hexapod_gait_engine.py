@@ -78,7 +78,7 @@ class MovementController(object):
         self._relaxed_rotation = Vector3()
         self._lift_height = 2
         self._pose_update_ready = False
-        self._command_queue = Queue()
+        self._command_queue = Queue(maxsize=2)
         self._ros_timer = rospy.Rate(INTERPOLATION_FREQUENCY)
 
     def spin(self):
@@ -153,7 +153,8 @@ class MovementController(object):
         self._theta = 0
 
     def schedule_move(self, move_name):
-        self._command_queue.put_nowait(move_name)
+        if not self._command_queue.full():
+            self._command_queue.put_nowait(move_name)
 
     def _should_move(self):
         return not self._velocity.is_zero() or self._theta != 0

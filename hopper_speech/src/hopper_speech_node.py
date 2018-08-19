@@ -37,9 +37,13 @@ class HopperSpeechHandles(object):
     def on_play_random(self, string_msg):
         folder_name = string_msg.data
         if not folder_name:
-            sound_file_names = filter(lambda name: ".wav" in name ,listdir(self.secondary_sound_path))
-            selected_file = random.choice(sound_file_names)
-            self.sound_client.playWave(self.secondary_sound_path + selected_file)
+            folder_name = ""
+        else:
+            folder_name += "/"
+        sound_file_names = filter(lambda name: ".wav" in name ,listdir(self.secondary_sound_path + folder_name))
+        selected_file = random.choice(sound_file_names)
+        self.sound_client.playWave(self.secondary_sound_path + folder_name + selected_file)
+
 
 if __name__ == '__main__':
     HopperSpeechHandles()

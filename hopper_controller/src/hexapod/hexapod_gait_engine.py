@@ -78,7 +78,7 @@ class MovementController(object):
         self._relaxed_rotation = Vector3()
         self._lift_height = 2
         self._pose_update_ready = False
-        self._command_queue = Queue(maxsize=2)
+        self._command_queue = Queue(maxsize=1)
         self._ros_timer = rospy.Rate(INTERPOLATION_FREQUENCY)
 
     def spin(self):

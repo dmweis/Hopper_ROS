@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 from os.path import expanduser
+from os import listdir
 import os.path as path
+import random
 import rospy
 import rospkg
 from sound_play.libsoundplay import SoundClient
@@ -14,9 +16,10 @@ class HopperSpeechHandles(object):
         rospy.init_node("hopper_speech_core", anonymous=True)
         rospack = rospkg.RosPack()
         self.primary_sound_path = rospack.get_path('hopper_speech') + "/sounds/"
-        self.secondary_sound_path = expanduser("~") + "/sounds/"
+        self.secondary_sound_path = expanduser("~") + "/Music/"
         self.sound_client = SoundClient()
-        self.play_sound_sub = rospy.Subscriber("hopper_play_sound", String, self.on_play_sound)
+        rospy.Subscriber("hopper_play_sound", String, self.on_play_sound)
+        rospy.Subscriber("hopper/sound/play_random", String, self.on_play_random)
         rospy.spin()
 
     def on_play_sound(self, string):
@@ -31,6 +34,12 @@ class HopperSpeechHandles(object):
         elif path.isfile(self.secondary_sound_path + wav_file_name):
             self.sound_client.playWave(self.secondary_sound_path + wav_file_name)
 
+    def on_play_random(self, string_msg):
+        folder_name = string_msg.data
+        if not folder_name:
+            sound_file_names = filter(lambda name: ".wav" in name ,listdir(self.secondary_sound_path))
+            selected_file = random.choice(sound_file_names)
+            self.sound_client.playWave(self.secondary_sound_path + selected_file)
 
 if __name__ == '__main__':
     HopperSpeechHandles()

@@ -69,6 +69,7 @@ class SteamControllerRosHandler(object):
 
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
+        self.random_speech = rospy.Publisher('hopper/sound/play_random', String, queue_size=5)
         self.move_pub = rospy.Publisher('hopper_schedule_move', String, queue_size=5)
         self.halt_command = rospy.Publisher('hopper/halt', HaltCommand, queue_size=1)
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
@@ -114,7 +115,7 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.Y:
                 self.speech_pub.publish("take_your_paws")
             if buttons_pressed & SCButtons.BACK:
-                self.speech_pub.publish("windows_hardware_error")
+                self.random_speech.publish("")
             if buttons_pressed & SCButtons.START:
                 self.speech_pub.publish("windows_startup")
         elif right_grip_down:

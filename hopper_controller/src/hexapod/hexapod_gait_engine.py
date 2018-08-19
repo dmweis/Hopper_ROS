@@ -178,9 +178,13 @@ class MovementController(object):
             LegFlags.RIGHT_REAR: "right_rear"
         }
         correction_angle = rospy.get_param("legs")[leg_dict[self.selected_single_leg]]["angle_offset"]
+        lifted_vector = Vector3(x=6, z=6)
+        lifted_vector.rotate_around_z(correction_angle)
+        translation_vector = self.single_leg_position.clone()
+        translation_vector.rotate_around_z(correction_angle)
         new_lifted_leg_pos = self._gait_engine.get_relaxed_pose()\
-            .transform(Vector3(x=6, z=6).rotate_around_z(correction_angle), self.selected_single_leg)\
-            .transform(self.single_leg_position.rotate_around_z(correction_angle), self.selected_single_leg)
+            .transform(lifted_vector, self.selected_single_leg)\
+            .transform(translation_vector, self.selected_single_leg)
         self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
 
     def _should_move(self):

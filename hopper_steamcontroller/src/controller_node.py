@@ -65,6 +65,7 @@ class SteamControllerRosHandler(object):
 
         self._left_pad_moved = 0
         self._right_pad_moved = 0
+        self.robot_height_offset = 0
 
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
@@ -116,7 +117,7 @@ class SteamControllerRosHandler(object):
                 self.speech_pub.publish("ultron")
             if buttons_pressed & SCButtons.START:
                 self.speech_pub.publish("take_your_paws")
-        if right_grip_down:
+        elif right_grip_down:
             if buttons_pressed & SCButtons.A:
                 self.move_pub.publish("happy_hand_dance")
             if buttons_pressed & SCButtons.B:
@@ -129,8 +130,17 @@ class SteamControllerRosHandler(object):
                 self.move_pub.publish("wave_hi")
             if buttons_pressed & SCButtons.START:
                 self.move_pub.publish("roar")
+        else:
+            if buttons_pressed & SCButtons.A:
+                self.robot_height_offset += 0.01
+            if buttons_pressed & SCButtons.Y:
+                self.robot_height_offset -= 0.01
+            if buttons_pressed & SCButtons.B:
+                self.robot_height_offset = 0
+
         if buttons_pressed & SCButtons.STEAM:
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))
+        
         # # buttons
         # for button in list(SCButtons):
         #     if button & buttons:
@@ -161,6 +171,7 @@ class SteamControllerRosHandler(object):
         robot_rot = 0
 
         stance_pose = Twist()
+        stance_pose.linear.z += self.robot_height_offset
 
         if check_button(buttons, SCButtons.LPADTOUCH):
             x, y = remap_axis(controller_data.lpad_x, controller_data.lpad_y, left_pad=True)

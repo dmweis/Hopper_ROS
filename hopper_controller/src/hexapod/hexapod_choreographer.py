@@ -77,12 +77,14 @@ def wave_hi(gait_engine):
 
     paw_lifted = lifted_pose.clone()
     paw_lifted.right_front.z = 0
+    paw_lifted.right_front.y -= 4
 
     paw_lowered = lifted_pose.clone()
     paw_lowered.right_front.z = -4
-    for i in range(3):
-        gait_engine.move_to_new_pose(paw_lifted, speed)
-        gait_engine.move_to_new_pose(paw_lowered, speed)
+    wavee_speed = 20
+    for i in range(4):
+        gait_engine.move_to_new_pose(paw_lifted, wavee_speed)
+        gait_engine.move_to_new_pose(paw_lowered, wavee_speed)
     gait_engine.move_to_new_pose(original_pose, speed)
 
 

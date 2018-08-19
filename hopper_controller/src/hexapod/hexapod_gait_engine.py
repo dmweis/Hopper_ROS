@@ -101,6 +101,7 @@ class MovementController(object):
         while not rospy.is_shutdown() and self.keep_running:
             if self.single_leg_mode_on:
                 self.handle_single_leg_mode()
+                self._relaxed = False
             elif self._should_move():
                 # execute move
                 self._gait_engine.step(self._velocity, self._theta, self._cycle_time, self._lift_height)
@@ -172,7 +173,6 @@ class MovementController(object):
             .transform(Vector3(z=6), self.selected_single_leg)\
             .transform(self.single_leg_position, self.selected_single_leg)
         self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
-        self._relaxed = False
 
     def _should_move(self):
         return not self._velocity.is_zero() or self._theta != 0

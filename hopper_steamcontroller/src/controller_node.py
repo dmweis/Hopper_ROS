@@ -89,6 +89,7 @@ class SteamControllerRosHandler(object):
         self.last_stance_msg = Twist()
         self.last_single_leg_msg = SingleLegCommand()
         self.slected_single_index = 0
+        self.last_single_leg_msg.selected_leg = ALL_LEGS[self.slected_single_index]
         self.last_single_leg_msg.single_leg_mode_on = False
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)
@@ -166,7 +167,7 @@ class SteamControllerRosHandler(object):
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))
         
         single_leg_command.single_leg_mode_on = self.single_leg_mode_on
-
+        single_leg_command.selected_leg = ALL_LEGS[self.slected_single_index]
         # # buttons
         # for button in list(SCButtons):
         #     if button & buttons:
@@ -248,7 +249,6 @@ class SteamControllerRosHandler(object):
             if self._new_command_available:
                 self.pub.publish(self._hopper_move_command_msg)
                 self.stance_translate.publish(self.last_stance_msg)
-                self.last_single_leg_msg.selected_leg = ALL_LEGS[self.slected_single_index]
                 self.single_leg_publisher.publish(self.last_single_leg_msg)
                 self._new_command_available = False
             rate.sleep()

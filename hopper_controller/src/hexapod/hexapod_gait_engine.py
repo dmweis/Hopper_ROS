@@ -169,9 +169,18 @@ class MovementController(object):
         self.single_leg_mode_on = command.single_leg_mode_on
 
     def handle_single_leg_mode(self):
+        leg_dict = {
+            LegFlags.LEFT_FRONT: "left_front",
+            LegFlags.LEFT_MIDDLE: "left_middle",
+            LegFlags.LEFT_REAR: "left_rear",
+            LegFlags.RIGHT_FRONT: "right_front",
+            LegFlags.RIGHT_MIDDLE: "right_middle",
+            LegFlags.RIGHT_REAR: "right_rear"
+        }
+        correction_angle = rospy.get_param("legs")[leg_dict[self.selected_single_leg]]["angle_offset"]
         new_lifted_leg_pos = self._gait_engine.get_relaxed_pose()\
-            .transform(Vector3(z=6), self.selected_single_leg)\
-            .transform(self.single_leg_position, self.selected_single_leg)
+            .transform(Vector3(x=6, z=6).rotate_around_z(correction_angle), self.selected_single_leg)\
+            .transform(self.single_leg_position.rotate_around_z(correction_angle), self.selected_single_leg)
         self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
 
     def _should_move(self):

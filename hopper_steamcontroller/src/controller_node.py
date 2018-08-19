@@ -46,23 +46,6 @@ def scale_trigger(value):
 def check_button(buttons, button_flag):
     return buttons & button_flag == button_flag
 
-ALL_LEGS = [
-        SingleLegCommand.LEFT_FRONT,
-        SingleLegCommand.RIGHT_FRONT,
-        SingleLegCommand.RIGHT_MIDDLE,
-        SingleLegCommand.RIGHT_REAR,
-        SingleLegCommand.LEFT_REAR,
-        SingleLegCommand.LEFT_MIDDLE
-        ]
-
-selected_leg_index = 0
-
-def get_next_selected_leg():
-    selected_leg_index += 1
-    if selected_leg_index > len(ALL_LEGS) - 1:
-        selected_leg_index = 0
-    return ALL_LEGS[selected_leg_index]
-
 
 class RosSteamController(SteamController):
     def run(self):
@@ -167,7 +150,7 @@ class SteamControllerRosHandler(object):
         if buttons_pressed & SCButtons.LB:
             self.single_leg_mode_on = not self.single_leg_mode_on
         if buttons_pressed & SCButtons.RB:
-            single_leg_command.selected_leg = get_next_selected_leg()
+            single_leg_command.selected_leg = SingleLegCommand.LEFT_FRONT
         if buttons_pressed & SCButtons.STEAM:
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))
         

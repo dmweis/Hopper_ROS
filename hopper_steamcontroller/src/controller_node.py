@@ -114,9 +114,9 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.Y:
                 self.speech_pub.publish("take_your_paws")
             if buttons_pressed & SCButtons.BACK:
-                self.speech_pub.publish("ultron")
+                self.speech_pub.publish("windows_hardware_error")
             if buttons_pressed & SCButtons.START:
-                self.speech_pub.publish("take_your_paws")
+                self.speech_pub.publish("windows_startup")
         elif right_grip_down:
             if buttons_pressed & SCButtons.A:
                 self.move_pub.publish("happy_hand_dance")

@@ -1,5 +1,6 @@
 from __future__ import division
 import dynamixel_functions as dynamixel
+from dynamixel_error_helper import get_rx_pack_error_description, get_tx_rx_result_description
 import serial.tools.list_ports
 
 # Control table address for protocol 1
@@ -63,8 +64,8 @@ class DynamixelDriver(object):
         if dxl_comm_result != 0:
             return False
         if dxl_error != 0:
-            dynamixel.printRxPacketError(PROTOCOL, dxl_error)
-            raise IOError()
+            error_desciption = get_rx_pack_error_description(dxl_error)
+            raise IOError("dxl_error: " + error_desciption)
         return True
 
     def search_servos(self, start_id=0, end_id=252):
@@ -140,8 +141,8 @@ class DynamixelDriver(object):
         dynamixel.groupSyncWriteTxPacket(sync_group_num)
         dxl_comm_result = dynamixel.getLastTxRxResult(self.__port_num, PROTOCOL)
         if dxl_comm_result != 0:
-            dynamixel.printTxRxResult(PROTOCOL, dxl_comm_result)
-            raise IOError("dxl_comm_result: " + str(dxl_comm_result))
+            error_desciption = get_tx_rx_result_description(dxl_comm_result)
+            raise IOError("dxl_comm_result: " + error_desciption)
         dynamixel.groupSyncWriteClearParam(sync_group_num)
 
     def set_compliance_slope(self, servo_id, compliance_slope):
@@ -170,11 +171,11 @@ class DynamixelDriver(object):
         dxl_comm_result = dynamixel.getLastTxRxResult(self.__port_num, 1)
         dxl_error = dynamixel.getLastRxPacketError(self.__port_num, 1)
         if dxl_comm_result != 0:
-            dynamixel.printTxRxResult(PROTOCOL, dxl_comm_result)
-            raise IOError("dxl_comm_result: " + str(dxl_comm_result))
+            error_desciption = get_tx_rx_result_description(dxl_comm_result)
+            raise IOError("dxl_comm_result: " + error_desciption)
         if dxl_error != 0:
-            dynamixel.printRxPacketError(PROTOCOL, dxl_error)
-            raise IOError("dxl_error: " + str(dxl_error))
+            error_desciption = get_rx_pack_error_description(dxl_error)
+            raise IOError("dxl_error: " + error_desciption)
 
     def close(self):
         dynamixel.closePort(self.__port_num)

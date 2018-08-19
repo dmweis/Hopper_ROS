@@ -209,7 +209,7 @@ class SteamControllerRosHandler(object):
                 self._left_pad_moved %= 0.1
             robot_x = -x
             robot_y = y
-            single_leg_command.position.x = y * 0.04
+            single_leg_command.position.x = -y * 0.04
             single_leg_command.position.y = x * 0.04
             # print "Left pad is at X:{0:.3f} Y:{1:.3f}".format(x, y)
 

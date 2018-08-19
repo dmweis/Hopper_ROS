@@ -26,13 +26,13 @@ JOINT_NAMES = [
 
 
 class JointStatePublisher(object):
-    def __init__(self):
+    def __init__(self, message_publisher):
         super(JointStatePublisher, self).__init__()
         self._publisher = rospy.Publisher('joint_states', JointState, queue_size=10)
         self._last_message = JointState()
         self.tibia_offset = rospy.get_param("tibia_offset")
         self.femur_offset = rospy.get_param("femur_offset")
-        get_default_message_publisher().register_publisher(self)
+        message_publisher.register_publisher(self)
 
     def update_joint_states(self, motor_positions):
         """

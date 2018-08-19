@@ -19,7 +19,9 @@ class HexapodController(object):
         rospy.init_node('hopper_controller')
         # build controller
         ik_driver = ros_abstraction.IkController()
-        tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(), ros_abstraction.OdomPublisher())
+        message_publisher = ros_abstraction.MessagePublisher()
+        tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
+                                 ros_abstraction.OdomPublisher(message_publisher))
         gait_engine = GaitEngine(tripod_gait)
         self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer())
         self.halt_publisher = rospy.Publisher("halt", Empty, queue_size=1, latch=True)
@@ -30,6 +32,7 @@ class HexapodController(object):
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
         rospy.Subscriber("hopper/halt", HaltCommand, self.on_halt_command)
         self.controller.spin()
+        message_publisher.stop()
         self.halt_publisher.publish(Empty())
 
     def on_halt_command(self, _):

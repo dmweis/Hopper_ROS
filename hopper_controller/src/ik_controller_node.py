@@ -3,7 +3,7 @@
 import rospy
 
 from hexapod import IkDriver, LegPositions
-from ros_abstraction import HexapodBodyController, JointStatePublisher
+from ros_abstraction import HexapodBodyController, JointStatePublisher, MessagePublisher
 from hopper_controller.msg import HexapodLegPositions
 from hopper_controller.srv import ReadHexapodLegPositions, ReadHexapodLegPositionsResponse
 
@@ -13,13 +13,15 @@ class IkControllerNode(object):
         super(IkControllerNode, self).__init__()
         rospy.init_node("hopper_ik_node")
         body_controller_proxy = HexapodBodyController()
-        joint_state_publisher = JointStatePublisher()
+        self.message_publisher = MessagePublisher()
+        joint_state_publisher = JointStatePublisher(self.message_publisher)
         self.ik_driver = IkDriver(body_controller_proxy, joint_state_publisher)
         rospy.Subscriber("hopper/ik/move_legs", HexapodLegPositions, self.on_move_legs, queue_size=5)
         self.read_leg_positions_service = rospy.Service("hopper/ik/read_leg_positions", ReadHexapodLegPositions, self.read_hexapod_leg_positions)
         self.ik_driver.setup()
         self.ik_driver.disable_motors()
         rospy.spin()
+        self.message_publisher.stop()
         self.ik_driver.disable_motors()
 
     def read_hexapod_leg_positions(self, _):

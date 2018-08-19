@@ -37,7 +37,7 @@ transform_broadcaster = tf2_ros.TransformBroadcaster()
 
 
 class OdomPublisher(object):
-    def __init__(self, parent_link_name="odom", child_link_name="base_footprint"):
+    def __init__(self, message_publisher, parent_link_name="odom", child_link_name="base_footprint"):
         super(OdomPublisher, self).__init__()
         self._publish_to_tf = rospy.get_param("~publish_odometry_to_tf", True)
         self._transform_broadcaster = transform_broadcaster
@@ -50,7 +50,7 @@ class OdomPublisher(object):
         self.odometry_position = Vector2()
         # init odometry message
         self._last_odom_msg = create_empty_odometry_msg(self._parent_link_name, self._child_link_name)
-        get_default_message_publisher().register_publisher(self)
+        message_publisher.register_publisher(self)
 
     def update_translation(self, direction, rotation):
         """
@@ -100,14 +100,14 @@ class OdomPublisher(object):
 
 
 class HeightPublisher(object):
-    def __init__(self, parent_link_name="base_footprint", child_link_name="base_stabilized"):
+    def __init__(self, message_publisher, parent_link_name="base_footprint", child_link_name="base_stabilized"):
         super(HeightPublisher, self).__init__()
         self._transform_broadcaster = transform_broadcaster
         self._parent_link_name = parent_link_name
         self._child_link_name = child_link_name
         # initialize default tf transform
         self._last_message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)
-        get_default_message_publisher().register_publisher(self)
+        message_publisher.register_publisher(self)
 
     def update_height(self, height):
         self._last_message.transform.translation.z = height / 100

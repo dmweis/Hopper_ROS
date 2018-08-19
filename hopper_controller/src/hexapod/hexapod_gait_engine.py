@@ -178,7 +178,7 @@ class MovementController(object):
             LegFlags.RIGHT_REAR: "right_rear"
         }
         base_vector_dict = rospy.get_param("legs")[leg_dict[self.selected_single_leg]]["position"]
-        lifted_vector = Vector3(base_vector_dict["x"] * 1.5, base_vector_dict["y"] * 1.5, base_vector_dict["z"] + 5)
+        lifted_vector = Vector3(base_vector_dict["x"] * 0.5, base_vector_dict["y"] * 0.5, base_vector_dict["z"] + 5)
         translation_vector = self.single_leg_position.clone()
         new_lifted_leg_pos = self._gait_engine.get_relaxed_pose()\
             .transform(lifted_vector, self.selected_single_leg)\

@@ -132,9 +132,9 @@ class SteamControllerRosHandler(object):
                 self.move_pub.publish("roar")
         else:
             if buttons_pressed & SCButtons.A:
-                self.robot_height_offset += 0.01
-            if buttons_pressed & SCButtons.Y:
                 self.robot_height_offset -= 0.01
+            if buttons_pressed & SCButtons.Y:
+                self.robot_height_offset += 0.01
             if buttons_pressed & SCButtons.B:
                 self.robot_height_offset = 0
 
@@ -196,7 +196,7 @@ class SteamControllerRosHandler(object):
 
         if not check_button(buttons, SCButtons.LPADTOUCH) and (controller_data.lpad_x != 0 or controller_data.lpad_y != 0):
             x, y = remap_axis(controller_data.lpad_x, controller_data.lpad_y)
-            stance_pose.linear.z = abs(y * 0.02)
+            stance_pose.linear.z = self.robot_height_offset + abs(y * 0.02)
             stance_pose.linear.y = x * 0.03
             stance_pose.angular.z = math.radians(x * 15)
             stance_pose.angular.y = math.radians(y * 12)

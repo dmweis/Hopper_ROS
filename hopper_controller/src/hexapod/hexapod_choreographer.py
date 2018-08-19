@@ -99,15 +99,14 @@ def lift_legs(gait_engine):
 
 def roar(gait_engine):
     slow_speed = 12
-    fast_speed = 20
-    gait_engine.reset_relaxed_body_pose(slow_speed)
+    fast_speed = 25
     normal_pose = gait_engine.get_relaxed_pose()
     lifted_middle = normal_pose \
         .transform(Vector3(x=4, z=4), LegFlags.MIDDLE)
     grounded_middle_front = normal_pose \
         .transform(Vector3(x=4), LegFlags.MIDDLE)
     lifted_front = grounded_middle_front \
-        .transform(Vector3(z=8, x=8), LegFlags.FRONT) \
+        .transform(Vector3(z=12, x=12), LegFlags.FRONT) \
         .rotate(Vector3(y=-14)) \
         .transform(Vector3(y=-6), LegFlags.LEFT_FRONT) \
         .transform(Vector3(y=6), LegFlags.RIGHT_FRONT)
@@ -126,7 +125,7 @@ def roar(gait_engine):
     gait_engine.move_to_new_pose(lifted_front, slow_speed)
     gait_engine.move_to_new_pose(grounded_middle_front, slow_speed)
     gait_engine.move_to_new_pose(lifted_middle, slow_speed)
-    gait_engine.reset_relaxed_body_pose()
+    gait_engine.move_to_new_pose(normal_pose, slow_speed)
 
 
 def hump(gait_engine):

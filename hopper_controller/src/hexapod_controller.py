@@ -5,6 +5,7 @@ import math
 import rospy
 from geometry_msgs.msg import Twist
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
+from hopper_controller.msg import SingleLegCommand
 from std_msgs.msg import String, Empty
 
 
@@ -30,6 +31,7 @@ class HexapodController(object):
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
         rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose_centimeters)
         rospy.Subscriber("hopper/stance_translate", Twist, self.update_pose)
+        rospy.Subscriber("hopper/single_leg_command", SingleLegCommand, self.update_single_leg)
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
         rospy.Subscriber("hopper/halt", HaltCommand, self.on_halt_command)
         self.controller.spin()
@@ -72,6 +74,10 @@ class HexapodController(object):
         transform = Vector3(twist.linear.x * 100, twist.linear.y * 100, twist.linear.z * 100)
         rotation = Vector3(math.degrees(twist.angular.x), math.degrees(twist.angular.y), math.degrees(twist.angular.z))
         self.controller.set_relaxed_pose(transform, rotation)
+
+    def update_single_leg(self, msg):
+        msg.position = Vector3(msg.position.x * 100, msg.position.y * 100, msg.position.z * 100)
+        self.controller.update_single_leg_command(msg)
 
     def update_pose_centimeters(self, twist):
         transform = Vector3(twist.linear.x, twist.linear.y, twist.linear.z)

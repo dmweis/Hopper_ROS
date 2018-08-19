@@ -78,6 +78,10 @@ class MovementController(object):
         self._relaxed_rotation = Vector3()
         self._lift_height = 2
         self._pose_update_ready = False
+        # single leg mode
+        self.single_leg_mode_on = False
+        self.selected_single_leg = int(LegFlags.LEFT_FRONT)
+        self.single_leg_position = Vector3()
         self._command_queue = Queue(maxsize=1)
         self._ros_timer = rospy.Rate(INTERPOLATION_FREQUENCY)
 
@@ -95,7 +99,9 @@ class MovementController(object):
         self._gait_engine.stand_up()
         self._speech_service.say("initialized_successfully")
         while not rospy.is_shutdown() and self.keep_running:
-            if self._should_move():
+            if self.single_leg_mode_on:
+                self.handle_single_leg_mode()
+            elif self._should_move():
                 # execute move
                 self._gait_engine.step(self._velocity, self._theta, self._cycle_time, self._lift_height)
                 self._relaxed = False
@@ -155,6 +161,18 @@ class MovementController(object):
     def schedule_move(self, move_name):
         if not self._command_queue.full():
             self._command_queue.put_nowait(move_name)
+
+    def update_single_leg_command(self, command):
+        self.selected_single_leg = LegFlags(command.selected_leg)
+        self.single_leg_position = Vector3.ros_vector3_to_overload_vector(command.position)
+        self.single_leg_mode_on = command.single_leg_mode_on
+
+    def handle_single_leg_mode(self):
+        new_lifted_leg_pos = self._gait_engine.get_relaxed_pose()\
+            .transform(Vector3(z=-4), self.selected_single_leg)\
+            .transform(self.single_leg_position, self.selected_single_leg)
+        self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
+        self._relaxed = False
 
     def _should_move(self):
         return not self._velocity.is_zero() or self._theta != 0

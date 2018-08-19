@@ -23,6 +23,7 @@ add_message_files(
   MotorCompliance.msg
   MotorSpeed.msg
   MotorTorque.msg
+  SingleLegCommand.msg
 )
 
 add_service_files(

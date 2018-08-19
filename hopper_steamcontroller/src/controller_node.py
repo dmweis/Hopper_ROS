@@ -7,6 +7,7 @@ from threading import Thread
 import rospy
 from geometry_msgs.msg import Twist, Quaternion, Vector3
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
+from hopper_controller.msg import SingleLegCommand
 from std_msgs.msg import String
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
 import usb1
@@ -45,6 +46,19 @@ def scale_trigger(value):
 def check_button(buttons, button_flag):
     return buttons & button_flag == button_flag
 
+def get_next_selected_leg():
+    legs = [
+        SingleLegCommand.LEFT_FRONT,
+        SingleLegCommand.RIGHT_FRONT,
+        SingleLegCommand.RIGHT_MIDDLE,
+        SingleLegCommand.RIGHT_REAR,
+        SingleLegCommand.LEFT_REAR,
+        SingleLegCommand.LEFT_MIDDLE
+        ]
+    while True:
+        for leg in legs:
+            yield leg
+
 
 class RosSteamController(SteamController):
     def run(self):
@@ -66,6 +80,7 @@ class SteamControllerRosHandler(object):
         self._left_pad_moved = 0
         self._right_pad_moved = 0
         self.robot_height_offset = 0
+        self.single_leg_mode_on = False
 
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
@@ -73,8 +88,11 @@ class SteamControllerRosHandler(object):
         self.move_pub = rospy.Publisher('hopper_schedule_move', String, queue_size=5)
         self.halt_command = rospy.Publisher('hopper/halt', HaltCommand, queue_size=1)
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
+        self.single_leg_publisher = rospy.Publisher('hopper/single_leg_command', SingleLegCommand, queue_size=5)
         self._hopper_move_command_msg = HopperMoveCommand()
         self.last_stance_msg = Twist()
+        self.last_single_leg_msg = SingleLegCommand()
+        self.last_single_leg_msg.single_leg_mode_on = False
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)
         # activate IMU
@@ -139,9 +157,17 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.B:
                 self.robot_height_offset = 0
 
+        single_leg_command = SingleLegCommand()
+
+        if buttons_pressed & SCButtons.LB:
+            self.single_leg_mode_on = not self.single_leg_mode_on
+        if buttons_pressed & SCButtons.RB:
+            single_leg_command.selected_leg = get_next_selected_leg()
         if buttons_pressed & SCButtons.STEAM:
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))
         
+        single_leg_command.single_leg_mode_on = self.single_leg_mode_on
+
         # # buttons
         # for button in list(SCButtons):
         #     if button & buttons:
@@ -183,6 +209,8 @@ class SteamControllerRosHandler(object):
                 self._left_pad_moved %= 0.1
             robot_x = -x
             robot_y = y
+            single_leg_command.position.x = x * 0.03
+            single_leg_command.position.y = y * 0.03
             # print "Left pad is at X:{0:.3f} Y:{1:.3f}".format(x, y)
 
         if check_button(buttons, SCButtons.RPADTOUCH):
@@ -192,6 +220,7 @@ class SteamControllerRosHandler(object):
             if self._right_pad_moved >= 0.1:
                 controller.addFeedback(RIGHT_PAD, amplitude=150)
                 self._right_pad_moved %= 0.1
+            single_leg_command.position.z = y * 0.03
             robot_rot = x
             # print "Right pad is at X:{0:.3f} Y:{1:.3f}".format(x, y)
 
@@ -212,7 +241,7 @@ class SteamControllerRosHandler(object):
         if controller_data.rtrig != 0:
             lift_height += 2 * scale_trigger(controller_data.rtrig)
             # print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
-        self.update_robot_command(robot_x, robot_y, robot_rot, cycle_time, stance_pose, lift_height=lift_height)
+        self.update_robot_command(robot_x, robot_y, robot_rot, cycle_time, stance_pose, single_leg_command, lift_height=lift_height)
 
     def publisher_loop(self):
         rate = rospy.Rate(60)
@@ -220,10 +249,11 @@ class SteamControllerRosHandler(object):
             if self._new_command_available:
                 self.pub.publish(self._hopper_move_command_msg)
                 self.stance_translate.publish(self.last_stance_msg)
+                self.single_leg_publisher.publish(self.last_single_leg_msg)
                 self._new_command_available = False
             rate.sleep()
 
-    def update_robot_command(self, x, y, rot, cycle_time, stance, lift_height=2):
+    def update_robot_command(self, x, y, rot, cycle_time, stance, single_leg_command, lift_height=2):
         move_command = HopperMoveCommand()
         tmp = x
         distance_multiplier = linear_map(cycle_time, 0.25, 1.0, 4.0, 1.0)
@@ -242,11 +272,14 @@ class SteamControllerRosHandler(object):
         self._hopper_move_command_msg.direction.angular.z != move_command.direction.angular.z or
         self._hopper_move_command_msg.lift_height != move_command.lift_height or
         self._hopper_move_command_msg.cycle_time != move_command.cycle_time or
-        self.last_stance_msg != stance)
+        self.last_stance_msg != stance or
+        self.last_single_leg_msg != single_leg_command)
         if message_changed:
             self._hopper_move_command_msg = move_command
             self.last_stance_msg = stance
+            self.last_single_leg_msg = single_leg_command
             self._new_command_available = True
+
 
 if __name__ == "__main__":
     SteamControllerRosHandler()

@@ -40,7 +40,7 @@ class HopperSpeechHandles(object):
             folder_name = ""
         else:
             folder_name += "/"
-        sound_file_names = filter(lambda name: ".wav" in name ,listdir(self.secondary_sound_path + folder_name))
+        sound_file_names = filter(lambda name: ".wav" in name or ".ogg" in name ,listdir(self.secondary_sound_path + folder_name))
         selected_file = random.choice(sound_file_names)
         self.sound_client.playWave(self.secondary_sound_path + folder_name + selected_file)
 

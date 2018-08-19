@@ -92,6 +92,7 @@ class SteamControllerRosHandler(object):
         self._hopper_move_command_msg = HopperMoveCommand()
         self.last_stance_msg = Twist()
         self.last_single_leg_msg = SingleLegCommand()
+        self.last_single_leg_msg.selected_leg = SingleLegCommand.LEFT_FRONT
         self.last_single_leg_msg.single_leg_mode_on = False
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)

@@ -169,7 +169,7 @@ class MovementController(object):
 
     def handle_single_leg_mode(self):
         new_lifted_leg_pos = self._gait_engine.get_relaxed_pose()\
-            .transform(Vector3(z=-4), self.selected_single_leg)\
+            .transform(Vector3(z=6), self.selected_single_leg)\
             .transform(self.single_leg_position, self.selected_single_leg)
         self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
         self._relaxed = False

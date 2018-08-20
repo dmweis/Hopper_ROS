@@ -102,7 +102,7 @@ class MovementController(object):
         while not rospy.is_shutdown() and self.keep_running:
             if self.single_leg_mode_on:
                 self.handle_single_leg_mode()
-            if self.selected_leg_switched:
+            elif self.selected_leg_switched:
                 self.selected_leg_switched = False
                 self._gait_engine.move_to_new_pose(self._gait_engine.get_relaxed_pose(), 15)
             elif self._should_move():

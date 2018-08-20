@@ -106,8 +106,8 @@ class BodyMotorController(object):
 
     def read_motor_telemetrics(self):
         robot_telemetrics = HexapodTelemetrics()
-        with self.driver_lock:
-            for servo_id in self.servo_ids:
+        for servo_id in self.servo_ids:
+            with self.driver_lock:
                 voltage = self.servo_driver.read_voltage(servo_id)
                 temperature = self.servo_driver.read_temperature(servo_id)
                 robot_telemetrics.servos.append(ServoTelemetrics(servo_id, temperature, voltage))

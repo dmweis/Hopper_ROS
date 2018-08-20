@@ -1,5 +1,6 @@
 from __future__ import division
 from __future__ import absolute_import
+import random
 from .hexapod_ik_driver import Vector3, Vector2, LegFlags
 from std_msgs.msg import String
 import rospy
@@ -169,7 +170,10 @@ moves = {
 
 
 def execute_choreography(gait_engine, choreography_name):
-    try:
-        moves[choreography_name](gait_engine)
-    except KeyError:
-        rospy.logerr("Key: (%s) not present in moves dictionary", choreography_name)
+    if choreography_name.lower() == "random":
+        moves[random.choice(moves.keys())](gait_engine)
+    else:
+        try:
+            moves[choreography_name](gait_engine)
+        except KeyError:
+            rospy.logerr("Key: (%s) not present in moves dictionary", choreography_name)

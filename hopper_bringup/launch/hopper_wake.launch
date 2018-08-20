@@ -13,6 +13,7 @@
         <env name="AUDIODEV" value="/dev/audio1"/>
     </node>
     <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py"/>
+    <node name="hacklab_speech" pkg="hopper_speech" type="hacklab_speak.py"/>
     <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>
     <include file="$(find hopper_bringup)/launch/sensors/stereo_cameras.launch" />
 </launch>

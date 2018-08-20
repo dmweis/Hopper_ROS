@@ -4,7 +4,7 @@ from Queue import Queue
 import traceback
 import rospy
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
-from .hexapod_choreographer import execute_choreography
+from .hexapod_choreographer import Choreographer
 import math
 
 INTERPOLATION_FREQUENCY = 60
@@ -69,6 +69,7 @@ class MovementController(object):
         super(MovementController, self).__init__()
         self.keep_running = True
         self._gait_engine = gait_engine
+        self.choreographer = Choreographer(self._gait_engine)
         self._speech_service = speech_service
         self._relaxed = True
         self._velocity = Vector2()
@@ -166,6 +167,11 @@ class MovementController(object):
         if not self._command_queue.full():
             self._command_queue.put_nowait(move_name)
 
+    def cancel_dance_moves(self):
+        while not self._command_queue.empty():
+            self._command_queue.get()
+        self.choreographer.cancel_move()
+
     def update_single_leg_command(self, selected_leg, position, single_leg_mode_on):
         new_selected_leg = LegFlags(selected_leg)
         if new_selected_leg != self.selected_single_leg:
@@ -203,7 +209,10 @@ class MovementController(object):
     def _check_and_execute_scheduled_move(self):
         while not self._command_queue.empty():
             command = self._command_queue.get()
-            execute_choreography(self._gait_engine, command)
+            if command.toLower() == "cancel":
+                self.cancel_dance_moves()
+                continue
+            self.choreographer.execute_choreography(command)
 
     def _log_current_state(self):
         data = {'direction': self._velocity,

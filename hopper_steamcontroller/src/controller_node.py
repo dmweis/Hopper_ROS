@@ -121,6 +121,8 @@ class SteamControllerRosHandler(object):
         left_grip_down = bool(buttons & SCButtons.LGRIP)
         right_grip_down = bool(buttons & SCButtons.RGRIP)
 
+        single_leg_command = SingleLegCommand()
+
         if left_grip_down:
             if buttons_pressed & SCButtons.A:
                 self.speech_pub.publish("bender")
@@ -135,8 +137,12 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.START:
                 self.speech_pub.publish("windows_startup")
         elif right_grip_down:
-            if buttons_pressed & SCButtons.A:
+            if buttons_pressed & SCButtons.LB:
                 self.move_pub.publish("random")
+            if buttons_pressed & SCButtons.RB:
+                self.move_pub.publish("cancel")
+            if buttons_pressed & SCButtons.A:
+                self.move_pub.publish("sad_emote")
             if buttons_pressed & SCButtons.B:
                 self.move_pub.publish("happy_dance")
             if buttons_pressed & SCButtons.X:
@@ -154,15 +160,13 @@ class SteamControllerRosHandler(object):
                 self.robot_height_offset += 0.01
             if buttons_pressed & SCButtons.B:
                 self.robot_height_offset = 0
-
-        single_leg_command = SingleLegCommand()
-
-        if buttons_pressed & SCButtons.LB:
-            self.single_leg_mode_on = not self.single_leg_mode_on
-        if buttons_pressed & SCButtons.RB:
-            self.slected_single_index += 1
-            if self.slected_single_index > len(ALL_LEGS) - 1:
-                self.slected_single_index = 0
+            if buttons_pressed & SCButtons.RB:
+                self.single_leg_mode_on = not self.single_leg_mode_on
+            if buttons_pressed & SCButtons.LB:
+                self.slected_single_index += 1
+                if self.slected_single_index > len(ALL_LEGS) - 1:
+                    self.slected_single_index = 0
+        
         if buttons_pressed & SCButtons.STEAM:
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))
         

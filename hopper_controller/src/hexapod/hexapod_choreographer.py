@@ -176,6 +176,7 @@ class Choreographer(object):
 
     def hump(self):
         speed = 13
+        hacklab_speaker = rospy.Publisher("hacklab/play", String, queue_size=1)
         normal_pose = self.gait_engine.get_relaxed_pose()
         forward_hump = normal_pose \
             .transform(Vector3(x=-3)) \
@@ -190,6 +191,7 @@ class Choreographer(object):
             speed = speed + 1
             self.check_cancel()
         self.speak_publisher.publish("Turret_turret_active_3")
+        hacklab_speaker.publish("Turret_turret_active_3.wav")
         self.gait_engine.move_to_new_pose(forward_hump, speed)
         for i in range(5):
             self.gait_engine.move_to_new_pose(forward_hump.transform(Vector3(z=-1)), speed)

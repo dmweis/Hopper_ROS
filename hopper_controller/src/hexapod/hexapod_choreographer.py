@@ -81,8 +81,11 @@ def wave_hi(gait_engine):
     paw_lowered = lifted_pose.clone()
     paw_lowered.right_front.z = 0
     wave_speed = 25
+    for i in range(2):
+        gait_engine.move_to_new_pose(paw_lifted, wave_speed)
+        gait_engine.move_to_new_pose(paw_lowered, wave_speed)
     speak_publisher.publish("Turret_turret_active_1")
-    for i in range(6):
+    for i in range(4):
         gait_engine.move_to_new_pose(paw_lifted, wave_speed)
         gait_engine.move_to_new_pose(paw_lowered, wave_speed)
     gait_engine.move_to_new_pose(original_pose, speed)

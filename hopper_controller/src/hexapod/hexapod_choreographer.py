@@ -65,6 +65,7 @@ def sad_emote(gait_engine):
 
 def wave_hi(gait_engine):
     speed = 12
+    speak_publisher = rospy.Publisher("hopper_play_sound", String, queue_size=1)
     original_pose = gait_engine.get_relaxed_pose()
     lifted_pose = gait_engine.get_relaxed_pose() \
         .rotate(Vector3(y=-5)) \
@@ -80,6 +81,7 @@ def wave_hi(gait_engine):
     paw_lowered = lifted_pose.clone()
     paw_lowered.right_front.z = 0
     wave_speed = 25
+    speak_publisher.publish("Turret_turret_active_1")
     for i in range(6):
         gait_engine.move_to_new_pose(paw_lifted, wave_speed)
         gait_engine.move_to_new_pose(paw_lowered, wave_speed)

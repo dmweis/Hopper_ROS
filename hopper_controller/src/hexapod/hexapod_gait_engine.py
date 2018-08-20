@@ -164,6 +164,9 @@ class MovementController(object):
         self._theta = 0
 
     def schedule_move(self, move_name):
+        if move_name.lower() == "cancel":
+            self.cancel_dance_moves()
+            return
         if not self._command_queue.full():
             self._command_queue.put_nowait(move_name)
 
@@ -209,9 +212,6 @@ class MovementController(object):
     def _check_and_execute_scheduled_move(self):
         while not self._command_queue.empty():
             command = self._command_queue.get()
-            if command.lower() == "cancel":
-                self.cancel_dance_moves()
-                continue
             self.choreographer.execute_choreography(command)
 
     def _log_current_state(self):

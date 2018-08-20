@@ -194,7 +194,8 @@ class MovementController(object):
         if self.selected_leg_switched:
             self.selected_leg_switched = False
             self._gait_engine.move_to_new_pose(self._gait_engine.get_relaxed_pose(), 15)
-        self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
+        if self.single_leg_mode_on:
+            self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
 
     def _should_move(self):
         return not self._velocity.is_zero() or self._theta != 0

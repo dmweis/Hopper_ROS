@@ -209,7 +209,7 @@ class MovementController(object):
     def _check_and_execute_scheduled_move(self):
         while not self._command_queue.empty():
             command = self._command_queue.get()
-            if command.toLower() == "cancel":
+            if command.lower() == "cancel":
                 self.cancel_dance_moves()
                 continue
             self.choreographer.execute_choreography(command)

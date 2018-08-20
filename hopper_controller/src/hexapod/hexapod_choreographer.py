@@ -191,7 +191,7 @@ class Choreographer(object):
             speed = speed + 1
             self.check_cancel()
         self.speak_publisher.publish("Turret_turret_active_3")
-        hacklab_speaker.publish("Turret_turret_active_3.wav")
+        hacklab_speaker.publish("portal/Turret_turret_active_3.wav")
         self.gait_engine.move_to_new_pose(forward_hump, speed)
         for i in range(5):
             self.gait_engine.move_to_new_pose(forward_hump.transform(Vector3(z=-1)), speed)

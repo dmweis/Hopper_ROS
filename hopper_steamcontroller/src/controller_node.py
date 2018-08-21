@@ -80,6 +80,7 @@ class SteamControllerRosHandler(object):
 
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
+        self.hacklab_play = rospy.Publisher('hacklab/play', String, queue_size=5)
         self.random_speech = rospy.Publisher('hopper/sound/play_random', String, queue_size=5)
         self.move_pub = rospy.Publisher('hopper_schedule_move', String, queue_size=5)
         self.halt_command = rospy.Publisher('hopper/halt', HaltCommand, queue_size=1)
@@ -136,6 +137,8 @@ class SteamControllerRosHandler(object):
                 self.random_speech.publish("")
             if buttons_pressed & SCButtons.START:
                 self.speech_pub.publish("windows_startup")
+            if buttons_pressed & SCButtons.LB:
+                self.hacklab_play.publish("portal/")
         elif right_grip_down:
             if buttons_pressed & SCButtons.LB:
                 self.move_pub.publish("random")

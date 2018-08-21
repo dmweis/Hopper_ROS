@@ -27,9 +27,10 @@ class BodyMotorController(object):
         rospy.Subscriber("hopper/body/motor_torque", MotorTorque, self.on_torque_command, queue_size=20)
         self.body_motor_positions_service = rospy.Service("hopper/read_hexapod_motor_positions", ReadHexapodMotorPositions, self.read_hexapod_motor_positions)
         self.telementrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
-        duration = rospy.Duration(4)
+        telemetrics_update_interval = rospy.Duration.from_sec(0.5)
+        self.telemetrics_motor_id_index = 0
         while not rospy.is_shutdown():
-            rospy.sleep(duration)
+            rospy.sleep(telemetrics_update_interval)
             try:
                 self.read_motor_telemetrics()
             except IOError as e:
@@ -106,11 +107,14 @@ class BodyMotorController(object):
 
     def read_motor_telemetrics(self):
         robot_telemetrics = HexapodTelemetrics()
-        for servo_id in self.servo_ids:
-            with self.driver_lock:
-                voltage = self.servo_driver.read_voltage(servo_id)
-                temperature = self.servo_driver.read_temperature(servo_id)
-                robot_telemetrics.servos.append(ServoTelemetrics(servo_id, temperature, voltage))
+        with self.driver_lock:
+            servo_id = self.servo_ids[self.telemetrics_motor_id_index]
+            voltage = self.servo_driver.read_voltage(servo_id)
+            temperature = self.servo_driver.read_temperature(servo_id)
+            robot_telemetrics.servos.append(ServoTelemetrics(servo_id, temperature, voltage))
+        self.telemetrics_motor_id_index += 1
+        if self.telemetrics_motor_id_index > len(self.servo_ids) - 1:
+            self.telemetrics_motor_id_index = 0
         self.telementrics_publisher.publish(robot_telemetrics)
 
 

@@ -8,6 +8,7 @@ This project is still far from finished and I will update this documentation as 
 
 ## ROS packages used
 
+ros-kinetic-move-base
 ros-kinetic-rplidar-ros  
 ros-kinetic-freenect-launch  
 ros-kinetic-joy  

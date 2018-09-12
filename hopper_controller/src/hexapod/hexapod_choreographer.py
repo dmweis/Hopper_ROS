@@ -19,7 +19,7 @@ class Choreographer(object):
             "sad_emote": self.sad_emote,
             "wave_hi": self.wave_hi,
             "lifted_legs": self.lift_legs,
-            "hump": self.hump,
+            #"hump": self.hump,
             "roar": self.roar
         }
 

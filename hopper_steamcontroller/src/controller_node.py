@@ -151,7 +151,7 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.X:
                 self.move_pub.publish("happy_spin")
             if buttons_pressed & SCButtons.Y:
-                self.move_pub.publish("hump")
+                self.move_pub.publish("happy_hand_dance")
             if buttons_pressed & SCButtons.BACK:
                 self.move_pub.publish("wave_hi")
             if buttons_pressed & SCButtons.START:

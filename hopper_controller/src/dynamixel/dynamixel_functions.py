@@ -38,7 +38,7 @@ elif 'Linux' in platform.platform():
     elif '32' in platform.architecture()[0]:
         library_path = path.join(local_path, "libdxl_x86_c.so")
     elif '64' in platform.architecture()[0]:
-        library_path = path.join(local_path, "libdxl_x64_c.so")
+        library_path = path.join(local_path, "libdxl_sbc64_c.so")
 dxl_lib = cdll.LoadLibrary(library_path)
 # dxl_lib = cdll.LoadLibrary("./libdxl_mac_c.dylib")  # for Mac OS
 
@@ -65,10 +65,8 @@ isPacketTimeout = dxl_lib.isPacketTimeout
 # packet_handler
 packetHandler = dxl_lib.packetHandler
 
-printTxRxResult = dxl_lib.printTxRxResult
 getTxRxResult = dxl_lib.getTxRxResult
 getTxRxResult.restype = ctypes.c_int
-printRxPacketError = dxl_lib.printRxPacketError
 getRxPacketError = dxl_lib.getRxPacketError
 getRxPacketError.restype = ctypes.c_byte
 

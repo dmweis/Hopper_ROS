@@ -19,9 +19,11 @@ class Choreographer(object):
             "sad_emote": self.sad_emote,
             "wave_hi": self.wave_hi,
             "lifted_legs": self.lift_legs,
-            #"hump": self.hump,
             "roar": self.roar
         }
+        child_safe = rospy.get_param("child_safe_mode", True)
+        if not child_safe:
+            self.dance_lookup["hump"] = self.hump
 
     def execute_choreography(self, choreography_name):
         original_pose = self.gait_engine.get_relaxed_pose()

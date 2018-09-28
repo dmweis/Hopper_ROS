@@ -78,6 +78,7 @@ class SteamControllerRosHandler(object):
         self.robot_height_offset = 0
         self.single_leg_mode_on = False
 
+        self.child_safe_mode = rospy.get_param("child_safe_mode", True)
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.hacklab_play = rospy.Publisher('hacklab/play', String, queue_size=5)
@@ -151,7 +152,10 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.X:
                 self.move_pub.publish("happy_spin")
             if buttons_pressed & SCButtons.Y:
-                self.move_pub.publish("happy_hand_dance")
+                if self.child_safe_mode:
+                    self.move_pub.publish("happy_hand_dance")
+                else:
+                    self.move_pub.publish("hump")
             if buttons_pressed & SCButtons.BACK:
                 self.move_pub.publish("wave_hi")
             if buttons_pressed & SCButtons.START:

@@ -10,7 +10,7 @@ legs:
     coxa_id: 1
     femur_id: 3
     tibia_id: 5
-    angle_offset: -45
+    angle_offset: -90
     position:
       x: 11.5
       y: 5
@@ -21,7 +21,7 @@ legs:
     coxa_id: 2
     femur_id: 4
     tibia_id: 6
-    angle_offset: 45
+    angle_offset: 90
     position:
       x: 11.5
       y: -5
@@ -54,7 +54,7 @@ legs:
     coxa_id: 7
     femur_id: 9
     tibia_id: 11
-    angle_offset: -135
+    angle_offset: -90
     position:
       x: -11.5
       y: 5
@@ -65,7 +65,7 @@ legs:
     coxa_id: 8
     femur_id: 10
     tibia_id: 12
-    angle_offset: 135
+    angle_offset: 90
     position:
       x: -11.5
       y: -5

@@ -74,11 +74,33 @@ def color_transitions(port, color_a, color_b, steps, delay):
         sleep(delay)
 
 
+def alternate_transitions(port, color_from, color_to, delay):
+    current_color = Color(color_from.red, color_from.green, color_from.blue)
+    while current_color.red < color_to.red or current_color.green < color_to.green or current_color.blue < color_to.blue:
+        if current_color.red < color_to.red:
+            current_color.red+=1
+        if current_color.green < color_to.green:
+            current_color.green+=1
+        if current_color.blue < color_to.blue:
+            current_color.blue+=1
+        port.write(ColorPacket(current_color))
+        sleep(delay)
+    while current_color.red > color_to.red or current_color.green > color_to.green or current_color.blue > color_to.blue:
+        if current_color.red > color_to.red:
+            current_color.red-=1
+        if current_color.green > color_to.green:
+            current_color.green-=1
+        if current_color.blue > color_to.blue:
+            current_color.blue-=1
+        port.write(ColorPacket(current_color))
+        sleep(delay)
+        
 
 with serial.Serial('/dev/ttyUSB0', 115200) as port:
     reset(port)
     while True:
-        color_transitions(port, Color(20, 0, 0), Color(0, 0, 20), 10, 0.1)
-        color_transitions(port, Color(0, 0, 20), Color(20, 0, 0), 10, 0.1)
+        # color_transitions(port, Color(20, 0, 0), Color(0, 0, 20), 10, 0.1)
+        # color_transitions(port, Color(0, 0, 20), Color(20, 0, 0), 10, 0.1)
+        alternate_transitions(port, Color(20, 0, 0), Color(0, 0, 20), 0.01)
+        alternate_transitions(port, Color(0, 0, 20), Color(20, 0, 0), 0.01)
 
-print("done")

@@ -33,10 +33,15 @@ def clamp(value, a, b):
 
 
 class Color():
-    def __init__(self, red=0, green=0, blue=0):
+    def __init__(self, red=0, green=0, blue=0, name=None):
         self.red = red
         self.green = green
         self.blue = blue
+        if name is not None:
+            web_color = webcolors.name_to_rgb(name)
+            self.red = web_color.red
+            self.green = web_color.green
+            self.blue = web_color.blue
 
     def to_data(self):
         return [self.red, self.green, self.blue]
@@ -96,6 +101,31 @@ def alternate_transitions(port, color_from, color_to, delay):
         sleep(delay)
 
 
+def cycle(port, color_from, color_to, delay):
+    pixel_data = ColorPacket(color_from)
+    for pixel in range(PIXEL_COUNT):
+        current_color = Color(color_from.red, color_from.green, color_from.blue)
+        while current_color.red < color_to.red or current_color.green < color_to.green or current_color.blue < color_to.blue:
+            if current_color.red < color_to.red:
+                current_color.red+=1
+            if current_color.green < color_to.green:
+                current_color.green+=1
+            if current_color.blue < color_to.blue:
+                current_color.blue+=1
+            pixel_data.set_pixel(pixel, current_color)
+            port.write(pixel_data.to_data())
+            sleep(delay)
+        while current_color.red > color_to.red or current_color.green > color_to.green or current_color.blue > color_to.blue:
+            if current_color.red > color_to.red:
+                current_color.red-=1
+            if current_color.green > color_to.green:
+                current_color.green-=1
+            if current_color.blue > color_to.blue:
+                current_color.blue-=1
+            pixel_data.set_pixel(pixel, current_color)
+            port.write(pixel_data.to_data())
+            sleep(delay)
+
 with serial.Serial('/dev/ttyUSB1', 115200) as port:
     reset(port)
     while True:
@@ -105,6 +135,8 @@ with serial.Serial('/dev/ttyUSB1', 115200) as port:
         delay = 0.05
         # color_transitions(port, Color(20, 0, 0), Color(0, 0, 20), 10, 0.1)
         # color_transitions(port, Color(0, 0, 20), Color(20, 0, 0), 10, 0.1)
-        alternate_transitions(port, red, blue, delay)
-        alternate_transitions(port, blue, green, delay)
-        alternate_transitions(port, green, red, delay)
+        # alternate_transitions(port, red, blue, delay)
+        # alternate_transitions(port, blue, green, delay)
+        # alternate_transitions(port, green, red, delay)
+        cycle(port, red, blue, 0.01)
+        cycle(port, blue, red, 0.01)

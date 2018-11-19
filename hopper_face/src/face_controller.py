@@ -99,8 +99,12 @@ def alternate_transitions(port, color_from, color_to, delay):
 with serial.Serial('/dev/ttyUSB1', 115200) as port:
     reset(port)
     while True:
+        red = Color(30, 0, 0)
+        green = Color(0, 30, 0)
+        blue = Color(0, 0, 30)
+        delay = 0.05
         # color_transitions(port, Color(20, 0, 0), Color(0, 0, 20), 10, 0.1)
         # color_transitions(port, Color(0, 0, 20), Color(20, 0, 0), 10, 0.1)
-        alternate_transitions(port, Color(30, 0, 5), Color(5, 0, 30), 0.05)
-        alternate_transitions(port, Color(5, 0, 30), Color(30, 0, 5), 0.05)
-
+        alternate_transitions(port, red, blue, delay)
+        alternate_transitions(port, blue, green, delay)
+        alternate_transitions(port, green, red, delay)

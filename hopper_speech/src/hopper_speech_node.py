@@ -16,7 +16,7 @@ class HopperSpeechHandles(object):
     def __init__(self):
         super(HopperSpeechHandles, self).__init__()
         rospy.init_node("hopper_speech_core", anonymous=True)
-        sound.init()
+        sound.init(44100, -16, 1, 1024)
         rospack = rospkg.RosPack()
         self.primary_sound_path = rospack.get_path('hopper_speech') + "/sounds/"
         self.secondary_sound_path = expanduser("~") + "/Music/"

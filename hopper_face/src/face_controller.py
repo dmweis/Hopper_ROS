@@ -126,6 +126,22 @@ def cycle(port, color_from, color_to, delay):
             port.write(pixel_data.to_data())
             sleep(delay)
 
+def breathing(port, color, delay):
+    for i in range(10):
+        new_color = Color()
+        new_color.red = 0 if color.red == 0 else color.red + i
+        new_color.green = 0 if color.green == 0 else color.green + i
+        new_color.blue = 0 if color.blue == 0 else color.blue + i
+        pixel_data = ColorPacket(new_color)
+        port.write(pixel_data.to_data())
+    for i in reversed(range(10)):
+        new_color = Color()
+        new_color.red = 0 if color.red == 0 else color.red + i
+        new_color.green = 0 if color.green == 0 else color.green + i
+        new_color.blue = 0 if color.blue == 0 else color.blue + i
+        pixel_data = ColorPacket(new_color)
+        port.write(pixel_data.to_data())
+
 with serial.Serial('/dev/ttyUSB1', 115200) as port:
     reset(port)
     while True:
@@ -138,5 +154,6 @@ with serial.Serial('/dev/ttyUSB1', 115200) as port:
         # alternate_transitions(port, red, blue, delay)
         # alternate_transitions(port, blue, green, delay)
         # alternate_transitions(port, green, red, delay)
-        cycle(port, red, blue, 0.01)
-        cycle(port, blue, red, 0.01)
+        # cycle(port, red, blue, 0.01)
+        # cycle(port, blue, red, 0.01)
+        breathing(Color(20, 0, 20), 0.01)

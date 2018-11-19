@@ -122,12 +122,12 @@ class Choreographer(object):
         paw_lowered = lifted_pose.clone()
         paw_lowered.right_front.z = 0
         wave_speed = 25
-        for i in range(2):
+        for i in range(1):
             self.gait_engine.move_to_new_pose(paw_lifted, wave_speed)
             self.gait_engine.move_to_new_pose(paw_lowered, wave_speed)
             self.check_cancel()
         self.speak_publisher.publish("Turret_turret_active_1")
-        for i in range(4):
+        for i in range(5):
             self.gait_engine.move_to_new_pose(paw_lifted, wave_speed)
             self.gait_engine.move_to_new_pose(paw_lowered, wave_speed)
             self.check_cancel()

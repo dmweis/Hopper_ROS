@@ -135,7 +135,7 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.Y:
                 self.speech_pub.publish("take_your_paws")
             if buttons_pressed & SCButtons.BACK:
-                self.random_speech.publish("")
+                self.random_speech.publish("interjections/")
             if buttons_pressed & SCButtons.START:
                 self.speech_pub.publish("windows_startup")
             if buttons_pressed & SCButtons.LB:
@@ -268,8 +268,8 @@ class SteamControllerRosHandler(object):
         move_command = HopperMoveCommand()
         tmp = x
         distance_multiplier = linear_map(cycle_time, 0.25, 1.0, 4.0, 1.0)
-        x = y * 0.13 * distance_multiplier
-        y = tmp * 0.13 * distance_multiplier
+        x = y * 0.1 * distance_multiplier
+        y = tmp * 0.1 * distance_multiplier
         if abs(rot) > 0.2:
             rot = -rot * 40 * linear_map(cycle_time, 0.25, 1, 4, 1)
         move_command.direction.linear.x = x

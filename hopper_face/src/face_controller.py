@@ -10,7 +10,7 @@ from time import sleep
 
 
 RESET_MSG = 121
-RESET_MSG_COUNT = 240
+RESET_MSG_COUNT = 243
 PIXEL_COUNT = 40
 
 PIXELS_ON_BIGGER_RING = 24
@@ -65,6 +65,7 @@ class ColorPacket():
 def reset(port):
     payload = bytearray([RESET_MSG] * RESET_MSG_COUNT)
     port.write(payload)
+    sleep(1)
 
 def color_transitions(port, color_a, color_b, steps, delay):
     def get_transitioning_color(val_from, val_to, step, steps):
@@ -127,33 +128,41 @@ def cycle(port, color_from, color_to, delay):
             sleep(delay)
 
 def breathing(port, color, delay):
-    for i in range(10):
+    for i in range(15):
         new_color = Color()
         new_color.red = 0 if color.red == 0 else color.red + i
         new_color.green = 0 if color.green == 0 else color.green + i
         new_color.blue = 0 if color.blue == 0 else color.blue + i
         pixel_data = ColorPacket(new_color)
         port.write(pixel_data.to_data())
-    for i in reversed(range(10)):
+        sleep(delay)
+    for i in reversed(range(15)):
         new_color = Color()
         new_color.red = 0 if color.red == 0 else color.red + i
         new_color.green = 0 if color.green == 0 else color.green + i
         new_color.blue = 0 if color.blue == 0 else color.blue + i
         pixel_data = ColorPacket(new_color)
         port.write(pixel_data.to_data())
+        sleep(delay)
 
-with serial.Serial('/dev/ttyUSB1', 115200) as port:
+with serial.Serial('/dev/ttyUSB0', 115200) as port:
     reset(port)
     while True:
-        red = Color(30, 0, 0)
-        green = Color(0, 30, 0)
-        blue = Color(0, 0, 30)
-        delay = 0.05
-        # color_transitions(port, Color(20, 0, 0), Color(0, 0, 20), 10, 0.1)
-        # color_transitions(port, Color(0, 0, 20), Color(20, 0, 0), 10, 0.1)
-        # alternate_transitions(port, red, blue, delay)
-        # alternate_transitions(port, blue, green, delay)
-        # alternate_transitions(port, green, red, delay)
+        delay = 0.1
+        #user_input = raw_input("Enter new number\n").split(" ")
+        #red = int(user_input[0])
+        #green = int(user_input[1])
+        #blue = int(user_input[2])
+        #color = Color(red, green, blue)
+        red = Color(20, 0, 0)
+        blue = Color(0, 0, 20)
+        green = Color(0, 20, 0)
+        #color_transitions(port, Color(20, 0, 0), Color(0, 0, 20), 10, 0.1)
+        #color_transitions(port, Color(0, 0, 20), Color(20, 0, 0), 10, 0.1)
+        alternate_transitions(port, red, blue, delay)
+        alternate_transitions(port, blue, green, delay)
+        alternate_transitions(port, green, red, delay)
         # cycle(port, red, blue, 0.01)
         # cycle(port, blue, red, 0.01)
-        breathing(Color(20, 0, 20), 0.01)
+        #breathing(port, Color(10, 0, 20), 0.05)
+        #port.write(ColorPacket(color).to_data())

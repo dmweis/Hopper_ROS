@@ -50,6 +50,10 @@ void loop() {
       resetValueCounter+=3;
       if (resetValueCounter >= RESET_COUNTER_MAX){
         all_off();
+        delay(500);
+        while(Serial.available() >= 1){
+          Serial.read();
+        }
         pinToUpdate = 0;
         resetValueCounter = 0;
       }

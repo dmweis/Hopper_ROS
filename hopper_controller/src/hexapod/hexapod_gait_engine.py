@@ -112,9 +112,9 @@ class MovementController(object):
                 self._relaxed = False
             elif not self._relaxed:
                 # go to relaxed
-                self._gait_engine.relax_next_leg()
+                self._gait_engine.relax_next_leg(self._cycle_time, self._lift_height)
                 if not self._should_move():
-                    self._gait_engine.relax_next_leg()
+                    self._gait_engine.relax_next_leg(self._cycle_time, self._lift_height)
                     self._relaxed = True
             elif self._pose_update_ready:
                 # update pose
@@ -254,8 +254,8 @@ class GaitEngine(object):
                                          cycle_time,
                                          leg_lift_height=lift_height)
 
-    def relax_next_leg(self):
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)
+    def relax_next_leg(self, cycle_time, leg_lift_height):
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, cycle_time, leg_lift_height=leg_lift_height)
 
     def move_to_new_pose(self, pose, speed_override):
         """

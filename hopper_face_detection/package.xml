@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>hopper_face_detection</name>
+  <version>0.0.0</version>
+  <description>The hopper_face_detection package</description>
+  <maintainer email="dweis@todo.todo">dweis</maintainer>
+  <license>TODO</license>
+ 
+ <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>rospy</exec_depend>
+
+
+  <export>
+
+  </export>
+</package>

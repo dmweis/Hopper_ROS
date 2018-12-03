@@ -12,8 +12,8 @@ legs:
     tibia_id: 5
     angle_offset: -90
     position:
-      x: 12.5
-      y: 6.35
+      x: 11.5
+      y: 6.3
       z: 0
     femur_correction: -235
     tibia_correction: -256
@@ -23,8 +23,8 @@ legs:
     tibia_id: 6
     angle_offset: 90
     position:
-      x: 12.5
-      y: -6.35
+      x: 11.5
+      y: -6.3
       z: 0
     femur_correction: 65
     tibia_correction: 44
@@ -35,7 +35,7 @@ legs:
     angle_offset: -90
     position:
       x: 0
-      y: 11.35
+      y: 10.3
       z: 0
     femur_correction: -235
     tibia_correction: -256
@@ -46,7 +46,7 @@ legs:
     angle_offset: 90
     position:
       x: 0
-      y: -11.35
+      y: -10.3
       z: 0
     femur_correction: 65
     tibia_correction: 44
@@ -56,8 +56,8 @@ legs:
     tibia_id: 11
     angle_offset: -90
     position:
-      x: -12.5
-      y: 6.35
+      x: -11.5
+      y: 6.3
       z: 0
     femur_correction: -235
     tibia_correction: -256
@@ -67,8 +67,8 @@ legs:
     tibia_id: 12
     angle_offset: 90
     position:
-      x: -12.5
-      y: -6.35
+      x: -11.5
+      y: -6.3
       z: 0
     femur_correction: 65
     tibia_correction: 44

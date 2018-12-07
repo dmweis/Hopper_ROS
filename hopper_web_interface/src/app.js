@@ -31,20 +31,21 @@ robot.registerForTelemetrics(function(msg){
 io.on('connection', function (socket) {
     robot.log(`User connected from ${socket.request.connection.remoteAddress}`);
     var lastCommand = { x: 0, y: 0, rot: 0 };
+    var liftHeight = 3;
     socket.on('direction', function (msg) {
-        lastCommand.x = msg.x * 6;
-        lastCommand.y = msg.y * 6;
-        robot.sendCommandToRobot(lastCommand.x, lastCommand.y, lastCommand.rot);
+        lastCommand.x = msg.x * .1;
+        lastCommand.y = msg.y * .1;
+        robot.sendCommandToRobot(lastCommand.x, lastCommand.y, lastCommand.rot, liftHeight);
     });
     socket.on('rotation', function (msg) {
-        lastCommand.rot = msg.y * -10;
-        robot.sendCommandToRobot(lastCommand.x, lastCommand.y, lastCommand.rot);
+        lastCommand.rot = msg.y * 0.7;
+        robot.sendCommandToRobot(lastCommand.x, lastCommand.y, lastCommand.rot, liftHeight);
     });
     socket.on('translationUpdate', function (msg) {
         robot.sendUpdateStanceCommand(msg.transform, msg.rotation);
     });
     socket.on('walkingModeUpdate', function (msg) {
-        robot.sendWalkingModeUpdate(msg.staticSpeedMode, msg.liftHeight);
+        liftHeight = msg.liftHeight;
     });
     socket.on('disconnected', function () {
         robot.log(`User disconnected from ${socket.request.connection.remoteAddress}`);

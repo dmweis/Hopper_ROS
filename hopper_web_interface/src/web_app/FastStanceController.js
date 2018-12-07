@@ -26,13 +26,13 @@
 }
 
 function convertToTwist(translationJoystick, heightJoystick, rotationJoystick) {
-    const transformMultiplier = 5;
-    const rotationMultiplier = 10;
+    const transformMultiplier = 0.05;
+    const rotationMultiplier = 0.1;
     return {
         transform: {
             x: translationJoystick.x * transformMultiplier,
             y: translationJoystick.y * transformMultiplier,
-            z: Math.max(heightJoystick.x * transformMultiplier, -4)
+            z: Math.max(heightJoystick.x * transformMultiplier, -0.04)
         },
         rotation: {
             x: -rotationJoystick.y * rotationMultiplier,

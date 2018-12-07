@@ -84,7 +84,7 @@ createStanceJoystick(document.getElementById("height_joystick_zone"), "navy", tr
 createStanceJoystick(document.getElementById("rotate_joystick_zone"), "navy", translationViewModel.rotationJoystick, 0.2);
 
 setInterval(function () {
-    const multiplier = 0.1;
+    const multiplier = 0.001;
     translationViewModel.transform.x += translationViewModel.translationJoystick.x * multiplier;
     translationViewModel.transform.y += translationViewModel.translationJoystick.y * multiplier;
     translationViewModel.transform.z += translationViewModel.heightJoystick.x * multiplier;

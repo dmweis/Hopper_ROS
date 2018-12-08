@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<robot 
+    xmlns:xacro="http://ros.org/wiki/xacro" name="Hopper">
+    <xacro:property name="coxa_length" value="0.05" />
+    <xacro:property name="femur_length" value="0.067" />
+    <material name="white">
+        <color rgba="1 1 1 1"/>
+    </material>
+    <material name="red">
+        <color rgba="1 0 0 1"/>
+    </material>
+    <!-- main body -->
+    <link name="base_link"/>
+    <link name="body_link">
+        <visual>
+            <geometry>
+                <mesh filename="package://hopper_description/meshes/hopper_body.stl" scale="0.001 0.001 0.001"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+    </link>
+    <joint name="base_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="body_link" />
+    </joint>
+    <link name="base_stabilized"/>
+    <joint name="base_orientation_joint" type="fixed">
+        <parent link="base_stabilized" />
+        <child link="base_link" />
+    </joint>
+    <!-- forward arrow -->
+    <link name="arrow">
+        <visual>
+            <geometry>
+                <cylinder length="0.2" radius="0.01"/>
+            </geometry>
+            <material name="red"/>
+            <origin xyz="0.1 0 0" rpy="0 ${pi/2} 0"/>
+        </visual>
+    </link>
+    <joint name="arrow_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="arrow" />
+    </joint>
+    <!-- laser attachment -->
+    <link name="laser"/>
+    <joint name="body_laser_joint" type="fixed">
+        <parent link="body_link" />
+        <child link="laser" />
+        <origin xyz="0.025 0 0.11" rpy="0 0 ${pi}"/>
+    </joint>
+    <!-- Stereo camera  -->
+    <link name="stereo_camera"/>
+    <joint name="body_camera_joint" type="fixed">
+        <parent link="body_link" />
+        <child link="stereo_camera" />
+        <origin xyz="0.025 0 0.11" />
+    </joint>
+    <link name="left_camera"/>
+    <link name="right_camera"/>
+    <joint name="camera_left_joint" type="fixed">
+        <parent link="stereo_camera" />
+        <child link="left_camera" />
+        <origin xyz="0 0.07 0" rpy="0 ${pi/2} 0" />
+    </joint>
+    <joint name="camera_right_joint" type="fixed">
+        <parent link="stereo_camera" />
+        <child link="right_camera" />
+        <origin xyz="0 -0.07 0" rpy="0 ${pi/2} 0" />
+    </joint>
+    <!-- xarco macro for leg -->
+    <xacro:macro name="leg" params="side position x y angle axis">
+        <!-- leg base -->
+        <link name="${side}_${position}_leg_base"/>
+        <joint name="${side}_${position}_leg_base_joint" type="fixed">
+            <origin xyz="${x} ${y} 0.0" rpy="0.0 0.0 0.0" />
+            <parent link="body_link" />
+            <child link="${side}_${position}_leg_base" />
+        </joint>
+        <!-- coxa -->
+        <link name="${side}_${position}_coxa">
+            <visual>
+                <geometry>
+                    <mesh filename="package://hopper_description/meshes/hopper_leg_coxa.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="white"/>
+            </visual>
+        </link>
+        <joint name="${side}_${position}_coxa_joint" type="revolute">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${angle}" />
+            <parent link="${side}_${position}_leg_base" />
+            <child link="${side}_${position}_coxa" />
+            <axis xyz="0.0 0.0 1.0" />
+            <limit lower="-${pi}" upper="${pi}" effort="1000.0" velocity="1"/>
+        </joint>
+        <!-- femur -->
+        <link name="${side}_${position}_femur">
+            <visual>
+                <geometry>
+                    <mesh filename="package://hopper_description/meshes/hopper_leg_femur.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="white"/>
+            </visual>
+        </link>
+        <joint name="${side}_${position}_femur_joint" type="revolute">
+            <origin xyz="${coxa_length} 0.0 0.0" rpy="-${pi/2} ${pi/2} 0.0" />
+            <parent link="${side}_${position}_coxa" />
+            <child link="${side}_${position}_femur" />
+            <axis xyz="0.0 0.0 ${-axis}" />
+            <limit lower="-${pi}" upper="${pi}" effort="1000.0" velocity="1"/>
+        </joint>
+        <!-- tibia -->
+        <link name="${side}_${position}_tibia">
+            <visual>
+                <geometry>
+                    <mesh filename="package://hopper_description/meshes/hopper_leg_tibia.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="white"/>
+            </visual>
+        </link>
+        <joint name="${side}_${position}_tibia_joint" type="revolute">
+            <origin xyz="0.0 -${femur_length} 0.0" rpy="${pi} 0.0 0.0" />
+            <parent link="${side}_${position}_femur" />
+            <child link="${side}_${position}_tibia" />
+            <axis xyz="0.0 0.0 ${axis}" />
+            <limit lower="-${pi}" upper="${pi}" effort="1000.0" velocity="1"/>
+        </joint>
+    </xacro:macro>
+    <!--build legs-->
+    <xacro:leg side="right" position="rear" x="-0.115" y="-0.050" angle="-${pi*3/4}" axis="1" />
+    <xacro:leg side="right" position="middle" x="0.0" y="-0.100" angle="-${pi/2}" axis="1" />
+    <xacro:leg side="right" position="front" x="0.115" y="-0.050" angle="-${pi/4}" axis="1" />
+    <xacro:leg side="left" position="rear" x="-0.115" y="0.050" angle="${pi*3/4}" axis="-1" />
+    <xacro:leg side="left" position="middle" x="0.0" y="0.100" angle="${pi/2}" axis="-1" />
+    <xacro:leg side="left" position="front" x="0.115" y="0.050" angle="${pi/4}" axis="-1" />
+</robot>

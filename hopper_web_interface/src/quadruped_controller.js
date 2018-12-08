@@ -77,3 +77,9 @@ exports.log = function (message) {
         console.log(message);
     }
 }
+
+exports.validateUser = function (username, password){
+    var globalUserName = process.env.web_username;
+    var globalPassword = process.env.web_password;
+    return username === globalUserName && password === globalPassword;
+}

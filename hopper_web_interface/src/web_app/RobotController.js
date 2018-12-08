@@ -1,6 +1,4 @@
-﻿var socket = io({
-    transports: ['websocket']
-});
+﻿var socket = createSocketIOConnection();
 
 const telemetricsVm = new Vue({
     el: '#telemetrics_display',

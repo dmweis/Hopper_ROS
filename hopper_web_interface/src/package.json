@@ -13,6 +13,7 @@
     "nipplejs": "^0.6.8",
     "rosnodejs": "^2.1.1",
     "socket.io": "^2.0.4",
+    "socketio-auth": "^0.1.1",
     "vue": "^2.5.13"
   }
 }

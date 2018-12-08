@@ -42,9 +42,7 @@ function convertToTwist(translationJoystick, heightJoystick, rotationJoystick) {
     }
 }
 
-var socket = io({
-    transports: ['websocket']
-  });
+var socket = createSocketIOConnection();
 
 const translationViewModel = new Vue({
     el: "#app",

@@ -148,7 +148,7 @@ class DynamixelDriver(object):
             raise IOError("dxl_comm_result: " + error_desciption)
         dynamixel.groupSyncWriteClearParam(sync_group_num)
 
-    def read_compliance_slope(self, servo_id, compliance_slope):
+    def set_compliance_slope(self, servo_id, compliance_slope):
         self.__write_byte(servo_id, CW_COMPLIANCE_SLOPE, compliance_slope)
         self.__write_byte(servo_id, CCW_COMPLIANCE_SLOPE, compliance_slope)
 
@@ -157,7 +157,7 @@ class DynamixelDriver(object):
         ccw = self.__read_byte(servo_id, CCW_COMPLIANCE_SLOPE)
         return cw, ccw
 
-    def set_compliance_margin(self, servo_id):
+    def read_compliance_margin(self, servo_id):
         cw = self.__read_byte(servo_id, CW_COMPLIANCE_MARGIN)
         ccw = self.__read_byte(servo_id, CCW_COMPLIANCE_MARGIN)
         return cw, ccw

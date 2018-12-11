@@ -98,8 +98,9 @@ class Choreographer(object):
         original_pose = self.gait_engine.get_relaxed_pose()
         relaxed_pose = original_pose.clone()
         for leg in relaxed_pose.get_legs_as_list():
-            leg.z = -6
+            leg.z = -9
         self.gait_engine.move_to_new_pose(relaxed_pose, speed)
+        self.check_cancel()
         self.gait_engine.move_to_new_pose(relaxed_pose.rotate(Vector3(y=8)), speed)
         self.check_cancel()
         self.gait_engine.move_to_new_pose(relaxed_pose.transform(Vector3(z=3)), speed)

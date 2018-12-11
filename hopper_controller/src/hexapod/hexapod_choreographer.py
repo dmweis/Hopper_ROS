@@ -255,18 +255,19 @@ class Choreographer(object):
 
         paw_lifted = lifted_pose.clone()
         if use_right:
-            paw_lifted.right_front.y -= 4
+            paw_lifted.right_front.z = 4
         else:
-            paw_lifted.left_front.y -= 4
+            paw_lifted.left_front.z = 4
         paw_lowered = lifted_pose.clone()
         if use_right:
             paw_lowered.right_front.z = 0
         else:
             paw_lowered.left_front.z = 0
-        wave_speed = 5
+        up_speed = 25
+        down_speed = 15
         self.speak_publisher.publish("interjections/wahoo")
-        for i in range(random.randint(0, 3)):
-            self.gait_engine.move_to_new_pose(paw_lifted, wave_speed)
-            self.gait_engine.move_to_new_pose(paw_lowered, wave_speed)
+        for i in range(random.randint(3, 7)):
+            self.gait_engine.move_to_new_pose(paw_lifted, up_speed)
+            self.gait_engine.move_to_new_pose(paw_lowered, down_speed)
             self.check_cancel()
         self.gait_engine.move_to_new_pose(original_pose, speed)

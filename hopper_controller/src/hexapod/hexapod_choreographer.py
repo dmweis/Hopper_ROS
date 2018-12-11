@@ -91,6 +91,7 @@ class Choreographer(object):
         for i in range(random.randint(4, 6)):
             self.gait_engine.move_to_new_pose(turned_left, speed)
             self.gait_engine.move_to_new_pose(turned_right, speed)
+            self.check_cancel()
         self.gait_engine.move_to_new_pose(relaxed_pose, speed)
 
     def sad_emote(self):

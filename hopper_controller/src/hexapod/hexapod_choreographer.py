@@ -149,14 +149,20 @@ class Choreographer(object):
         fast_speed = 25
         normal_pose = self.gait_engine.get_relaxed_pose()
         lifted_middle = normal_pose \
-            .transform(Vector3(x=4, z=4), LegFlags.MIDDLE)
+            .transform(Vector3(x=6, z=4), LegFlags.MIDDLE)
         grounded_middle_front = normal_pose \
-            .transform(Vector3(x=4), LegFlags.MIDDLE)
+            .transform(Vector3(x=6), LegFlags.MIDDLE) \
+            .transform(Vector3(y=-2), LegFlags.LEFT_MIDDLE) \
+            .transform(Vector3(y=2), LegFlags.RIGHT_MIDDLE)
         lifted_front = grounded_middle_front \
-            .transform(Vector3(z=12, x=12), LegFlags.FRONT) \
+            .transform(Vector3(z=14, x=10), LegFlags.FRONT) \
             .rotate(Vector3(y=-14)) \
             .transform(Vector3(y=-6), LegFlags.LEFT_FRONT) \
             .transform(Vector3(y=6), LegFlags.RIGHT_FRONT)
+        lifted_front_retracted = lifted_front \
+            .transform(Vector3(x=-6), LegFlags.FRONT) \
+            .transform(Vector3(y=6), LegFlags.LEFT_FRONT) \
+            .transform(Vector3(y=-6), LegFlags.RIGHT_FRONT)
         lifted_left = lifted_front \
             .transform(Vector3(z=-2), LegFlags.LEFT_FRONT) \
             .transform(Vector3(z=2), LegFlags.RIGHT_FRONT)
@@ -172,7 +178,8 @@ class Choreographer(object):
             self.gait_engine.move_to_new_pose(lifted_right, fast_speed)
             self.check_cancel()
         self.gait_engine.move_to_new_pose(lifted_front, slow_speed)
-        self.gait_engine.move_to_new_pose(grounded_middle_front, slow_speed)
+        self.gait_engine.move_to_new_pose(lifted_front_retracted, fast_speed)
+        self.gait_engine.move_to_new_pose(grounded_middle_front, slow_speed - 5)
         self.gait_engine.move_to_new_pose(lifted_middle, slow_speed)
         self.gait_engine.move_to_new_pose(normal_pose, slow_speed)
 

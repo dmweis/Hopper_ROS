@@ -153,7 +153,7 @@ class SteamControllerRosHandler(object):
                 self.move_pub.publish("happy_spin")
             if buttons_pressed & SCButtons.Y:
                 if self.child_safe_mode:
-                    self.move_pub.publish("happy_hand_dance")
+                    self.move_pub.publish("combat_cry")
                 else:
                     self.move_pub.publish("hump")
             if buttons_pressed & SCButtons.BACK:

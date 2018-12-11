@@ -19,7 +19,8 @@ class Choreographer(object):
             "sad_emote": self.sad_emote,
             "wave_hi": self.wave_hi,
             "lifted_legs": self.lift_legs,
-            "roar": self.roar
+            "roar": self.roar,
+            "combat_cry": self.combat_cry
         }
         child_safe = rospy.get_param("child_safe_mode", True)
         if not child_safe:
@@ -228,3 +229,44 @@ class Choreographer(object):
             self.check_cancel()
         self.gait_engine.move_to_new_pose(backwards_hump, 9)
         self.gait_engine.move_to_new_pose(normal_pose, speed)
+
+    def combat_cry(self):
+        use_right = random.choice([True, False])
+        speed = 12
+        original_pose = self.gait_engine.get_relaxed_pose()
+        lifted_pose = original_pose.clone()
+
+        if use_right:
+            lifted_pose = lifted_pose \
+                .rotate(Vector3(y=-5)) \
+                .rotate(Vector3(x=-5)) \
+                .transform(Vector3(z=-2)) \
+                .transform(Vector3(10, -2), LegFlags.RIGHT_FRONT)
+            lifted_pose.right_front.z = 6
+        else:
+            lifted_pose = lifted_pose \
+                .rotate(Vector3(y=-5)) \
+                .rotate(Vector3(x=5)) \
+                .transform(Vector3(z=-2)) \
+                .transform(Vector3(10, 2), LegFlags.LEFT_FRONT)
+            lifted_pose.left_front.z = 6
+        self.gait_engine.move_to_new_pose(lifted_pose, speed)
+        self.check_cancel()
+
+        paw_lifted = lifted_pose.clone()
+        if use_right:
+            paw_lifted.right_front.y -= 4
+        else:
+            paw_lifted.left_front.y -= 4
+        paw_lowered = lifted_pose.clone()
+        if use_right:
+            paw_lowered.right_front.z = 0
+        else:
+            paw_lowered.left_front.z = 0
+        wave_speed = 5
+        self.speak_publisher.publish("interjections/wahoo")
+        for i in range(random.randint(0, 3)):
+            self.gait_engine.move_to_new_pose(paw_lifted, wave_speed)
+            self.gait_engine.move_to_new_pose(paw_lowered, wave_speed)
+            self.check_cancel()
+        self.gait_engine.move_to_new_pose(original_pose, speed)

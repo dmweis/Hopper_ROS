@@ -111,7 +111,7 @@ class Choreographer(object):
         use_right = random.choice([True, False])
         speed = 12
         original_pose = self.gait_engine.get_relaxed_pose()
-        lifted_pose = self.gait_engine.get_relaxed_pose()
+        lifted_pose = original_pose.clone()
 
         if use_right:
             lifted_pose = lifted_pose \
@@ -122,10 +122,10 @@ class Choreographer(object):
             lifted_pose.right_front.z = 4
         else:
             lifted_pose = lifted_pose \
-                .rotate(Vector3(y=5)) \
-                .rotate(Vector3(x=-5)) \
+                .rotate(Vector3(y=-5)) \
+                .rotate(Vector3(x=5)) \
                 .transform(Vector3(z=-2)) \
-                .transform(Vector3(10, 2), LegFlags.RIGHT_FRONT)
+                .transform(Vector3(10, 2), LegFlags.LEFT_FRONT)
             lifted_pose.left_front.z = 4
         self.gait_engine.move_to_new_pose(lifted_pose, speed)
         self.check_cancel()

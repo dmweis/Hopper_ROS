@@ -96,8 +96,10 @@ class Choreographer(object):
     def sad_emote(self):
         speed = 3
         original_pose = self.gait_engine.get_relaxed_pose()
-        self.gait_engine.reset_relaxed_body_pose(speed)
-        relaxed_pose = self.gait_engine.get_relaxed_pose()
+        relaxed_pose = original_pose.clone()
+        for leg in relaxed_pose.get_legs_as_list():
+            leg.z = -6
+        self.gait_engine.move_to_new_pose(relaxed_pose, speed)
         self.gait_engine.move_to_new_pose(relaxed_pose.rotate(Vector3(y=8)), speed)
         self.check_cancel()
         self.gait_engine.move_to_new_pose(relaxed_pose.transform(Vector3(z=3)), speed)

@@ -384,7 +384,7 @@ class LegPositions(hopper_controller.msg.HexapodLegPositions):
             position_copy.right_rear = other.right_rear.clone()
         return position_copy
 
-    def get_legs_as_list(self, legs):
+    def get_legs_as_list(self, legs=LegFlags.ALL):
         selected_legs = []
         if (legs & LegFlags.LEFT_FRONT) != 0:
             selected_legs.append(self.left_front)

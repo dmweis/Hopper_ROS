@@ -77,7 +77,7 @@ class Choreographer(object):
         lean_right = legs_separated_pose.clone() \
             .rotate(Vector3(x=2))
 
-        for i in range(4):
+        for i in range(random.randint(3, 6)):
             self.gait_engine.move_to_new_pose(lean_right, speed)
             self.gait_engine.move_to_new_pose(lean_left, speed)
             self.check_cancel()
@@ -88,7 +88,7 @@ class Choreographer(object):
         relaxed_pose = self.gait_engine.get_relaxed_pose()
         turned_left = self.gait_engine.get_relaxed_pose().rotate(Vector3(z=3))
         turned_right = self.gait_engine.get_relaxed_pose().rotate(Vector3(z=-3))
-        for i in range(4):
+        for i in range(random.randint(4, 6)):
             self.gait_engine.move_to_new_pose(turned_left, speed)
             self.gait_engine.move_to_new_pose(turned_right, speed)
         self.gait_engine.move_to_new_pose(relaxed_pose, speed)
@@ -108,29 +108,45 @@ class Choreographer(object):
         self.gait_engine.move_to_new_pose(original_pose, speed)
 
     def wave_hi(self):
+        use_right = random.choice([True, False])
         speed = 12
         original_pose = self.gait_engine.get_relaxed_pose()
-        lifted_pose = self.gait_engine.get_relaxed_pose() \
-            .rotate(Vector3(y=-5)) \
-            .rotate(Vector3(x=-5)) \
-            .transform(Vector3(z=-2)) \
-            .transform(Vector3(10, -2), LegFlags.RIGHT_FRONT)
-        lifted_pose.right_front.z = 4
+        lifted_pose = self.gait_engine.get_relaxed_pose()
+
+        if use_right:
+            lifted_pose = lifted_pose \
+                .rotate(Vector3(y=-5)) \
+                .rotate(Vector3(x=-5)) \
+                .transform(Vector3(z=-2)) \
+                .transform(Vector3(10, -2), LegFlags.RIGHT_FRONT)
+            lifted_pose.right_front.z = 4
+        else:
+            lifted_pose = lifted_pose \
+                .rotate(Vector3(y=5)) \
+                .rotate(Vector3(x=-5)) \
+                .transform(Vector3(z=-2)) \
+                .transform(Vector3(10, 2), LegFlags.RIGHT_FRONT)
+            lifted_pose.left_front.z = 4
         self.gait_engine.move_to_new_pose(lifted_pose, speed)
         self.check_cancel()
 
         paw_lifted = lifted_pose.clone()
-        paw_lifted.right_front.y -= 2
-
+        if use_right:
+            paw_lifted.right_front.y -= 2
+        else:
+            paw_lifted.left_front.y -= 2
         paw_lowered = lifted_pose.clone()
-        paw_lowered.right_front.z = 0
+        if use_right:
+            paw_lowered.right_front.z = 0
+        else:
+            paw_lowered.left_front.z = 0
         wave_speed = 25
-        for i in range(1):
+        for i in range(random.randint(0, 3)):
             self.gait_engine.move_to_new_pose(paw_lifted, wave_speed)
             self.gait_engine.move_to_new_pose(paw_lowered, wave_speed)
             self.check_cancel()
         self.speak_publisher.publish("Turret_turret_active_1")
-        for i in range(5):
+        for i in range(random.randint(1, 5)):
             self.gait_engine.move_to_new_pose(paw_lifted, wave_speed)
             self.gait_engine.move_to_new_pose(paw_lowered, wave_speed)
             self.check_cancel()
@@ -176,7 +192,7 @@ class Choreographer(object):
         self.gait_engine.move_to_new_pose(grounded_middle_front, slow_speed)
         self.check_cancel()
         self.gait_engine.move_to_new_pose(lifted_front, fast_speed)
-        for i in range(6):
+        for i in range(random.randint(4, 7)):
             self.gait_engine.move_to_new_pose(lifted_left, fast_speed)
             self.gait_engine.move_to_new_pose(lifted_right, fast_speed)
             self.check_cancel()

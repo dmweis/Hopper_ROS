@@ -91,8 +91,8 @@ def track_points_move(gray, prev_gray, keypoints, img_to_draw):
         top_left = rect[:2]
         bottom_right = (top_left[0] + rect[2], top_left[1] + rect[3])
         cv.rectangle(img_to_draw, top_left, bottom_right, 255, 4)
-        center_x = op_left[0] + rect[2] / 2.0
-        center_y = op_left[1] + rect[3] / 2.0
+        center_x = top_left[0] + rect[2] / 2.0
+        center_y = top_left[1] + rect[3] / 2.0
         position = (center_x, center_y)
     return new_keypoints, position
 
@@ -108,7 +108,7 @@ def unite_images(images):
     img1 = cv.hconcat(images[:2])
     img2 = cv.hconcat(images[2:])
     img = cv.vconcat((img1, img2))
-    return img
+    return cv.resize(img, 320, 240)
 
 global_prev_keypoints = None
 prev_gray = None

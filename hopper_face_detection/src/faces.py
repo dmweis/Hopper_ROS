@@ -100,7 +100,7 @@ global_prev_keypoints = None
 prev_gray = None
 faces_image = None
 features_image = None
-cam = cv.VideoCapture(1)
+cam = cv.VideoCapture(0)
 while True:
     ret, img = cam.read()
     height, width = img.shape[:2]

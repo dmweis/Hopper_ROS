@@ -7,6 +7,7 @@ import numpy as np
 from cv_bridge import CvBridge
 import rospy
 from sensor_msgs.msg import CompressedImage, Image
+from geometry_msgs.msg import Pose2D
 import os
 
 def map_linear(value, in_min, in_max, out_min, out_max):
@@ -81,6 +82,7 @@ def track_points_move(gray, prev_gray, keypoints, img_to_draw):
         new_keypoints.append((x, y))
         cv.circle(img_to_draw, (x, y), 3, 255, -1)
     op_flow_array = np.float32([p for p in optical_flow]).reshape(-1, 1, 2)
+    position = None
     if len(optical_flow) > 6 and False:
         ellipse = cv.fitEllipse(op_flow_array)
         cv.ellipse(img_to_draw, ellipse, 255, 4)
@@ -89,7 +91,10 @@ def track_points_move(gray, prev_gray, keypoints, img_to_draw):
         top_left = rect[:2]
         bottom_right = (top_left[0] + rect[2], top_left[1] + rect[3])
         cv.rectangle(img_to_draw, top_left, bottom_right, 255, 4)
-    return new_keypoints
+        center_x = op_left[0] + rect[2] / 2.0
+        center_y = op_left[1] + rect[3] / 2.0
+        position = (center_x, center_y)
+    return new_keypoints, position
 
 
 def display_images(images):
@@ -113,6 +118,7 @@ cv_bridge = CvBridge()
 
 rospy.init_node("face_detection")
 finished_image = rospy.Publisher("camera/detected_faces/original", Image, queue_size=1)
+face_position_publisher = rospy.Publisher("camera/detected_face_position", Pose2D, queue_size=4)
 
 def on_image(msg):
     global global_prev_keypoints
@@ -134,8 +140,11 @@ def on_image(msg):
         faces = detect_faces(gray, faces_image)
         keypoints = find_features_in_faces(gray, faces, features_image)
     else:
-        keypoints = track_points_move(
+        keypoints, position = track_points_move(
             gray, prev_gray, global_prev_keypoints, tracked_features_image)
+        mapped_x = map_linear(position[0], 0, width, -1.0, 1.0)
+        mapped_y = map_linear(position[1], 0, height, -1.0, 1.0)
+        face_position_publisher.publish(Pose2D(mapped_x, mapped_y, 0.0))
 
     # display_images((cv.cvtColor(gray, cv.COLOR_GRAY2BGR),
     #                 faces_image, features_image, tracked_features_image))

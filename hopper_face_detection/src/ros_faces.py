@@ -108,7 +108,7 @@ def unite_images(images):
     img1 = cv.hconcat(images[:2])
     img2 = cv.hconcat(images[2:])
     img = cv.vconcat((img1, img2))
-    return cv.resize(img, 320, 240)
+    return cv.resize(img, (320, 240))
 
 global_prev_keypoints = None
 prev_gray = None

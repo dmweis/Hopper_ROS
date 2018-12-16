@@ -17,7 +17,8 @@ faces_image = None
 features_image = None
 
 rospy.init_node("face_detection")
-finished_image = rospy.Publisher("camera/detected_faces/original", Image, queue_size=1)
+result_image_publisher = rospy.Publisher("camera/detected_faces", Image, queue_size=1)
+result_compressed_image_publisher = rospy.Publisher("camera/detected_faces/compressed", CompressedImage, queue_size=1)
 face_position_publisher = rospy.Publisher("camera/detected_face_position", Pose2D, queue_size=4)
 
 def on_image(msg):
@@ -26,11 +27,15 @@ def on_image(msg):
     global faces_image
     global features_image
 
+    publish_images = result_image_publisher.get_num_connections() + result_compressed_image_publisher.get_num_connections() > 0
+
     img = vision.ros_msg_to_image(msg)
     gray = vision.process_image(img)
     height, width = img.shape[:2]
 
-    tracked_features_image = img.copy()
+    tracked_features_image = None
+    if publish_images:
+        tracked_features_image = img.copy()
 
     if global_prev_keypoints is None or len(global_prev_keypoints) < 1:
         faces_image = img.copy()
@@ -45,10 +50,12 @@ def on_image(msg):
         mapped_y = vision.map_linear(position[1], 0, height, -1.0, 1.0)
         face_position_publisher.publish(Pose2D(mapped_x, mapped_y, 0.0))
 
-    final_image = vision.unite_images((cv.cvtColor(gray, cv.COLOR_GRAY2BGR),
+    if publish_images:
+        final_image = vision.unite_images((cv.cvtColor(gray, cv.COLOR_GRAY2BGR),
                     faces_image, features_image, tracked_features_image))
-    # finished_image.publish(vision.image_to_ros_msg(vision.resize_image(final_image)))
-    finished_image.publish(vision.image_to_ros_msg(final_image))
+        # finished_image.publish(vision.image_to_ros_msg(vision.resize_image(final_image)))
+        result_image_publisher.publish(vision.image_to_ros_msg(final_image))
+        result_compressed_image_publisher.publish(vision.image_to_ros_compressed_image(final_image))
     prev_gray = gray
     global_prev_keypoints = keypoints
 

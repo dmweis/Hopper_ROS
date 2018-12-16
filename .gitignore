@@ -1,3 +1,4 @@
 /CMakeLists.txt
 .idea
 .vscode
+*.pyc

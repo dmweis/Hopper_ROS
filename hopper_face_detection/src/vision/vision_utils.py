@@ -31,6 +31,12 @@ def image_to_ros_msg(image):
         cv_bridge = CvBridge()
     return cv_bridge.cv2_to_imgmsg(image, encoding="bgr8")
 
+def image_to_ros_compressed_image(image):
+    global cv_bridge
+    if cv_bridge is None:
+        cv_bridge = CvBridge()
+    return cv_bridge.cv2_to_compressed_imgmsg(image)
+
 script_dir = os.path.dirname(os.path.realpath(__file__))
 #face_cascade = cv.CascadeClassifier('data/haarcascade_frontalface_alt2.xml')
 face_cascade = cv.CascadeClassifier(

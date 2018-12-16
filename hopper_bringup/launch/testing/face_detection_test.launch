@@ -11,5 +11,5 @@
     </node>
     <node name="hopper_face_detection" pkg="hopper_face_detection" type="ros_faces.py" />
     <node name="hopper_face_follower" pkg="hopper_face_detection" type="face_follower.py" />
-    <node name="face_republish" pkg="image_transport" type="republish" args="raw in:=camera/detected_faces/original out:=camera/detected_faces"/>
+    <!-- <node name="face_republish" pkg="image_transport" type="republish" args="raw in:=camera/detected_faces/original out:=camera/detected_faces"/> -->
 </launch>

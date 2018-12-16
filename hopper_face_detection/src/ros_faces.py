@@ -53,9 +53,8 @@ def on_image(msg):
     if publish_images:
         final_image = vision.unite_images((cv.cvtColor(gray, cv.COLOR_GRAY2BGR),
                     faces_image, features_image, tracked_features_image))
-        # finished_image.publish(vision.image_to_ros_msg(vision.resize_image(final_image)))
-        result_image_publisher.publish(vision.image_to_ros_msg(final_image))
-        result_compressed_image_publisher.publish(vision.image_to_ros_compressed_image(final_image))
+        result_image_publisher.publish(vision.image_to_ros_msg(vision.resize_image(final_image)))
+        result_compressed_image_publisher.publish(vision.image_to_ros_compressed_image(vision.resize_image(final_image)))
     prev_gray = gray
     global_prev_keypoints = keypoints
 

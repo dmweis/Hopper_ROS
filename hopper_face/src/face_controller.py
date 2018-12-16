@@ -171,7 +171,7 @@ class LedController(object):
         self.selected_mode = "idle_1"
         self.selected_color = "red"
         self.modes = {
-            "idel_1": self.idel_1,
+            "idle_1": self.idle_1,
             "idle_2": self.idle_2,
             "idle_3": self.idle_3,
             "breathing": self.breathing

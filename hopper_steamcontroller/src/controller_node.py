@@ -8,7 +8,7 @@ import rospy
 from geometry_msgs.msg import Twist, Quaternion, Vector3
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
 from hopper_controller.msg import SingleLegCommand
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
 import usb1
 
@@ -87,10 +87,12 @@ class SteamControllerRosHandler(object):
         self.halt_command = rospy.Publisher('hopper/halt', HaltCommand, queue_size=1)
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
         self.single_leg_publisher = rospy.Publisher('hopper/single_leg_command', SingleLegCommand, queue_size=5)
+        self.toggle_face_tracking_publisher = rospy.Publisher("/hopper/face_tracking_enabled", Bool, queue_size=10)
         self._hopper_move_command_msg = HopperMoveCommand()
         self.last_stance_msg = Twist()
         self.last_single_leg_msg = SingleLegCommand()
         self.slected_single_index = 0
+        self.face_tracking_enabled = False
         self.last_single_leg_msg.selected_leg = ALL_LEGS[self.slected_single_index]
         self.last_single_leg_msg.single_leg_mode_on = False
         self._new_command_available = True
@@ -173,6 +175,9 @@ class SteamControllerRosHandler(object):
                 self.slected_single_index += 1
                 if self.slected_single_index > len(ALL_LEGS) - 1:
                     self.slected_single_index = 0
+            if buttons_pressed & SCButtons.START:
+                self.face_tracking_enabled = not self.face_tracking_enabled
+                self.toggle_face_tracking_publisher.publish(Bool(self.face_tracking_enabled))
         
         if buttons_pressed & SCButtons.STEAM:
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))

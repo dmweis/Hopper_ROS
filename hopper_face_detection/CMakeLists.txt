@@ -4,6 +4,7 @@ project(hopper_face_detection)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
+  std_msgs
   rospy
 )
 

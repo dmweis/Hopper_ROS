@@ -9,6 +9,7 @@ from geometry_msgs.msg import Pose2D, Twist
 class FaceFollower(object):
     def __init__(self):
         super(FaceFollower, self).__init__()
+        rospy.init_node("face_follower")
         self.last_twist = Twist()
         self.stance_publisher = rospy.Publisher("hopper/stance_translate", Twist, queue_size=1)
         rospy.Subscriber("camera/detected_face_position", Pose2D, self.on_new_face_pose, queue_size=1)

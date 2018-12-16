@@ -31,7 +31,7 @@ class FaceFollower(object):
     def on_new_face_pose(self, msg):
         if self.tracking_enabled:
             new_x = self.current_x + radians(msg.x * 2)
-            new_y = self.current_y + radians(msg.y * 1)
+            new_y = self.current_y + radians(msg.y * 2)
             new_x = clamp(new_x, -LIMIT_X, LIMIT_X)
             new_y = clamp(new_y, LOWER_LIMIT_Y, -UPPER_LIMIT_Y)
             new_twist = Twist()

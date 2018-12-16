@@ -42,9 +42,15 @@ def on_image(msg):
         features_image = img.copy()
         faces = vision.detect_faces(gray, faces_image)
         keypoints = vision.find_features(gray, faces, features_image)
+
+        position = vision.find_bounding_rect(keypoints, tracked_features_image)
+        mapped_x = vision.map_linear(position[0], 0, width, -1.0, 1.0)
+        mapped_y = vision.map_linear(position[1], 0, height, -1.0, 1.0)
+        face_position_publisher.publish(Pose2D(mapped_x, mapped_y, 0.0))
     else:
         keypoints = vision.track_points_move(
             gray, prev_gray, global_prev_keypoints, tracked_features_image)
+
         position = vision.find_bounding_rect(keypoints, tracked_features_image)
         mapped_x = vision.map_linear(position[0], 0, width, -1.0, 1.0)
         mapped_y = vision.map_linear(position[1], 0, height, -1.0, 1.0)

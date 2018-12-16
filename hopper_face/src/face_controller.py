@@ -180,7 +180,7 @@ class LedController(object):
                          self.on_mode_change, queue_size=3)
         self.main_loop()
 
-    def on_mode_change(self, msg)
+    def on_mode_change(self, msg):
     new_mode = msg.data.lower()
     # special case for random
     if new_mode == "random":

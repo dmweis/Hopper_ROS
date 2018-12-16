@@ -88,6 +88,7 @@ class SteamControllerRosHandler(object):
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
         self.single_leg_publisher = rospy.Publisher('hopper/single_leg_command', SingleLegCommand, queue_size=5)
         self.toggle_face_tracking_publisher = rospy.Publisher("/hopper/face_tracking_enabled", Bool, queue_size=10)
+        self.face_color_publisher = rospy.Publisher("hopper/face/mode", String, queue_size=3)
         self._hopper_move_command_msg = HopperMoveCommand()
         self.last_stance_msg = Twist()
         self.last_single_leg_msg = SingleLegCommand()
@@ -178,6 +179,10 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.START:
                 self.face_tracking_enabled = not self.face_tracking_enabled
                 self.toggle_face_tracking_publisher.publish(Bool(self.face_tracking_enabled))
+            if buttons_pressed & SCButtons.BACK:
+                self.face_color_publisher.publish(String("random"))
+            if buttons_pressed & SCButtons.X:
+                self.face_color_publisher.publish(String("breathing:blue"))
         
         if buttons_pressed & SCButtons.STEAM:
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))

@@ -41,15 +41,15 @@ class FaceFollower(object):
             self.current_x = new_x
             self.current_y = new_y
 
-    def on_tracking_enable_msg(self, msg)
+    def on_tracking_enable_msg(self, msg):
         self.tracking_enabled = msg.data
         if not self.tracking_enabled:
             new_twist = Twist()
             new_twist.angular.z = 0
             new_twist.angular.y = 0
             self.stance_publisher.publish(new_twist)
-            self.current_x = new_x
-            self.current_y = new_y
+            self.current_x = 0
+            self.current_y = 0
 
 
 if __name__ == "__main__":

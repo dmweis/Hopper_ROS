@@ -33,6 +33,8 @@ class FaceFollower(object):
         new_twist.angular.z = new_x
         new_twist.angular.y = new_y
         self.stance_publisher.publish(new_twist)
+        self.current_x = new_x
+        self.current_y = new_y
 
 if __name__ == "__main__":
     FaceFollower()

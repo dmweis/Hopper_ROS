@@ -104,7 +104,6 @@ cam = cv.VideoCapture(0)
 while True:
     ret, img = cam.read()
     height, width = img.shape[:2]
-
     gray = process_image(img)
 
     tracked_features_image = img.copy()

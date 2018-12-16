@@ -10,8 +10,8 @@ def clamp(value, a, b):
     bigger = max(a, b)
     return min(bigger, max(smaller, value))
 
-LIMIT_X = radians(15)
-UPPER_LIMIT_Y = radians(16)
+LIMIT_X = radians(18)
+UPPER_LIMIT_Y = radians(20)
 LOWER_LIMIT_Y = radians(12)
 
 
@@ -29,7 +29,7 @@ class FaceFollower(object):
         new_x = self.current_x + radians(msg.x * 2)
         new_y = self.current_y + radians(msg.y * 1)
         new_x = clamp(new_x, -LIMIT_X, LIMIT_X)
-        new_y = clamp(new_y, -LOWER_LIMIT_Y, UPPER_LIMIT_Y)
+        new_y = clamp(new_y, LOWER_LIMIT_Y, -UPPER_LIMIT_Y)
         new_twist = Twist()
         new_twist.angular.z = new_x
         new_twist.angular.y = new_y

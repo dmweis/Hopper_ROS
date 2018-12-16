@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" >
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" respawn="true">
         <param name="video_device" value="/dev/video0" />
         <param name="image_width" value="320" />
         <param name="image_height" value="240" />

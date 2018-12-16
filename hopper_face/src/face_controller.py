@@ -181,23 +181,23 @@ class LedController(object):
         self.main_loop()
 
     def on_mode_change(self, msg):
-    new_mode = msg.data.lower()
-    # special case for random
-    if new_mode == "random":
-        self.selected_color = random.choice(COLORS)
-        self.selected_mode = random.choice(self.modes)
-        return
-    if ":" in new_mode:
-        mode, color = new_mode.split(":")
-        if color in COLORS:
-            self.selected_color = color
+        new_mode = msg.data.lower()
+        # special case for random
+        if new_mode == "random":
+            self.selected_color = random.choice(COLORS)
+            self.selected_mode = random.choice(self.modes)
+            return
+        if ":" in new_mode:
+            mode, color = new_mode.split(":")
+            if color in COLORS:
+                self.selected_color = color
+            else:
+                rospy.logwarn("Color: " + color + " unknown")
+            new_mode = mode
+        if new_mode in self.modes:
+            self.selected_mode = new_mode
         else:
-            rospy.logwarn("Color: " + color + " unknown")
-        new_mode = mode
-    if new_mode in self.modes:
-        self.selected_mode = new_mode
-    else:
-        rospy.logwarn("Mode: " + new_mode + " unknown")
+            rospy.logwarn("Mode: " + new_mode + " unknown")
 
     def main_loop(self):
         with serial.Serial('/dev/ttyUSB0', 115200) as port:

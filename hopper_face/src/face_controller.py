@@ -184,8 +184,8 @@ class LedController(object):
         new_mode = msg.data.lower()
         # special case for random
         if new_mode == "random":
-            self.selected_color = random.choice(COLORS)
-            self.selected_mode = random.choice(self.modes)
+            self.selected_color = random.choice(list(COLORS))
+            self.selected_mode = random.choice(list(self.modes))
             return
         if ":" in new_mode:
             mode, color = new_mode.split(":")
@@ -230,7 +230,7 @@ class LedController(object):
         color_transitions(self.port, blue, red, 10, 0.1)
 
     def breathing(self):
-        breathing(port, COLORS[self.selected_color], 0.05)
+        breathing(self.port, COLORS[self.selected_color], 0.05)
 
 
 if __name__ == "__main__":

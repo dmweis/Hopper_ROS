@@ -84,6 +84,7 @@ def color_transitions(port, color_a, color_b, steps, delay):
         new_color.blue = get_transitioning_color(
             color_a.blue, color_b.blue, step, steps)
         port.write(ColorPacket(new_color).to_data())
+        yield 0
         sleep(delay)
 
 
@@ -97,6 +98,7 @@ def alternate_transitions(port, color_from, color_to, delay):
         if current_color.blue < color_to.blue:
             current_color.blue += 1
         port.write(ColorPacket(current_color).to_data())
+        yield 0
         sleep(delay)
     while current_color.red > color_to.red or current_color.green > color_to.green or current_color.blue > color_to.blue:
         if current_color.red > color_to.red:
@@ -106,6 +108,7 @@ def alternate_transitions(port, color_from, color_to, delay):
         if current_color.blue > color_to.blue:
             current_color.blue -= 1
         port.write(ColorPacket(current_color).to_data())
+        yield 0
         sleep(delay)
 
 
@@ -123,6 +126,7 @@ def cycle(port, color_from, color_to, delay):
                 current_color.blue += 1
             pixel_data.set_pixel(pixel, current_color)
             port.write(pixel_data.to_data())
+            yield 0
             sleep(delay)
         while current_color.red > color_to.red or current_color.green > color_to.green or current_color.blue > color_to.blue:
             if current_color.red > color_to.red:
@@ -133,6 +137,7 @@ def cycle(port, color_from, color_to, delay):
                 current_color.blue -= 1
             pixel_data.set_pixel(pixel, current_color)
             port.write(pixel_data.to_data())
+            yield 0
             sleep(delay)
 
 
@@ -144,6 +149,7 @@ def breathing(port, color, delay):
         new_color.blue = 0 if color.blue == 0 else color.blue + i
         pixel_data = ColorPacket(new_color)
         port.write(pixel_data.to_data())
+        yield 0
         sleep(delay)
     for i in reversed(range(15)):
         new_color = Color()
@@ -152,6 +158,7 @@ def breathing(port, color, delay):
         new_color.blue = 0 if color.blue == 0 else color.blue + i
         pixel_data = ColorPacket(new_color)
         port.write(pixel_data.to_data())
+        yield 0
         sleep(delay)
 
 
@@ -204,7 +211,10 @@ class LedController(object):
             reset(port)
             self.port = port
             while not rospy.is_shutdown():
-                self.modes[self.selected_mode]()
+                selected_mode = self.selected_mode
+                for i in self.modes[selected_mode]():
+                    if selected_mode != self.selected_mode:
+                        break
                 # set all off at the end
             port.write(ColorPacket().to_data())
 

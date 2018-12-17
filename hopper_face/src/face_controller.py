@@ -143,19 +143,21 @@ def cycle(port, color_from, color_to, delay):
 
 def breathing(port, color, delay):
     for i in range(15):
+        current_color = color()
         new_color = Color()
-        new_color.red = 0 if color.red == 0 else color.red + i
-        new_color.green = 0 if color.green == 0 else color.green + i
-        new_color.blue = 0 if color.blue == 0 else color.blue + i
+        new_color.red = 0 if current_color.red == 0 else current_color.red + i
+        new_color.green = 0 if current_color.green == 0 else current_color.green + i
+        new_color.blue = 0 if current_color.blue == 0 else current_color.blue + i
         pixel_data = ColorPacket(new_color)
         port.write(pixel_data.to_data())
         yield 0
         sleep(delay)
     for i in reversed(range(15)):
+        current_color = color()
         new_color = Color()
-        new_color.red = 0 if color.red == 0 else color.red + i
-        new_color.green = 0 if color.green == 0 else color.green + i
-        new_color.blue = 0 if color.blue == 0 else color.blue + i
+        new_color.red = 0 if current_color.red == 0 else current_color.red + i
+        new_color.green = 0 if current_color.green == 0 else current_color.green + i
+        new_color.blue = 0 if current_color.blue == 0 else current_color.blue + i
         pixel_data = ColorPacket(new_color)
         port.write(pixel_data.to_data())
         yield 0
@@ -248,7 +250,7 @@ class LedController(object):
             yield i
 
     def breathing(self):
-        for i in breathing(self.port, COLORS[self.selected_color], 0.05):
+        for i in breathing(self.port, lambda:COLORS[self.selected_color], 0.05):
             yield i
 
 

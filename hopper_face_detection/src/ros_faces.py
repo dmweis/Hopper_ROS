@@ -9,7 +9,7 @@ from vision import vision_utils as vision
 
 from sensor_msgs.msg import CompressedImage, Image
 from geometry_msgs.msg import Pose2D
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, String
 
 tracking_enabled = False
 global_prev_keypoints = None
@@ -21,6 +21,7 @@ rospy.init_node("face_detection")
 result_image_publisher = rospy.Publisher("camera/detected_faces", Image, queue_size=1)
 result_compressed_image_publisher = rospy.Publisher("camera/detected_faces/compressed", CompressedImage, queue_size=1)
 face_position_publisher = rospy.Publisher("camera/detected_face_position", Pose2D, queue_size=4)
+face_color_publisher = rospy.Publisher("hopper/face/mode", String, queue_size=3)
 
 def on_image(msg):
     global tracking_enabled
@@ -44,6 +45,10 @@ def on_image(msg):
             faces_image = img.copy()
             features_image = img.copy()
             faces = vision.detect_faces(gray, faces_image)
+            if len(faces) < 1:
+                face_color_publisher.publish(String("breathing:red"))
+            else:
+                face_color_publisher.publish(String("breathing:purple"))
             keypoints = vision.find_features(gray, faces, features_image)
 
             position = vision.find_bounding_rect(keypoints, tracked_features_image)
@@ -57,6 +62,10 @@ def on_image(msg):
             position = vision.find_bounding_rect(keypoints, tracked_features_image)
             mapped_x = vision.map_linear(position[0], 0, width, -1.0, 1.0)
             mapped_y = vision.map_linear(position[1], 0, height, -1.0, 1.0)
+            if abs(mapped_x) + abs(mapped_y) < 0.2:
+                face_color_publisher.publish(String("breathing:blue"))
+            else:
+                face_color_publisher.publish(String("breathing:purple"))
             face_position_publisher.publish(Pose2D(mapped_x, mapped_y, 0.0))
 
         if publish_images:

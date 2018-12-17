@@ -23,6 +23,14 @@ result_compressed_image_publisher = rospy.Publisher("camera/detected_faces/compr
 face_position_publisher = rospy.Publisher("camera/detected_face_position", Pose2D, queue_size=4)
 face_color_publisher = rospy.Publisher("hopper/face/mode", String, queue_size=3)
 
+last_color_selected = ""
+
+def send_color(text):
+    global last_color_selected
+    if last_color_selected != text:
+        face_color_publisher.publish(String(text))
+        last_color_selected = text
+
 def on_image(msg):
     global tracking_enabled
     if tracking_enabled:
@@ -46,9 +54,9 @@ def on_image(msg):
             features_image = img.copy()
             faces = vision.detect_faces(gray, faces_image)
             if len(faces) < 1:
-                face_color_publisher.publish(String("breathing:red"))
+                send_color("breathing:red")
             else:
-                face_color_publisher.publish(String("breathing:purple"))
+                send_color("breathing:purple")
             keypoints = vision.find_features(gray, faces, features_image)
 
             position = vision.find_bounding_rect(keypoints, tracked_features_image)
@@ -63,9 +71,9 @@ def on_image(msg):
             mapped_x = vision.map_linear(position[0], 0, width, -1.0, 1.0)
             mapped_y = vision.map_linear(position[1], 0, height, -1.0, 1.0)
             if abs(mapped_x) + abs(mapped_y) < 0.2:
-                face_color_publisher.publish(String("breathing:blue"))
+                send_color("breathing:blue")
             else:
-                face_color_publisher.publish(String("breathing:purple"))
+                send_color("breathing:purple")
             face_position_publisher.publish(Pose2D(mapped_x, mapped_y, 0.0))
 
         if publish_images:
@@ -88,7 +96,7 @@ def on_tracking_enabled_msg(msg):
         prev_gray = None
         faces_image = None
         features_image = None
-        face_color_publisher.publish(String("random"))
+        send_color("random")
 
 
 rospy.Subscriber("/camera/rgb/image_color", Image, on_image, queue_size=1)

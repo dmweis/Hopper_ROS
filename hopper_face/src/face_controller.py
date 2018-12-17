@@ -223,24 +223,32 @@ class LedController(object):
         red = COLORS["red"]
         blue = COLORS["blue"]
         green = COLORS["green"]
-        alternate_transitions(self.port, red, blue, delay)
-        alternate_transitions(self.port, blue, green, delay)
-        alternate_transitions(self.port, green, red, delay)
+        for i in alternate_transitions(self.port, red, blue, delay):
+            yield i
+        for i in alternate_transitions(self.port, blue, green, delay):
+            yield i
+        for i in alternate_transitions(self.port, green, red, delay):
+            yield i
 
     def idle_2(self):
         red = COLORS["red"]
         blue = COLORS["blue"]
-        cycle(self.port, red, blue, 0.01)
-        cycle(self.port, blue, red, 0.01)
+        for i in cycle(self.port, red, blue, 0.01):
+            yield i
+        for i in cycle(self.port, blue, red, 0.01):
+            yield i
 
     def idle_3(self):
         red = COLORS["red"]
         blue = COLORS["blue"]
-        color_transitions(self.port, red, blue, 10, 0.1)
-        color_transitions(self.port, blue, red, 10, 0.1)
+        for i in color_transitions(self.port, red, blue, 10, 0.1):
+            yield i
+        for i in color_transitions(self.port, blue, red, 10, 0.1):
+            yield i
 
     def breathing(self):
-        breathing(self.port, COLORS[self.selected_color], 0.05)
+        for i in breathing(self.port, COLORS[self.selected_color], 0.05):
+            yield i
 
 
 if __name__ == "__main__":

@@ -166,7 +166,8 @@ COLORS = {
     "red": Color(10, 0, 0),
     "blue": Color(0, 0, 10),
     "green": Color(0, 10, 0),
-    "purple": Color(10, 10, 0)
+    "yellow": Color(10, 10, 0),
+    "purple": Color(10, 0, 10)
 }
 
 

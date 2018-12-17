@@ -88,6 +88,8 @@ def on_tracking_enabled_msg(msg):
         prev_gray = None
         faces_image = None
         features_image = None
+        face_color_publisher.publish(String("random"))
+
 
 rospy.Subscriber("/camera/rgb/image_color", Image, on_image, queue_size=1)
 rospy.Subscriber("/hopper/face_tracking_enabled", Bool, on_tracking_enabled_msg, queue_size=10)

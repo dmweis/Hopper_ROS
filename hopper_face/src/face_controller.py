@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
+from __future__ import print_function, division
 
 import serial
 import random
 import rospy
 
-from colorsys import hsv_to_rgb
+from colorsys import hsv_to_rgb, rgb_to_hsv
 from time import sleep
 from std_msgs.msg import String
 
@@ -34,8 +34,9 @@ def clamp(value, a, b):
     return max(min(max_value, value), min_value)
 
 
-class Color():
+class Color(object):
     def __init__(self, red=0, green=0, blue=0, name=None):
+        super(Color, self).__init__()
         self.red = red
         self.green = green
         self.blue = blue
@@ -45,8 +46,32 @@ class Color():
             self.green = web_color.green
             self.blue = web_color.blue
 
+    def faded_out(self, reduce_by):
+        h, s, v = self.to_hsv()
+        v = v - v*reduce_by
+        v = clamp(v, 0.0, 1.0)
+        return HsvColor(h, s, v)
+
     def to_data(self):
         return [self.red, self.green, self.blue]
+
+    def to_hsv(self):
+        red = map_linear(self.red, 0, 255, 0, 1.0)
+        green = map_linear(self.green, 0, 255, 0, 1.0)
+        blue = map_linear(self.blue, 0, 255, 0, 1.0)
+        return rgb_to_hsv(red, green, blue)
+
+    def clone(self):
+        return Color(self.red, self.green, self.blue)
+
+
+class HsvColor(Color):
+    def __init__(self, h, s, v):
+        red, green, blue = hsv_to_rgb(h, s, v)
+        red = int(red * 255)
+        green = int(green * 255)
+        blue = int(blue * 255)
+        super(HsvColor, self).__init__(red, green, blue)
 
 
 class ColorPacket():
@@ -56,112 +81,36 @@ class ColorPacket():
         else:
             self.data = Color().to_data() * PIXEL_COUNT
 
+    def correct_pixel_index(self, index):
+        index %= PIXEL_COUNT
+
+        if index >= PIXELS_ON_BIGGER_RING:
+            index_on_smaller = index - PIXELS_ON_BIGGER_RING
+            final_index = PIXELS_ON_SMALLER_RING - 1 - index_on_smaller + PIXELS_ON_BIGGER_RING
+            return final_index
+        return index
+
     def set_pixel(self, index, color):
+        index = self.correct_pixel_index(index)
         self.data[index * 3] = color.red
         self.data[index * 3 + 1] = color.green
         self.data[index * 3 + 2] = color.blue
 
+    def get_pixel(self, index):
+        index = self.correct_pixel_index(index)
+        color = Color()
+        color.red = self.data[index * 3]
+        color.green = self.data[index * 3 + 1]
+        color.blue = self.data[index * 3 + 2]
+        return color
+
+    def fade_out(self, reduce_by):
+        for index in range(PIXEL_COUNT):
+            pixel = self.get_pixel(index).faded_out(reduce_by)
+            self.set_pixel(index, pixel)
+
     def to_data(self):
         return bytearray(self.data)
-
-
-def reset(port):
-    payload = bytearray([RESET_MSG] * RESET_MSG_COUNT)
-    port.write(payload)
-    sleep(1)
-
-
-def color_transitions(port, color_a, color_b, steps, delay):
-    def get_transitioning_color(val_from, val_to, step, steps):
-        val = map_linear(step, 0, steps, val_from, val_to)
-        return clamp(int(round(val)), 0, 255)
-    for step in range(steps):
-        new_color = Color()
-        new_color.red = get_transitioning_color(
-            color_a.red, color_b.red, step, steps)
-        new_color.green = get_transitioning_color(
-            color_a.green, color_b.green, step, steps)
-        new_color.blue = get_transitioning_color(
-            color_a.blue, color_b.blue, step, steps)
-        port.write(ColorPacket(new_color).to_data())
-        yield 0
-        sleep(delay)
-
-
-def alternate_transitions(port, color_from, color_to, delay):
-    current_color = Color(color_from.red, color_from.green, color_from.blue)
-    while current_color.red < color_to.red or current_color.green < color_to.green or current_color.blue < color_to.blue:
-        if current_color.red < color_to.red:
-            current_color.red += 1
-        if current_color.green < color_to.green:
-            current_color.green += 1
-        if current_color.blue < color_to.blue:
-            current_color.blue += 1
-        port.write(ColorPacket(current_color).to_data())
-        yield 0
-        sleep(delay)
-    while current_color.red > color_to.red or current_color.green > color_to.green or current_color.blue > color_to.blue:
-        if current_color.red > color_to.red:
-            current_color.red -= 1
-        if current_color.green > color_to.green:
-            current_color.green -= 1
-        if current_color.blue > color_to.blue:
-            current_color.blue -= 1
-        port.write(ColorPacket(current_color).to_data())
-        yield 0
-        sleep(delay)
-
-
-def cycle(port, color_from, color_to, delay):
-    pixel_data = ColorPacket(color_from)
-    for pixel in range(PIXEL_COUNT):
-        current_color = Color(
-            color_from.red, color_from.green, color_from.blue)
-        while current_color.red < color_to.red or current_color.green < color_to.green or current_color.blue < color_to.blue:
-            if current_color.red < color_to.red:
-                current_color.red += 1
-            if current_color.green < color_to.green:
-                current_color.green += 1
-            if current_color.blue < color_to.blue:
-                current_color.blue += 1
-            pixel_data.set_pixel(pixel, current_color)
-            port.write(pixel_data.to_data())
-            yield 0
-            sleep(delay)
-        while current_color.red > color_to.red or current_color.green > color_to.green or current_color.blue > color_to.blue:
-            if current_color.red > color_to.red:
-                current_color.red -= 1
-            if current_color.green > color_to.green:
-                current_color.green -= 1
-            if current_color.blue > color_to.blue:
-                current_color.blue -= 1
-            pixel_data.set_pixel(pixel, current_color)
-            port.write(pixel_data.to_data())
-            yield 0
-            sleep(delay)
-
-
-def breathing(port, color, delay):
-    for i in range(15):
-        current_color = color()
-        new_color = Color()
-        new_color.red = 0 if current_color.red == 0 else current_color.red + i
-        new_color.green = 0 if current_color.green == 0 else current_color.green + i
-        new_color.blue = 0 if current_color.blue == 0 else current_color.blue + i
-        pixel_data = ColorPacket(new_color)
-        port.write(pixel_data.to_data())
-        yield 0
-        sleep(delay)
-    for i in reversed(range(15)):
-        current_color = color()
-        new_color = Color()
-        new_color.red = 0 if current_color.red == 0 else current_color.red + i
-        new_color.green = 0 if current_color.green == 0 else current_color.green + i
-        new_color.blue = 0 if current_color.blue == 0 else current_color.blue + i
-        pixel_data = ColorPacket(new_color)
-        port.write(pixel_data.to_data())
-        yield 0
-        sleep(delay)
 
 
 COLORS = {
@@ -178,17 +127,11 @@ class LedController(object):
         super(LedController, self).__init__()
         rospy.init_node("face_controller")
         self.port = None
-        self.selected_mode = "idle_1"
-        self.selected_color = "red"
-        self.modes = {
-            "idle_1": self.idle_1,
-            "idle_2": self.idle_2,
-            "idle_3": self.idle_3,
-            "breathing": self.breathing
-        }
+        self.selected_mode = ""
+        self.selected_color = ""
+        self.modes = {}
         rospy.Subscriber("hopper/face/mode", String,
                          self.on_mode_change, queue_size=3)
-        self.main_loop()
 
     def on_mode_change(self, msg):
         new_mode = msg.data.lower()
@@ -209,50 +152,191 @@ class LedController(object):
         else:
             rospy.logwarn("Mode: " + new_mode + " unknown")
 
-    def main_loop(self):
+    def write(self, frame):
+        self.port.write(frame.to_data())
+
+    def reset(self):
+        payload = bytearray([RESET_MSG] * RESET_MSG_COUNT)
+        self.port.write(payload)
+        sleep(1)
+
+    def run(self):
         with serial.Serial('/dev/ttyUSB0', 115200) as port:
-            reset(port)
             self.port = port
+            self.reset()
             while not rospy.is_shutdown():
+                if not (self.selected_color and self.selected_mode):
+                    sleep(0.2)
+                    continue 
                 selected_mode = self.selected_mode
                 for i in self.modes[selected_mode]():
                     if selected_mode != self.selected_mode:
                         break
+                    if rospy.is_shutdown():
+                        break
                 # set all off at the end
             port.write(ColorPacket().to_data())
+
+
+class AnimationController(LedController):
+    def __init__(self):
+        super(AnimationController, self).__init__()
+        self.selected_mode = "larson_scanner"
+        self.selected_color = "red"
+        self.modes = {
+            "idle_1": self.idle_1,
+            "idle_2": self.idle_2,
+            "idle_3": self.idle_3,
+            "breathing": self.breathing,
+            "fade_out": self.fade_out,
+            "larson_scanner": self.larson_scanner
+        }
+        self.run()
 
     def idle_1(self):
         delay = 0.1
         red = COLORS["red"]
         blue = COLORS["blue"]
         green = COLORS["green"]
-        for i in alternate_transitions(self.port, red, blue, delay):
+        for i in self.alternate_transitions(red, blue, delay):
             yield i
-        for i in alternate_transitions(self.port, blue, green, delay):
+        for i in self.alternate_transitions(blue, green, delay):
             yield i
-        for i in alternate_transitions(self.port, green, red, delay):
+        for i in self.alternate_transitions(green, red, delay):
             yield i
 
     def idle_2(self):
         red = COLORS["red"]
         blue = COLORS["blue"]
-        for i in cycle(self.port, red, blue, 0.01):
+        for i in self.cycle(red, blue, 0.01):
             yield i
-        for i in cycle(self.port, blue, red, 0.01):
+        for i in self.cycle(blue, red, 0.01):
             yield i
 
     def idle_3(self):
         red = COLORS["red"]
         blue = COLORS["blue"]
-        for i in color_transitions(self.port, red, blue, 10, 0.1):
+        for i in self.color_transitions(red, blue, 10, 0.1):
             yield i
-        for i in color_transitions(self.port, blue, red, 10, 0.1):
+        for i in self.color_transitions(blue, red, 10, 0.1):
             yield i
 
     def breathing(self):
-        for i in breathing(self.port, lambda:COLORS[self.selected_color], 0.05):
+        for i in self.breathing(lambda:COLORS[self.selected_color], 0.05):
             yield i
+
+    def color_transitions(self, color_a, color_b, steps, delay):
+        def get_transitioning_color(val_from, val_to, step, steps):
+            val = map_linear(step, 0, steps, val_from, val_to)
+            return clamp(int(round(val)), 0, 255)
+        for step in range(steps):
+            new_color = Color()
+            new_color.red = get_transitioning_color(
+                color_a.red, color_b.red, step, steps)
+            new_color.green = get_transitioning_color(
+                color_a.green, color_b.green, step, steps)
+            new_color.blue = get_transitioning_color(
+                color_a.blue, color_b.blue, step, steps)
+            self.port.write(ColorPacket(new_color).to_data())
+            yield 0
+            sleep(delay)
+
+    def alternate_transitions(self, color_from, color_to, delay):
+        current_color = Color(color_from.red, color_from.green, color_from.blue)
+        while current_color.red < color_to.red or current_color.green < color_to.green or current_color.blue < color_to.blue:
+            if current_color.red < color_to.red:
+                current_color.red += 1
+            if current_color.green < color_to.green:
+                current_color.green += 1
+            if current_color.blue < color_to.blue:
+                current_color.blue += 1
+            self.port.write(ColorPacket(current_color).to_data())
+            yield 0
+            sleep(delay)
+        while current_color.red > color_to.red or current_color.green > color_to.green or current_color.blue > color_to.blue:
+            if current_color.red > color_to.red:
+                current_color.red -= 1
+            if current_color.green > color_to.green:
+                current_color.green -= 1
+            if current_color.blue > color_to.blue:
+                current_color.blue -= 1
+            self.port.write(ColorPacket(current_color).to_data())
+            yield 0
+            sleep(delay)
+
+    def cycle(self, color_from, color_to, delay):
+        pixel_data = ColorPacket(color_from)
+        for pixel in range(PIXEL_COUNT):
+            current_color = Color(
+                color_from.red, color_from.green, color_from.blue)
+            while current_color.red < color_to.red or current_color.green < color_to.green or current_color.blue < color_to.blue:
+                if current_color.red < color_to.red:
+                    current_color.red += 1
+                if current_color.green < color_to.green:
+                    current_color.green += 1
+                if current_color.blue < color_to.blue:
+                    current_color.blue += 1
+                pixel_data.set_pixel(pixel, current_color)
+                self.port.write(pixel_data.to_data())
+                yield 0
+                sleep(delay)
+            while current_color.red > color_to.red or current_color.green > color_to.green or current_color.blue > color_to.blue:
+                if current_color.red > color_to.red:
+                    current_color.red -= 1
+                if current_color.green > color_to.green:
+                    current_color.green -= 1
+                if current_color.blue > color_to.blue:
+                    current_color.blue -= 1
+                pixel_data.set_pixel(pixel, current_color)
+                self.port.write(pixel_data.to_data())
+                yield 0
+                sleep(delay)
+
+    def breathing(self, color, delay):
+        for i in range(15):
+            current_color = color()
+            new_color = Color()
+            new_color.red = 0 if current_color.red == 0 else current_color.red + i
+            new_color.green = 0 if current_color.green == 0 else current_color.green + i
+            new_color.blue = 0 if current_color.blue == 0 else current_color.blue + i
+            pixel_data = ColorPacket(new_color)
+            self.port.write(pixel_data.to_data())
+            yield 0
+            sleep(delay)
+        for i in reversed(range(15)):
+            current_color = color()
+            new_color = Color()
+            new_color.red = 0 if current_color.red == 0 else current_color.red + i
+            new_color.green = 0 if current_color.green == 0 else current_color.green + i
+            new_color.blue = 0 if current_color.blue == 0 else current_color.blue + i
+            pixel_data = ColorPacket(new_color)
+            self.port.write(pixel_data.to_data())
+            yield 0
+            sleep(delay)
+
+    def larson_scanner(self):
+        for index in range(19, PIXEL_COUNT + 19):
+            # color = COLORS[self.selected_color]
+            color = Color(blue=180)
+            frame = ColorPacket()
+            frame.set_pixel(index, color)
+            frame.set_pixel(index - 1, color.faded_out(0.6))
+            frame.set_pixel(index -2, color.faded_out(0.8))
+            frame.set_pixel(index -3, color.faded_out(0.9))
+            self.write(frame)
+            sleep(0.05)
+            yield 0
+
+    def fade_out(self):
+        frame = ColorPacket(COLORS["red"])
+        self.write(frame)
+        sleep(0.1)
+        for index in range(10):
+            frame.fade_out(0.1)
+            self.write(frame)
+            sleep(1)
+            yield 0
 
 
 if __name__ == "__main__":
-    LedController()
+    AnimationController()

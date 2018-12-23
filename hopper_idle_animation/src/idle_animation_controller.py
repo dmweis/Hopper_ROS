@@ -6,6 +6,10 @@ import rospy
 from hopper_msgs.msg import HopperMoveCommand
 from std_msgs.msg import String
 
+IDLE_ANIMATIONS = [
+    "bored_looking_around"
+]
+
 
 class IdleAnimationController(object):
     def __init__(self):
@@ -35,14 +39,14 @@ class IdleAnimationController(object):
 
     def is_idle(self):
         now = rospy.Time.now()
-        print "Time since action:", (now - self.last_action_time).to_sec()
+        rospy.logdebug("Time since action:" + str((now - self.last_action_time).to_sec()))
         return now - self.last_action_time > self.idle_timeout and \
             now - self.last_idle_action_time > self.idle_action_timeout
 
     def idler_check(self):
         if self.is_idle():
-            print "Idle action executed"
-            self.animation_publisher.publish(String("random"))
+            rospy.logdebug("Idle action executed")
+            self.animation_publisher.publish(String(random.choice(IDLE_ANIMATIONS)))
             self.last_idle_action_time = rospy.Time.now()
 
 

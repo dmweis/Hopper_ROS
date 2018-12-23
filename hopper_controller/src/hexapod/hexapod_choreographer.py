@@ -20,7 +20,8 @@ class Choreographer(object):
             "wave_hi": self.wave_hi,
             "lifted_legs": self.lift_legs,
             "roar": self.roar,
-            "combat_cry": self.combat_cry
+            "combat_cry": self.combat_cry,
+            "bored_looking_around", self.bored_looking_around
         }
         child_safe = rospy.get_param("child_safe_mode", True)
         if not child_safe:
@@ -269,5 +270,19 @@ class Choreographer(object):
         for i in range(random.randint(3, 7)):
             self.gait_engine.move_to_new_pose(paw_lifted, up_speed)
             self.gait_engine.move_to_new_pose(paw_lowered, down_speed)
+            self.check_cancel()
+        self.gait_engine.move_to_new_pose(original_pose, speed)
+    
+    def bored_looking_around(self):
+        speed = 5
+        original_pose = self.gait_engine.get_relaxed_pose()
+        for i in range(random.randint(2, 5)):
+            rotation = Vector3()
+            rotation.x = random.random() * 6 - 3
+            rotation.y = random.random() * 6 - 3
+            rotation.z = random.random() * 6 - 3
+            new_pose = original_pose.clone() \
+                .rotate(rotation)
+            self.gait_engine.move_to_new_pose(new_pose, speed)
             self.check_cancel()
         self.gait_engine.move_to_new_pose(original_pose, speed)

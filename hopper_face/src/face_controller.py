@@ -222,7 +222,7 @@ class AnimationController(LedController):
             yield i
 
     def breathing(self):
-        for i in self.breathing(lambda:COLORS[self.selected_color], 0.05):
+        for i in self.breathing_animation(lambda:COLORS[self.selected_color], 0.05):
             yield i
 
     def color_transitions(self, color_a, color_b, steps, delay):
@@ -292,7 +292,7 @@ class AnimationController(LedController):
                 yield 0
                 sleep(delay)
 
-    def breathing(self, color, delay):
+    def breathing_animation(self, color, delay):
         for i in range(15):
             current_color = color()
             new_color = Color()

@@ -7,7 +7,9 @@ from hopper_msgs.msg import HopperMoveCommand
 from std_msgs.msg import String
 
 IDLE_ANIMATIONS = [
-    "bored_looking_around"
+    "bored_looking_around",
+    "bored_stretch",
+    "bored_lift_leg"
 ]
 
 

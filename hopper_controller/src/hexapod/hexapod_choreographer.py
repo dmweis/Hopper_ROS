@@ -21,7 +21,9 @@ class Choreographer(object):
             "lifted_legs": self.lift_legs,
             "roar": self.roar,
             "combat_cry": self.combat_cry,
-            "bored_looking_around", self.bored_looking_around
+            "bored_looking_around": self.bored_looking_around,
+            "bored_stretch": self.bored_stretch,
+            "bored_lift_leg": self.bored_lift_leg
         }
         child_safe = rospy.get_param("child_safe_mode", True)
         if not child_safe:
@@ -286,3 +288,39 @@ class Choreographer(object):
             self.gait_engine.move_to_new_pose(new_pose, speed)
             self.check_cancel()
         self.gait_engine.move_to_new_pose(original_pose, speed)
+
+    def bored_stretch(self):
+        speed = 10
+        relaxed_pose = self.gait_engine.get_relaxed_pose()
+        leaning_back = relaxed_pose.clone() \
+            .rotate(Vector3(y=-8))
+
+        lean_left = leaning_back.clone() \
+            .rotate(Vector3(x=-3))
+
+        lean_right = leaning_back.clone() \
+            .rotate(Vector3(x=3))
+
+        for i in range(random.randint(1, 2)):
+            self.gait_engine.move_to_new_pose(lean_right, speed)
+            self.gait_engine.move_to_new_pose(lean_left, speed)
+            self.check_cancel()
+        self.gait_engine.move_to_new_pose(relaxed_pose, speed)
+
+    def bored_lift_leg(self):
+        speed = 8
+        self.gait_engine.reset_relaxed_body_pose(speed)
+        relaxed_pose = self.gait_engine.get_relaxed_pose().clone()
+        selected_leg = random.choice([LegFlags.LEFT_FRONT, LegFlags.RIGHT_FRONT])
+
+        lifted = relaxed_pose.transform(Vector3(z=random.randint(4, 6)), selected_leg)
+        self.gait_engine.move_to_new_pose(lifted)
+
+        lifted_left = lifted.transform(Vector3(y=-2), selected_leg)
+        lifted_right = lifted.transform(Vector3(y=2), selected_leg)
+
+        for i in range(random.randint(1, 2)):
+            self.gait_engine.move_to_new_pose(lifted_left)
+            self.gait_engine.move_to_new_pose(lifted_right)
+            self.check_cancel()
+        self.gait_engine.reset_relaxed_body_pose()

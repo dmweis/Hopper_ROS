@@ -5,6 +5,7 @@ import rospy
 
 from hopper_msgs.msg import HopperMoveCommand
 from std_msgs.msg import String
+from geometry_msgs.msg import Twist
 
 IDLE_ANIMATIONS = [
     "bored_looking_around",
@@ -23,6 +24,7 @@ class IdleAnimationController(object):
         self.idle_action_timeout = rospy.Duration(5)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand,
                          self.on_move_command, queue_size=10)
+        rospy.Subscriber("hopper/stance_translate", Twist, self.on_stance_message, queue_size=1)
         self.animation_publisher = rospy.Publisher(
             "hopper_schedule_move", String, queue_size=5)
         while not rospy.is_shutdown():
@@ -38,6 +40,9 @@ class IdleAnimationController(object):
             msg.direction.angular.z != 0
         if moving:
             self.last_action_time = rospy.Time.now()
+
+    def on_stance_message(self, msg):
+        self.last_action_time = rospy.Time.now()
 
     def is_idle(self):
         now = rospy.Time.now()

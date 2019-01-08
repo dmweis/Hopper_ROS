@@ -309,6 +309,7 @@ class Choreographer(object):
 
     def bored_lift_leg(self):
         speed = 8
+        fast_speed = 20
         self.gait_engine.reset_relaxed_body_pose(speed)
         relaxed_pose = self.gait_engine.get_relaxed_pose().clone()
         selected_leg = random.choice([LegFlags.LEFT_FRONT, LegFlags.RIGHT_FRONT])
@@ -320,7 +321,7 @@ class Choreographer(object):
         lifted_right = lifted.transform(Vector3(y=2), selected_leg)
 
         for i in range(random.randint(1, 2)):
-            self.gait_engine.move_to_new_pose(lifted_left, speed)
-            self.gait_engine.move_to_new_pose(lifted_right, speed)
+            self.gait_engine.move_to_new_pose(lifted_left, fast_speed)
+            self.gait_engine.move_to_new_pose(lifted_right, fast_speed)
             self.check_cancel()
-        self.gait_engine.reset_relaxed_body_pose()
+        self.gait_engine.move_to_new_pose(relaxed_pose, speed)

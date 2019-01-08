@@ -10,7 +10,8 @@ from geometry_msgs.msg import Twist
 IDLE_ANIMATIONS = [
     "bored_looking_around",
     "bored_stretch",
-    "bored_lift_leg"
+    "bored_lift_leg",
+    "happy_spin"
 ]
 
 

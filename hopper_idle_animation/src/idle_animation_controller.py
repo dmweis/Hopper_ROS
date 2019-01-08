@@ -11,7 +11,8 @@ IDLE_ANIMATIONS = [
     "bored_looking_around",
     "bored_stretch",
     "bored_lift_leg",
-    "happy_spin"
+    "happy_spin",
+    "happy_dance"
 ]
 
 
@@ -26,6 +27,7 @@ class IdleAnimationController(object):
         rospy.Subscriber("hopper/move_command", HopperMoveCommand,
                          self.on_move_command, queue_size=10)
         rospy.Subscriber("hopper/stance_translate", Twist, self.on_stance_message, queue_size=1)
+        rospy.Subscriber("hopper_schedule_move", String, self.on_move_scheduled queue_size=1)
         self.animation_publisher = rospy.Publisher(
             "hopper_schedule_move", String, queue_size=5)
         while not rospy.is_shutdown():
@@ -44,6 +46,10 @@ class IdleAnimationController(object):
 
     def on_stance_message(self, msg):
         self.last_action_time = rospy.Time.now()
+
+    def on_move_scheduled(self, msg):
+        self.last_idle_action_time = rospy.Time.now()
+        
 
     def is_idle(self):
         now = rospy.Time.now()

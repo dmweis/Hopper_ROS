@@ -314,13 +314,13 @@ class Choreographer(object):
         selected_leg = random.choice([LegFlags.LEFT_FRONT, LegFlags.RIGHT_FRONT])
 
         lifted = relaxed_pose.transform(Vector3(z=random.randint(4, 6)), selected_leg)
-        self.gait_engine.move_to_new_pose(lifted)
+        self.gait_engine.move_to_new_pose(lifted, speed)
 
         lifted_left = lifted.transform(Vector3(y=-2), selected_leg)
         lifted_right = lifted.transform(Vector3(y=2), selected_leg)
 
         for i in range(random.randint(1, 2)):
-            self.gait_engine.move_to_new_pose(lifted_left)
-            self.gait_engine.move_to_new_pose(lifted_right)
+            self.gait_engine.move_to_new_pose(lifted_left, speed)
+            self.gait_engine.move_to_new_pose(lifted_right, speed)
             self.check_cancel()
         self.gait_engine.reset_relaxed_body_pose()

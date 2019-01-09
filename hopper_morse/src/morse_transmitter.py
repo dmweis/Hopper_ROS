@@ -35,14 +35,14 @@ MORSE ={
     }
 
 LEG_DOWN = SingleLegCommand()
-LEG_DOWN.single_leg_mode_on = self.single_leg_mode_on
+LEG_DOWN.single_leg_mode_on = True
 LEG_DOWN.selected_leg = SingleLegCommand.RIGHT_FRONT
-LEG_DOWN.position.z = -0.2
+LEG_DOWN.position.z = -0.025
 
 LEG_UP = SingleLegCommand()
-LEG_UP.single_leg_mode_on = self.single_leg_mode_on
+LEG_UP.single_leg_mode_on = True
 LEG_UP.selected_leg = SingleLegCommand.RIGHT_FRONT
-LEG_DOWN.position.z = 0
+LEG_UP.position.z = -0.01
 
 
 class MorseEncoder(object):
@@ -50,9 +50,13 @@ class MorseEncoder(object):
         super(MorseEncoder, self).__init__()
         rospy.init_node('morse_encoder')
         self.leg_publisher = rospy.Publisher('hopper/single_leg_command', SingleLegCommand, queue_size=10)
-        self.unit = 0.5
+        self.unit = 0.2
         # rospy.Subscriber('hopper/morse', String, self.on_morse, queue_size=1)
-        self.do_word(map(lambda x : x.upper(x), "Hello world"))
+        self.do_word("CQ")
+        self.hold_up(self.unit * 7)
+        self.do_word("CQ")
+        self.hold_up(self.unit * 7)
+        self.do_word("CQ")
 
     def do_word(self, word):
         for character in map(lambda character : MORSE[character], word):
@@ -60,9 +64,10 @@ class MorseEncoder(object):
         self.hold_down(self.unit * 4)
 
     def do_character(self, character):
+        print "Doing:", character
         for symbol in character:
             self.do_symbol(symbol)
-        self.hold_up(self.unit * 2)
+        self.hold_up(self.unit * 3)
 
     def do_symbol(self, symbol):
         if symbol == '.':
@@ -73,13 +78,13 @@ class MorseEncoder(object):
             self.hold_up(self.unit)
 
     def hold_down(self, time):
-        self.leg_publisher(LEG_DOWN)
+        self.leg_publisher.publish(LEG_DOWN)
         rospy.sleep(time)
-        self.leg_publisher(LEG_UP)
+        self.leg_publisher.publish(LEG_UP)
 
     def hold_up(self, time):
         rospy.sleep(time)
 
 
-if __name__ == "__name__":
+if __name__ == "__main__":
     MorseEncoder()

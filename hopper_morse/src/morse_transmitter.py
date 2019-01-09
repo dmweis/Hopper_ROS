@@ -5,34 +5,23 @@ import rospy
 from hopper_controller.msg import SingleLegCommand
 from std_msgs.msg import String
 
-MORSE ={
-    "A" : ".-",
-    "B" : "-...",
-    "C" : "-.-.",
-    "D" : "-..",
-    "E" : ".",
-    "F" : "..-.",
-    "G" : "--.",
-    "H" : "....",
-    "I" : "..",
-    "J" : ".---",
-    "K" : "-.-",
-    "L" : ".-..",
-    "M" : "--",
-    "N" : "-.",
-    "O" : "---",
-    "P" : ".--.",
-    "Q" : "--.-",
-    "R" : ".-.",
-    "S" : "...",
-    "T" : "-",
-    "U" : "..-",
-    "V" : "...-",
-    "W" : ".--",
-    "X" : "-..-",
-    "Y" : "-.--",
-    "Z" : "--.."
-    }
+MORSE = {'A': '.-',     'B': '-...',   'C': '-.-.', 
+        'D': '-..',    'E': '.',      'F': '..-.',
+        'G': '--.',    'H': '....',   'I': '..',
+        'J': '.---',   'K': '-.-',    'L': '.-..',
+        'M': '--',     'N': '-.',     'O': '---',
+        'P': '.--.',   'Q': '--.-',   'R': '.-.',
+        'S': '...',    'T': '-',      'U': '..-',
+        'V': '...-',   'W': '.--',    'X': '-..-',
+        'Y': '-.--',   'Z': '--..',
+
+        '0': '-----',  '1': '.----',  '2': '..---',
+        '3': '...--',  '4': '....-',  '5': '.....',
+        '6': '-....',  '7': '--...',  '8': '---..',
+        '9': '----.',
+
+        ' ': ' '
+        }
 
 LEG_DOWN = SingleLegCommand()
 LEG_DOWN.single_leg_mode_on = True
@@ -51,20 +40,21 @@ class MorseEncoder(object):
         rospy.init_node('morse_encoder')
         self.leg_publisher = rospy.Publisher('hopper/single_leg_command', SingleLegCommand, queue_size=10)
         self.unit = 0.2
+        self.hold_up(2)
         # rospy.Subscriber('hopper/morse', String, self.on_morse, queue_size=1)
-        self.do_word("CQ")
-        self.hold_up(self.unit * 7)
-        self.do_word("CQ")
-        self.hold_up(self.unit * 7)
-        self.do_word("CQ")
+        self.do_phrase("CQ")
+        self.hold_up(0.1)
 
-    def do_word(self, word):
-        for character in map(lambda character : MORSE[character], word):
+    def do_phrase(self, phrase):
+        for character in map(lambda character : MORSE[character.upper()], phrase):
             self.do_character(character)
         self.hold_down(self.unit * 4)
 
     def do_character(self, character):
         print "Doing:", character
+        if character == ' ':
+            self.hold_up(self.unit * 7)
+            return
         for symbol in character:
             self.do_symbol(symbol)
         self.hold_up(self.unit * 3)
@@ -83,6 +73,7 @@ class MorseEncoder(object):
         self.leg_publisher.publish(LEG_UP)
 
     def hold_up(self, time):
+        self.leg_publisher.publish(LEG_UP)
         rospy.sleep(time)
 
 

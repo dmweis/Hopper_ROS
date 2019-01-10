@@ -1,6 +1,4 @@
-﻿var socket = io({
-    transports: ['websocket']
-});
+﻿var socket = createSocketIOConnection();
 
 const telemetricsVm = new Vue({
     el: '#telemetrics_display',
@@ -8,8 +6,7 @@ const telemetricsVm = new Vue({
         averageTemperature: 0,
         averageVoltage: 0,
         connected: false,
-        staticSpeedMode: false,
-        liftHeight: 2
+        liftHeight: 3
     },
     watch: {
         connected: function () {
@@ -17,16 +14,6 @@ const telemetricsVm = new Vue({
         },
         liftHeight: function() {
             socket.emit('walkingModeUpdate', {
-                staticSpeedMode: this.staticSpeedMode,
-                liftHeight: this.liftHeight
-            });
-        }
-    },
-    methods: {
-        toggleStaticSpeedMode: function(){
-            this.staticSpeedMode= !this.staticSpeedMode;
-            socket.emit('walkingModeUpdate', {
-                staticSpeedMode: this.staticSpeedMode,
                 liftHeight: this.liftHeight
             });
         }

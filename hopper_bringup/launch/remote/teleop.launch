@@ -3,12 +3,4 @@
     <arg name="model" default="$(find hopper_description)/urdf/hopper.xarco"/>
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
-    <node name="remote_soundplay_node" pkg="sound_play" type="soundplay_node.py" >
-        <remap from="robotsound" to="remote_robotsound"/>
-        <remap from="sound_play" to="remote_sound_play"/>
-    </node>
-    <node name="remote_hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py" >
-        <remap from="robotsound" to="remote_robotsound"/>
-        <remap from="sound_play" to="remote_sound_play"/>
-    </node>
 </launch>

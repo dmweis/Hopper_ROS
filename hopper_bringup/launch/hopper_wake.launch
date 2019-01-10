@@ -8,10 +8,13 @@
         <param name="publish_odometry_to_tf" value="false"/>
         <param name="sound_on" value="false"/>
     </node>
-    <!-- <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" /> -->
+    <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />
     <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py"/>
     <!-- <node name="hacklab_speech" pkg="hopper_speech" type="hacklab_speak.py"/> -->
     <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>
+    <node name="hopper_face" pkg="hopper_face" type="face_controller.py"/>
+    <node name="hopper_idle_animation" pkg="hopper_idle_animation" type="idle_animation_controller.py"/>
+    <include file="$(find hopper_bringup)/launch/sensors/face_tracking.launch"/>
     <!-- <include file="$(find hopper_bringup)/launch/sensors/laser_wake.launch" /> -->
 </launch>
 

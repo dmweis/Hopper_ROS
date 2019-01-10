@@ -124,9 +124,12 @@ class DynamixelDriver(object):
         self.__write_uint_16(servo_id, CW_ANGLE_LIMIT, min_angle)
 
     def read_angle_limits(self, servo_id):
-        max = self.__read_uint_16(servo_id, CCW_ANGLE_LIMIT)
-        min = self.__read_uint_16(servo_id, CW_ANGLE_LIMIT)
-        return min, max
+        max_angle = self.__read_uint_16(servo_id, CCW_ANGLE_LIMIT)
+        min_angle = self.__read_uint_16(servo_id, CW_ANGLE_LIMIT)
+        return min_angle, max_angle
+
+    def read_torque_limit(self, servo_id):
+        return self.__read_uint_16(servo_id, TORQUE_LIMIT)
 
     def group_sync_write_goal_degrees(self, commands):
         commands = map(lambda command: (command[0], degrees_to_dynamixel_units(command[1])), commands)
@@ -148,6 +151,16 @@ class DynamixelDriver(object):
     def set_compliance_slope(self, servo_id, compliance_slope):
         self.__write_byte(servo_id, CW_COMPLIANCE_SLOPE, compliance_slope)
         self.__write_byte(servo_id, CCW_COMPLIANCE_SLOPE, compliance_slope)
+
+    def read_compliance_slope(self, servo_id):
+        cw = self.__read_byte(servo_id, CW_COMPLIANCE_SLOPE)
+        ccw = self.__read_byte(servo_id, CCW_COMPLIANCE_SLOPE)
+        return cw, ccw
+
+    def read_compliance_margin(self, servo_id):
+        cw = self.__read_byte(servo_id, CW_COMPLIANCE_MARGIN)
+        ccw = self.__read_byte(servo_id, CCW_COMPLIANCE_MARGIN)
+        return cw, ccw
 
     def __write_uint_16(self, servo_id, address, data):
         dynamixel.write2ByteTxRx(self.__port_num, PROTOCOL, servo_id, address, data)

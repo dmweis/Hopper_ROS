@@ -23,7 +23,7 @@ RELAXED_POSITION = LegPositions(
     Vector3(-LEG_DISTANCE_LATERAL, -LEG_DISTANCE_LONGITUDAL, LEG_HEIGHT),
 )
 
-OFFSET_DISTANCE = 3
+OFFSET_DISTANCE = 1.5
 GROUND_LEG_HEIGHT = -3
 
 GROUND_LEVEL_RELAXED_POSITION = LegPositions(
@@ -84,6 +84,7 @@ class MovementController(object):
         self.selected_leg_switched = False
         self.selected_single_leg = int(LegFlags.LEFT_FRONT)
         self.single_leg_position = Vector3()
+        self.single_leg_fast_mode = False
         self._command_queue = Queue(maxsize=1)
         self._ros_timer = rospy.Rate(INTERPOLATION_FREQUENCY)
 
@@ -112,9 +113,9 @@ class MovementController(object):
                 self._relaxed = False
             elif not self._relaxed:
                 # go to relaxed
-                self._gait_engine.relax_next_leg()
+                self._gait_engine.relax_next_leg(self._cycle_time, self._lift_height)
                 if not self._should_move():
-                    self._gait_engine.relax_next_leg()
+                    self._gait_engine.relax_next_leg(self._cycle_time, self._lift_height)
                     self._relaxed = True
             elif self._pose_update_ready:
                 # update pose
@@ -175,7 +176,7 @@ class MovementController(object):
             self._command_queue.get()
         self.choreographer.cancel_move()
 
-    def update_single_leg_command(self, selected_leg, position, single_leg_mode_on):
+    def update_single_leg_command(self, selected_leg, position, single_leg_mode_on, fast_mode):
         new_selected_leg = LegFlags(selected_leg)
         if new_selected_leg != self.selected_single_leg:
             self.selected_leg_switched = True
@@ -183,6 +184,7 @@ class MovementController(object):
         self.single_leg_position = position
         if self.single_leg_mode_on and not single_leg_mode_on:
             self.selected_leg_switched = True
+        self.single_leg_fast_mode = fast_mode
         self.single_leg_mode_on = single_leg_mode_on
 
     def handle_single_leg_mode(self):
@@ -204,7 +206,10 @@ class MovementController(object):
             self.selected_leg_switched = False
             self._gait_engine.move_to_new_pose(self._gait_engine.get_relaxed_pose(), 15)
         if self.single_leg_mode_on:
-            self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
+            if self.single_leg_fast_mode:
+                self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 100)
+            else:
+                self._gait_engine.move_to_new_pose(new_lifted_leg_pos, 15)
 
     def _should_move(self):
         return not self._velocity.is_zero() or self._theta != 0
@@ -254,8 +259,8 @@ class GaitEngine(object):
                                          cycle_time,
                                          leg_lift_height=lift_height)
 
-    def relax_next_leg(self):
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)
+    def relax_next_leg(self, cycle_time, leg_lift_height):
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, cycle_time, leg_lift_height=leg_lift_height)
 
     def move_to_new_pose(self, pose, speed_override):
         """

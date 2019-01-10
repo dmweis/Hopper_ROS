@@ -1,0 +1,75 @@
+coxa_length: 5
+femur_length: 6.7
+tibia_length: 14
+
+femur_offset: 13
+tibia_offset: 35
+
+legs:
+  left_front:
+    coxa_id: 1
+    femur_id: 3
+    tibia_id: 5
+    angle_offset: -45
+    position:
+      x: 11.5
+      y: 5
+      z: 0
+    femur_correction: -227
+    tibia_correction: -295
+  right_front:
+    coxa_id: 2
+    femur_id: 4
+    tibia_id: 6
+    angle_offset: 45
+    position:
+      x: 11.5
+      y: -5
+      z: 0
+    femur_correction: 73
+    tibia_correction: 5
+  left_middle:
+    coxa_id: 13
+    femur_id: 15
+    tibia_id: 17
+    angle_offset: -90
+    position:
+      x: 0
+      y: 10
+      z: 0
+    femur_correction: -227
+    tibia_correction: -295
+  right_middle:
+    coxa_id: 14
+    femur_id: 16
+    tibia_id: 18
+    angle_offset: 90
+    position:
+      x: 0
+      y: -10
+      z: 0
+    femur_correction: 73
+    tibia_correction: 5
+  left_rear:
+    coxa_id: 7
+    femur_id: 9
+    tibia_id: 11
+    angle_offset: -135
+    position:
+      x: -11.5
+      y: 5
+      z: 0
+    femur_correction: -227
+    tibia_correction: -295
+  right_rear:
+    coxa_id: 8
+    femur_id: 10
+    tibia_id: 12
+    angle_offset: 135
+    position:
+      x: -11.5
+      y: -5
+      z: 0
+    femur_correction: 73
+    tibia_correction: 5
+

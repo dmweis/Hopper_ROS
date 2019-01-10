@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <robot 
     xmlns:xacro="http://ros.org/wiki/xacro" name="Hopper">
-    <xacro:property name="coxa_length" value="0.05" />
-    <xacro:property name="femur_length" value="0.067" />
+    <xacro:property name="coxa_length" value="0.044" />
+    <xacro:property name="femur_length" value="0.07" />
     <material name="white">
         <color rgba="1 1 1 1"/>
     </material>
@@ -127,10 +127,10 @@
         </joint>
     </xacro:macro>
     <!--build legs-->
-    <xacro:leg side="right" position="rear" x="-0.115" y="-0.050" angle="-${pi*3/4}" axis="1" />
-    <xacro:leg side="right" position="middle" x="0.0" y="-0.100" angle="-${pi/2}" axis="1" />
-    <xacro:leg side="right" position="front" x="0.115" y="-0.050" angle="-${pi/4}" axis="1" />
-    <xacro:leg side="left" position="rear" x="-0.115" y="0.050" angle="${pi*3/4}" axis="-1" />
-    <xacro:leg side="left" position="middle" x="0.0" y="0.100" angle="${pi/2}" axis="-1" />
-    <xacro:leg side="left" position="front" x="0.115" y="0.050" angle="${pi/4}" axis="-1" />
+    <xacro:leg side="right" position="rear" x="-0.115" y="-0.063" angle="-${pi/2}" axis="1" />
+    <xacro:leg side="right" position="middle" x="0.0" y="-0.103" angle="-${pi/2}" axis="1" />
+    <xacro:leg side="right" position="front" x="0.115" y="-0.063" angle="-${pi/2}" axis="1" />
+    <xacro:leg side="left" position="rear" x="-0.115" y="0.063" angle="${pi/2}" axis="-1" />
+    <xacro:leg side="left" position="middle" x="0.0" y="0.103" angle="${pi/2}" axis="-1" />
+    <xacro:leg side="left" position="front" x="0.115" y="0.063" angle="${pi/2}" axis="-1" />
 </robot>

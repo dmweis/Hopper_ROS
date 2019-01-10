@@ -67,3 +67,32 @@
 
     return vm;
 }
+
+function askUserForAuth() {
+    var username = prompt("Enter username:");
+    var password = prompt("Enter password:");
+    authentication = { username: username, password: password };
+    return authentication;
+}
+
+function createSocketIOConnection() {
+    var authentication = JSON.parse(localStorage.getItem('hopper_auth'));
+    if (!authentication) {
+        authentication = askUserForAuth();
+        localStorage.setItem('hopper_auth', JSON.stringify(authentication));
+    }
+    var socket = io({
+        transports: ['websocket']
+    });
+
+    socket.emit('authentication', authentication);
+    socket.on('authenticated', function () {
+        console.log("Authentication success!");
+    });
+    socket.on('unauthorized', function (err) {
+        console.log("There was an error with the authentication:", err.message);
+        localStorage.clear();
+        alert("Authentication failed! Refresh to retry!");
+    });
+    return socket;
+}

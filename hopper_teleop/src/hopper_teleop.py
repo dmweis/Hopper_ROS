@@ -52,10 +52,10 @@ class HopperTeleop(pyglet.window.Window):
 
     def send_new_message(self):
         new_message = HopperMoveCommand()
-        new_message.lift_height = 2
-        new_message.cycle_time = 1
-        new_message.direction.linear.x = self.x * 0.1
-        new_message.direction.linear.y = self.y * 0.1
+        new_message.lift_height = 4
+        new_message.cycle_time = 0.75
+        new_message.direction.linear.x = self.x * 0.12
+        new_message.direction.linear.y = self.y * 0.12
         new_message.direction.angular.z = math.radians(self.rotation * 30)
         self.publisher.publish(new_message)
 

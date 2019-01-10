@@ -77,7 +77,7 @@ class HexapodController(object):
 
     def update_single_leg(self, msg):
         position = Vector3(msg.position.x * 100, msg.position.y * 100, msg.position.z * 100)
-        self.controller.update_single_leg_command(msg.selected_leg, position, msg.single_leg_mode_on)
+        self.controller.update_single_leg_command(msg.selected_leg, position, msg.single_leg_mode_on, msg.fast_mode)
 
     def update_pose_centimeters(self, twist):
         transform = Vector3(twist.linear.x, twist.linear.y, twist.linear.z)

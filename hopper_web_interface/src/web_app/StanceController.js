@@ -25,9 +25,7 @@
         });
 }
 
-var socket = io({
-    transports: ['websocket']
-  });
+var socket = createSocketIOConnection();
 
 const translationViewModel = new Vue({
     el: "#app",
@@ -84,13 +82,14 @@ createStanceJoystick(document.getElementById("height_joystick_zone"), "navy", tr
 createStanceJoystick(document.getElementById("rotate_joystick_zone"), "navy", translationViewModel.rotationJoystick, 0.2);
 
 setInterval(function () {
-    const multiplier = 0.1;
+    const multiplier = 0.001;
+    const rotationMultiplier = 0.002;
     translationViewModel.transform.x += translationViewModel.translationJoystick.x * multiplier;
     translationViewModel.transform.y += translationViewModel.translationJoystick.y * multiplier;
     translationViewModel.transform.z += translationViewModel.heightJoystick.x * multiplier;
-    translationViewModel.rotation.y += translationViewModel.rotationJoystick.x * multiplier;
-    translationViewModel.rotation.x -= translationViewModel.rotationJoystick.y * multiplier;
-    translationViewModel.rotation.z -= translationViewModel.heightJoystick.y * multiplier;
+    translationViewModel.rotation.y += translationViewModel.rotationJoystick.x * rotationMultiplier;
+    translationViewModel.rotation.x -= translationViewModel.rotationJoystick.y * rotationMultiplier;
+    translationViewModel.rotation.z -= translationViewModel.heightJoystick.y * rotationMultiplier;
 }, 20);
 
 setInterval(function () {

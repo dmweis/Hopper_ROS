@@ -8,3 +8,4 @@ int32 RIGHT_MIDDLE = 32
 geometry_msgs/Vector3 position
 int32 selected_leg
 bool single_leg_mode_on
+bool fast_mode

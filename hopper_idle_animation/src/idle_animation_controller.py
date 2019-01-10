@@ -29,7 +29,7 @@ class IdleAnimationController(object):
         rospy.Subscriber("hopper/move_command", HopperMoveCommand,
                          self.on_move_command, queue_size=10)
         rospy.Subscriber("hopper/stance_translate", Twist, self.on_stance_message, queue_size=1)
-        rospy.Subscriber("hopper_schedule_move", String, self.on_move_scheduled queue_size=1)
+        rospy.Subscriber("hopper_schedule_move", String, self.on_move_scheduled, queue_size=1)
         self.animation_publisher = rospy.Publisher(
             "hopper_schedule_move", String, queue_size=5)
         while not rospy.is_shutdown():

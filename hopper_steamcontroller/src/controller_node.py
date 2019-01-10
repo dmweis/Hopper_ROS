@@ -78,6 +78,8 @@ class SteamControllerRosHandler(object):
         self.robot_height_offset = 0
         self.single_leg_mode_on = False
 
+        self.idle_animations_enabled = True
+
         self.child_safe_mode = rospy.get_param("child_safe_mode", True)
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
@@ -88,6 +90,7 @@ class SteamControllerRosHandler(object):
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
         self.single_leg_publisher = rospy.Publisher('hopper/single_leg_command', SingleLegCommand, queue_size=5)
         self.toggle_face_tracking_publisher = rospy.Publisher("/hopper/face_tracking_enabled", Bool, queue_size=10)
+        self.enable_idle_animations_publisher = rospy.Publisher("hopper/idle_animations/enabled", Bool, queue_size=10)
         self.face_color_publisher = rospy.Publisher("hopper/face/mode", String, queue_size=3)
         self._hopper_move_command_msg = HopperMoveCommand()
         self.last_stance_msg = Twist()
@@ -170,6 +173,9 @@ class SteamControllerRosHandler(object):
                 self.robot_height_offset += 0.01
             if buttons_pressed & SCButtons.B:
                 self.robot_height_offset = 0
+            if buttons_pressed & SCButtons.X:
+                self.idle_animations_enabled = not self.idle_animations_enabled
+                self.enable_idle_animations_publisher.publish(Bool(self.idle_animations_enabled))
             if buttons_pressed & SCButtons.RB:
                 self.single_leg_mode_on = not self.single_leg_mode_on
             if buttons_pressed & SCButtons.LB:

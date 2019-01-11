@@ -119,6 +119,14 @@ COLORS = {
     "purple": Color(10, 0, 10)
 }
 
+BRIGHT_COLORS = {
+    "red": Color(180, 0, 0),
+    "blue": Color(0, 0, 180),
+    "green": Color(0, 180, 0),
+    "yellow": Color(150, 150, 0),
+    "purple": Color(150, 0, 150)
+}
+
 
 class LedController(object):
     def __init__(self):
@@ -178,7 +186,7 @@ class AnimationController(LedController):
     def __init__(self):
         super(AnimationController, self).__init__()
         self.selected_mode = "larson_scanner"
-        self.selected_color = "red"
+        self.selected_color = "purple"
         self.modes = {
             "idle_1": self.idle_1,
             "idle_2": self.idle_2,
@@ -312,8 +320,8 @@ class AnimationController(LedController):
 
     def larson_scanner(self):
         for index in range(19, PIXEL_COUNT + 19):
-            # color = COLORS[self.selected_color]
             color = Color(blue=180)
+            color = BRIGHT_COLORS[self.selected_color]
             frame = ColorPacket()
             frame.set_pixel(index, color)
             frame.set_pixel(index - 1, color.faded_out(0.6))

@@ -185,7 +185,7 @@ class LedController(object):
 class AnimationController(LedController):
     def __init__(self):
         super(AnimationController, self).__init__()
-        self.selected_mode = "larson_scanner"
+        self.selected_mode = "larson_scanner_2"
         self.selected_color = "purple"
         self.modes = {
             "idle_1": self.idle_1,
@@ -193,7 +193,8 @@ class AnimationController(LedController):
             "idle_3": self.idle_3,
             "breathing": self.breathing,
             "fade_out": self.fade_out,
-            "larson_scanner": self.larson_scanner
+            "larson_scanner": self.larson_scanner,
+            "larson_scanner_2": self.larson_scanner_2
         }
         self.run()
 
@@ -320,13 +321,32 @@ class AnimationController(LedController):
 
     def larson_scanner(self):
         for index in range(19, PIXEL_COUNT + 19):
-            color = Color(blue=180)
             color = BRIGHT_COLORS[self.selected_color]
             frame = ColorPacket()
             frame.set_pixel(index, color)
             frame.set_pixel(index - 1, color.faded_out(0.6))
             frame.set_pixel(index -2, color.faded_out(0.8))
             frame.set_pixel(index -3, color.faded_out(0.9))
+            self.write(frame)
+            sleep(0.05)
+            yield 0
+
+    def larson_scanner_2(self):
+        for index in range(48):
+            index_smaller = int(round(map_linear(index, 0, 48, 0, PIXELS_ON_BIGGER_RING)))
+            index_bigger = int(round(map_linear(index, 0, 48, PIXELS_ON_BIGGER_RING, PIXELS_ON_BIGGER_RING + PIXELS_ON_SMALLER_RING)))
+
+            color = BRIGHT_COLORS[self.selected_color]
+            frame = ColorPacket()
+            frame.set_pixel(index_smaller, color)
+            frame.set_pixel(index_smaller - 1, color.faded_out(0.6))
+            frame.set_pixel(index_smaller -2, color.faded_out(0.8))
+            frame.set_pixel(index_smaller -3, color.faded_out(0.9))
+
+            frame.set_pixel(index_bigger, color)
+            frame.set_pixel(index_bigger - 1, color.faded_out(0.6))
+            frame.set_pixel(index_bigger -2, color.faded_out(0.8))
+            frame.set_pixel(index_bigger -3, color.faded_out(0.9))
             self.write(frame)
             sleep(0.05)
             yield 0

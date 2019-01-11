@@ -6,13 +6,11 @@ import serial
 import random
 import rospy
 
+from cobs import cobs
 from colorsys import hsv_to_rgb, rgb_to_hsv
 from time import sleep
 from std_msgs.msg import String
 
-
-RESET_MSG = 121
-RESET_MSG_COUNT = 243
 PIXEL_COUNT = 40
 
 PIXELS_ON_BIGGER_RING = 24
@@ -110,7 +108,7 @@ class ColorPacket():
             self.set_pixel(index, pixel)
 
     def to_data(self):
-        return bytearray(self.data)
+        return cobs.encode(bytes(bytearray(self.data))) + bytes(bytearray([0]))
 
 
 COLORS = {
@@ -156,9 +154,7 @@ class LedController(object):
         self.port.write(frame.to_data())
 
     def reset(self):
-        payload = bytearray([RESET_MSG] * RESET_MSG_COUNT)
-        self.port.write(payload)
-        sleep(1)
+        self.port.write(ColorPacket().to_data())
 
     def run(self):
         with serial.Serial('/dev/ttyUSB0', 115200) as port:

@@ -1,5 +1,5 @@
 #include <Adafruit_NeoPixel.h>
-
+#include <PacketSerial.h>
 
 #define NEOPIXEL_PIN 4
 
@@ -7,17 +7,15 @@
 #define PIXELS_ON_BIGGER_RING 24
 #define PIXELS_ON_SMALLER_RING 16
 
-#define RESET_VALUE 121
-#define RESET_COUNTER_MAX 240
-
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMBER_OF_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+PacketSerial_<COBS, 0, 500> packetSerial;
 
 int pinToUpdate = 0;
-int resetValueCounter = 0;
 
 void setup() {
   pixels.begin();
-  Serial.begin(115200);
+  packetSerial.begin(115200);
+  packetSerial.setPacketHandler(&onPacketReceived);
   all_off();
 }
 
@@ -33,32 +31,27 @@ void all_off(){
 }
 
 void loop() {
-  if (Serial.available() >= 3){
-    byte red = Serial.read();
-    byte green = Serial.read();
-    byte blue = Serial.read();
+  packetSerial.update();
+}
+
+void onPacketReceived(const uint8_t* buffer, size_t size){
+  if (size != NUMBER_OF_PIXELS * 3){
+    return;
+  } 
+  // Make a temporary buffer.
+  uint8_t tempBuffer[size];
+
+  // Copy the packet into our temporary buffer.
+  memcpy(tempBuffer, buffer, size);
+
+  for (int i = 0; i < size; i+=3){
+    byte red = tempBuffer[i];
+    byte green = tempBuffer[i+1];;
+    byte blue = tempBuffer[i+2];;
     uint32_t newColor = pixels.Color(red, green, blue);
     pixels.setPixelColor(pinToUpdate, newColor);
     pinToUpdate++;
-    if (pinToUpdate >= NUMBER_OF_PIXELS){
-      pixels.show();
-      pinToUpdate = 0;
-    }
-
-    // reset logic
-    if (red == RESET_VALUE && green == RESET_VALUE && blue == RESET_VALUE){
-      resetValueCounter+=3;
-      if (resetValueCounter >= RESET_COUNTER_MAX){
-        all_off();
-        delay(500);
-        while(Serial.available() >= 1){
-          Serial.read();
-        }
-        pinToUpdate = 0;
-        resetValueCounter = 0;
-      }
-    } else {
-      resetValueCounter = 0;
-    }
   }
+  pixels.show();
+  pinToUpdate = 0;
 }

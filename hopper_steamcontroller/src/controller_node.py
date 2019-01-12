@@ -187,8 +187,6 @@ class SteamControllerRosHandler(object):
                 self.toggle_face_tracking_publisher.publish(Bool(self.face_tracking_enabled))
             if buttons_pressed & SCButtons.BACK:
                 self.face_color_publisher.publish(String("random"))
-            if buttons_pressed & SCButtons.X:
-                self.face_color_publisher.publish(String("breathing:blue"))
         
         if buttons_pressed & SCButtons.STEAM:
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))

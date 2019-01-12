@@ -78,7 +78,7 @@ class SteamControllerRosHandler(object):
         self.robot_height_offset = 0
         self.single_leg_mode_on = False
 
-        self.idle_animations_enabled = True
+        self.idle_animations_enabled = rospy.get_param("idle_enabled_startup", False)
 
         self.child_safe_mode = rospy.get_param("child_safe_mode", True)
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)

@@ -24,7 +24,7 @@ class IdleAnimationController(object):
         self.last_idle_action_time = rospy.Time.now()
         self.idle_timeout = rospy.Duration(10)
         self.idle_action_timeout = rospy.Duration(5)
-        self.animations_enabled = True
+        self.animations_enabled = rospy.get_param("idle_enabled_startup", False)
         rospy.Subscriber("hopper/idle_animations/enabled", Bool, self.on_idle_animations_enabled, queue_size=10)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand,
                          self.on_move_command, queue_size=10)

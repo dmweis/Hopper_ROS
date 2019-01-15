@@ -87,6 +87,9 @@ class MovementController(object):
         self.single_leg_fast_mode = False
         self._command_queue = Queue(maxsize=1)
         self._ros_timer = rospy.Rate(INTERPOLATION_FREQUENCY)
+        # sitting mode
+        self.stand_mode = bool(rospy.get_param("stand_up_at_startup", False))
+        self.currently_standing = False
 
     def spin(self):
         try:
@@ -99,35 +102,45 @@ class MovementController(object):
 
     def _main_controller_loop(self):
         rospy.loginfo("Hexapod gait engine started")
-        self._gait_engine.stand_up()
         self._speech_service.say("initialized_successfully")
         while not rospy.is_shutdown() and self.keep_running:
-            if self.single_leg_mode_on:
-                self.handle_single_leg_mode()
-            elif self.selected_leg_switched:
-                self.selected_leg_switched = False
-                self._gait_engine.move_to_new_pose(self._gait_engine.get_relaxed_pose(), 15)
-            elif self._should_move():
-                # execute move
-                self._gait_engine.step(self._velocity, self._theta, self._cycle_time, self._lift_height)
-                self._relaxed = False
-            elif not self._relaxed:
-                # go to relaxed
-                self._gait_engine.relax_next_leg(self._cycle_time, self._lift_height)
-                if not self._should_move():
-                    self._gait_engine.relax_next_leg(self._cycle_time, self._lift_height)
-                    self._relaxed = True
-            elif self._pose_update_ready:
-                # update pose
-                self._pose_update_ready = False
-                self._gait_engine.update_relaxed_body_pose(self._relaxed_transformation, self._relaxed_rotation)
-            else:
-                # execute any scheduled moves
-                self._check_and_execute_scheduled_move()
-                # this will sleep enough to maintain correct frequency
-                self._ros_timer.sleep()
-        self._gait_engine.sit_down()
+            if self.stand_mode and not self.currently_standing:
+                self._gait_engine.stand_up()
+                self.currently_standing = True
+            elif not self.stand_mode and self.currently_standing:
+                self._gait_engine.sit_down()
+                self.currently_standing = False
+            if self.currently_standing:
+                self.moving_mode_loop_tick()
+        if self.currently_standing:
+            self._gait_engine.sit_down()
         self._gait_engine.stop()
+
+    def moving_mode_loop_tick(self):
+        if self.single_leg_mode_on:
+            self.handle_single_leg_mode()
+        elif self.selected_leg_switched:
+            self.selected_leg_switched = False
+            self._gait_engine.move_to_new_pose(self._gait_engine.get_relaxed_pose(), 15)
+        elif self._should_move():
+            # execute move
+            self._gait_engine.step(self._velocity, self._theta, self._cycle_time, self._lift_height)
+            self._relaxed = False
+        elif not self._relaxed:
+            # go to relaxed
+            self._gait_engine.relax_next_leg(self._cycle_time, self._lift_height)
+            if not self._should_move():
+                self._gait_engine.relax_next_leg(self._cycle_time, self._lift_height)
+                self._relaxed = True
+        elif self._pose_update_ready:
+            # update pose
+            self._pose_update_ready = False
+            self._gait_engine.update_relaxed_body_pose(self._relaxed_transformation, self._relaxed_rotation)
+        else:
+            # execute any scheduled moves
+            self._check_and_execute_scheduled_move()
+            # this will sleep enough to maintain correct frequency
+            self._ros_timer.sleep()
 
     def set_relaxed_pose(self, transform, rotation):
         """
@@ -280,6 +293,7 @@ class GaitEngine(object):
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._default_cycle_time)
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._default_cycle_time)
         self.gait_sequencer.execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
+        self.gait_sequencer.stop()
 
     def reset_relaxed_body_pose(self, speed_override=9):
         self.gait_sequencer.reset_relaxed_body_pose(speed_override=speed_override)

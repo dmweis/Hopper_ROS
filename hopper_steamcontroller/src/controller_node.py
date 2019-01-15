@@ -7,7 +7,7 @@ from threading import Thread
 import rospy
 from geometry_msgs.msg import Twist, Quaternion, Vector3
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
-from hopper_controller.msg import SingleLegCommand
+from hopper_controller.msg import SingleLegCommand, StandCommand
 from std_msgs.msg import String, Bool
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
 import usb1
@@ -80,6 +80,8 @@ class SteamControllerRosHandler(object):
 
         self.idle_animations_enabled = rospy.get_param("idle_enabled_startup", False)
 
+        self.standing = bool(rospy.get_param("stand_up_at_startup", False))
+
         self.child_safe_mode = rospy.get_param("child_safe_mode", True)
         self.pub = rospy.Publisher("hopper/move_command", HopperMoveCommand, queue_size=10)
         self.speech_pub = rospy.Publisher('hopper_play_sound', String, queue_size=5)
@@ -87,6 +89,7 @@ class SteamControllerRosHandler(object):
         self.random_speech = rospy.Publisher('hopper/sound/play_random', String, queue_size=5)
         self.move_pub = rospy.Publisher('hopper_schedule_move', String, queue_size=5)
         self.halt_command = rospy.Publisher('hopper/halt', HaltCommand, queue_size=1)
+        self.stand_command_publisher = rospy.Publisher("hopper/stand", StandCommand, queue_size=10)
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
         self.single_leg_publisher = rospy.Publisher('hopper/single_leg_command', SingleLegCommand, queue_size=5)
         self.toggle_face_tracking_publisher = rospy.Publisher("/hopper/face_tracking_enabled", Bool, queue_size=10)
@@ -189,7 +192,11 @@ class SteamControllerRosHandler(object):
                 self.face_color_publisher.publish(String("random"))
         
         if buttons_pressed & SCButtons.STEAM:
-            self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller comamnd"))
+            self.standing = not self.standing
+            self.stand_command_publisher.publish(stand_command_publisher(self.standing))
+
+        if buttons & SCButtons.START and buttons & SCButtons.BACK:
+            self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller command"))
         
         single_leg_command.single_leg_mode_on = self.single_leg_mode_on
         single_leg_command.selected_leg = ALL_LEGS[self.slected_single_index]

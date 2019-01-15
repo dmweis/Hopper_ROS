@@ -24,6 +24,7 @@ add_message_files(
   MotorSpeed.msg
   MotorTorque.msg
   SingleLegCommand.msg
+  StandCommand.msg.msg
 )
 
 add_service_files(

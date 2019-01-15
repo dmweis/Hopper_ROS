@@ -193,7 +193,7 @@ class SteamControllerRosHandler(object):
         
         if buttons_pressed & SCButtons.STEAM:
             self.standing = not self.standing
-            self.stand_command_publisher.publish(stand_command_publisher(self.standing))
+            self.stand_command_publisher.publish(StandCommand(self.standing))
 
         if buttons & SCButtons.START and buttons & SCButtons.BACK:
             self.halt_command.publish(HaltCommand(rospy.Time.now(), "Controller command"))

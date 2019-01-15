@@ -3,6 +3,7 @@
 import random
 import rospy
 
+from random import randint
 from hopper_msgs.msg import HopperMoveCommand
 from std_msgs.msg import String, Bool
 from geometry_msgs.msg import Twist
@@ -20,10 +21,13 @@ class IdleAnimationController(object):
     def __init__(self):
         super(IdleAnimationController, self).__init__()
         rospy.init_node("hopper_idle_animation")
-        self.last_action_time = rospy.Time.now()
-        self.last_idle_action_time = rospy.Time.now()
-        self.idle_timeout = rospy.Duration(10)
-        self.idle_action_timeout = rospy.Duration(5)
+        
+        self.last_action_time = rospy.Time.now() + rospy.Duration(20)
+        self.last_idle_action_time = rospy.Time.now()  + rospy.Duration(20)
+
+        self.idle_timeout = rospy.Duration(randint(10, 15))
+        self.idle_action_timeout = rospy.Duration(randint(5, 15))
+        
         self.animations_enabled = rospy.get_param("idle_enabled_startup", False)
         rospy.Subscriber("hopper/idle_animations/enabled", Bool, self.on_idle_animations_enabled, queue_size=10)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand,
@@ -65,6 +69,7 @@ class IdleAnimationController(object):
         if self.animations_enabled and self.is_idle():
             rospy.logdebug("Idle action executed")
             self.animation_publisher.publish(String(random.choice(IDLE_ANIMATIONS)))
+            self.idle_action_timeout = rospy.Duration(randint(5, 15))
             self.last_idle_action_time = rospy.Time.now()
 
 

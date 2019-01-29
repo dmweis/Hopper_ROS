@@ -23,7 +23,8 @@ class Choreographer(object):
             "combat_cry": self.combat_cry,
             "bored_looking_around": self.bored_looking_around,
             "bored_stretch": self.bored_stretch,
-            "bored_lift_leg": self.bored_lift_leg
+            "bored_lift_leg": self.bored_lift_leg,
+            "high_five": self.high_five
         }
         child_safe = rospy.get_param("child_safe_mode", True)
         if not child_safe:
@@ -325,3 +326,31 @@ class Choreographer(object):
             self.gait_engine.move_to_new_pose(lifted_right, fast_speed)
             self.check_cancel()
         self.gait_engine.move_to_new_pose(relaxed_pose, speed)
+
+    def high_five(self):
+        speed = 12
+        original_pose = self.gait_engine.get_relaxed_pose()
+        lifted_pose = original_pose.clone()
+
+        lifted_pose = lifted_pose \
+            .rotate(Vector3(y=-5)) \
+            .rotate(Vector3(x=-5)) \
+            .transform(Vector3(z=-2)) \
+            .transform(Vector3(10, -2), LegFlags.RIGHT_FRONT)
+        lifted_pose.right_front.z = 6
+        self.gait_engine.move_to_new_pose(lifted_pose, speed)
+        self.check_cancel()
+
+        paw_lifted = lifted_pose.clone()
+        paw_lifted.right_front.x += 5
+        paw_lowered = lifted_pose.clone()
+        #paw_lowered.right_front.x = 0
+
+        up_speed = 10
+        down_speed = 10
+        for i in range(1):
+            self.gait_engine.move_to_new_pose(paw_lifted, up_speed)
+            self.gait_engine.move_to_new_pose(paw_lowered, down_speed)
+            self.check_cancel()
+        self.gait_engine.move_to_new_pose(original_pose, speed)
+

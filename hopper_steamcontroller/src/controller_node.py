@@ -155,7 +155,7 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.RB:
                 self.move_pub.publish("cancel")
             if buttons_pressed & SCButtons.A:
-                self.move_pub.publish("sad_emote")
+                self.move_pub.publish("high_five")
             if buttons_pressed & SCButtons.B:
                 self.move_pub.publish("happy_dance")
             if buttons_pressed & SCButtons.X:

@@ -17,6 +17,7 @@ class LeapListener(object):
     def __init__(self):
         super(LeapListener, self).__init__()
         rospy.init_node("leap_listener")
+        self.published_zero = True
         self.body_pose_publisher = rospy.Publisher("hopper/stance_translate", Twist, queue_size=10)
         rospy.Subscriber("leap_motion/leap_device", Human, self.on_leap_msg)
         rospy.spin()
@@ -40,6 +41,7 @@ class LeapListener(object):
             pose.angular = rotation
             # print pose
             self.body_pose_publisher.publish(pose)
+            self.published_zero = False
         elif msg.left_hand is not None and msg.left_hand.is_present and is_open(msg.left_hand):
             hand = msg.left_hand
             position = Vector3()
@@ -58,9 +60,11 @@ class LeapListener(object):
             pose.angular = rotation
             # print pose
             self.body_pose_publisher.publish(pose)
-        else:
+            self.published_zero = False
+        elif not self.published_zero:
             # print "Not moving"
             self.body_pose_publisher.publish(Twist())
+            self.published_zero = True
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ def move_towards(target, current, step=1):
 
 class IdleAnimationController(object):
 
-    breathing_variation = 0.001
+    breathing_variation = 0.005
 
     def __init__(self):
         super(IdleAnimationController, self).__init__()
@@ -39,7 +39,7 @@ class IdleAnimationController(object):
         self.last_idle_action_time = rospy.Time.now()  + rospy.Duration(20)
 
         self.idle_timeout = rospy.Duration(randint(10, 15))
-        self.idle_action_timeout = rospy.Duration(randint(5, 15))
+        self.idle_action_timeout = rospy.Duration(randint(15, 30))
 
         self.robot_height = 0.0
         self.current_breathing_offset = 0.0
@@ -55,7 +55,7 @@ class IdleAnimationController(object):
         while not rospy.is_shutdown():
             self.idler_check()
             self.breathing_tick()
-            rospy.sleep(0.002)
+            rospy.sleep(0.01)
 
     def on_move_command(self, msg):
         moving = msg.direction.linear.x != 0 or \
@@ -72,9 +72,12 @@ class IdleAnimationController(object):
             return
         self.last_action_time = rospy.Time.now()
         self.robot_height = msg.linear.z
+        self.current_breathing_offset = 0.0
 
     def on_move_scheduled(self, msg):
-        self.last_idle_action_time = rospy.Time.now()
+        if msg._connection_header["callerid"] == rospy.get_name():
+            return
+        self.last_action_time = rospy.Time.now()
 
     def is_idle(self):
         now = rospy.Time.now()
@@ -89,11 +92,11 @@ class IdleAnimationController(object):
         if self.animations_enabled and self.is_idle():
             rospy.logdebug("Idle action executed")
             self.animation_publisher.publish(String(random.choice(IDLE_ANIMATIONS)))
-            self.idle_action_timeout = rospy.Duration(randint(5, 15))
+            self.idle_action_timeout = rospy.Duration(randint(15, 30))
             self.last_idle_action_time = rospy.Time.now()
 
     def breathing_tick(self):
-        if self.animations_enabled and self.is_idle():
+        if self.animations_enabled and rospy.Time.now() - self.last_action_time > self.idle_timeout:
             current_target = self.breathing_variation
             if not self.breathing_up:
                 current_target = -current_target

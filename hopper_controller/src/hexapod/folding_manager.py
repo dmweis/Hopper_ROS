@@ -53,7 +53,6 @@ class FoldingManager(object):
         self.position_femur_tibia()
         current_position = self.body_controller.read_hexapod_motor_positions()
         self.last_motor_position = current_position
-        # left side
         left_middle_backwards = current_position.left_middle.coxa > 150.0
         right_middle_backwards = current_position.right_middle.coxa < 150.0
         while True:
@@ -87,6 +86,32 @@ class FoldingManager(object):
             if lf and lm and lr and rf and rm and rr:
                 break
 
+    def unflod_on_ground(self):
+        self.position_femur_tibia()
+        current_position = self.body_controller.read_hexapod_motor_positions()
+        self.last_motor_position = current_position
+        while True:
+            rospy.sleep(0.01)
+            lm = move_leg(self.last_motor_position.left_middle, tibia=190)
+            rm = move_leg(self.last_motor_position.right_middle, tibia=90)
+            self.body_controller.set_motors(self.last_motor_position)
+            if lm and rm:
+                break
+        while True:
+            rospy.sleep(0.01)
+            lm = move_leg(self.last_motor_position.left_middle, coxa=150)
+            rm = move_leg(self.last_motor_position.right_middle, coxa=150)
+            self.body_controller.set_motors(self.last_motor_position)
+            if lm and rm:
+                break
+        while True:
+            rospy.sleep(0.01)
+            lm = move_leg(self.last_motor_position.left_middle, femur=80, tibia=190)
+            rm = move_leg(self.last_motor_position.right_middle, femur=190, tibia=80)
+            self.body_controller.set_motors(self.last_motor_position)
+            if lm and rm:
+                break
+
     def fold(self):
         self.position_femur_tibia()
         current_position = self.body_controller.read_hexapod_motor_positions()
@@ -107,3 +132,7 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lm and rm:
                 break
+        rospy.sleep(1)
+        self.body_controller.set_torque(False)
+        while True:
+            rospy.logerr(self.body_controller.read_hexapod_motor_positions())

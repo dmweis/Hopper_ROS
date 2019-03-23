@@ -88,7 +88,7 @@ class FoldingManager(object):
             lm = move_leg(self.last_motor_position.left_middle, 150)
             if self.last_motor_position.left_middle.coxa < 170:
                 lr = move_leg(self.last_motor_position.left_rear, 150)
-            if self.last_motor_position.right_middle.coxa > 170:
+            if self.last_motor_position.right_middle.coxa < 170:
                 rf = move_leg(self.last_motor_position.right_front, 150)
             rm = move_leg(self.last_motor_position.right_middle, 150)
             if self.last_motor_position.right_middle.coxa > 130:

@@ -5,7 +5,7 @@ import math
 import rospy
 from geometry_msgs.msg import Twist
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
-from hopper_controller.msg import SingleLegCommand, StandCommand
+from hopper_controller.msg import SingleLegCommand, StandCommand, FoldCommand
 from std_msgs.msg import String, Empty
 
 
@@ -38,6 +38,7 @@ class HexapodController(object):
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
         rospy.Subscriber("hopper/halt", HaltCommand, self.on_halt_command)
         rospy.Subscriber("hopper/stand", StandCommand, self.on_stand_command, queue_size=10)
+        rospy.Subscriber("hopper/fold_command", FoldCommand, self.on_fold_command, queue_size=10)
         self.controller.spin()
         message_publisher.stop()
         self.halt_publisher.publish(Empty())
@@ -47,6 +48,9 @@ class HexapodController(object):
 
     def on_stand_command(self, stand_command):
         self.controller.stand_mode = stand_command.stand
+
+    def on_fold_command(self, msg):
+        self.controller.folding_operation = msg.operation
 
     def on_move_command(self, move_command):
         # convert directions from meter to cm

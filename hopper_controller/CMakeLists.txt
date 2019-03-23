@@ -25,6 +25,7 @@ add_message_files(
   MotorTorque.msg
   SingleLegCommand.msg
   StandCommand.msg
+  FoldCommand.msg
 )
 
 add_service_files(

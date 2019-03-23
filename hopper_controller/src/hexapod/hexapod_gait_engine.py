@@ -5,6 +5,7 @@ import traceback
 import rospy
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 from .hexapod_choreographer import Choreographer
+from hopper_controller.msg import FoldCommand
 import math
 
 INTERPOLATION_FREQUENCY = 60
@@ -91,6 +92,7 @@ class MovementController(object):
         # sitting mode
         self.stand_mode = bool(rospy.get_param("stand_up_at_startup", False))
         self.currently_standing = False
+        self.folding_operation = None
 
     def spin(self):
         try:
@@ -105,11 +107,6 @@ class MovementController(object):
         rospy.loginfo("Hexapod gait engine started")
         self._speech_service.say("initialized_successfully")
         while not rospy.is_shutdown() and self.keep_running:
-            while True:
-                self.folding_manager.unfold_on_ground()
-                rospy.sleep(1)
-                self.folding_manager.fold_on_ground()
-                rospy.sleep(1)
             if self.stand_mode and not self.currently_standing:
                 self._gait_engine.stand_up()
                 self.currently_standing = True
@@ -118,6 +115,16 @@ class MovementController(object):
                 self.currently_standing = False
             if self.currently_standing:
                 self.moving_mode_loop_tick()
+            elif self.folding_operation:
+                if self.folding_operation == FoldCommand.FOLD:
+                    self.folding_manager.fold()
+                elif self.folding_operation == FoldCommand.UNFOLD:
+                    self.folding_manager.unfold()
+                elif self.folding_operation == FoldCommand.FOLD_GROUNDED:
+                    self.folding_manager.fold_on_ground()
+                elif self.folding_operation == FoldCommand.UNFOLD_GROUNDED:
+                    self.folding_manager.unfold_on_ground()
+                self.folding_operation = None
         if self.currently_standing:
             self._gait_engine.sit_down()
         self._gait_engine.stop()

@@ -1,0 +1,6 @@
+int32 FOLD = 1
+int32 UNFOLD = 2
+int32 FOLD_GROUNDED = 4
+int32 UNFOLD_GROUNDED = 8
+
+int32 operation

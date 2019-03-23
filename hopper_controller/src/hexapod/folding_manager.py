@@ -27,7 +27,7 @@ def move_leg(leg, coxa=None, femur=None, tibia=None):
         leg.femur, femur_done = move_towards(femur, leg.femur)
     if tibia:
         leg.tibia, tibia_done = move_towards(tibia, leg.tibia)
-    return coxa_done and femur_done, tibia_done
+    return coxa_done and femur_done and tibia_done
 
 
 class FoldingManager(object):
@@ -44,9 +44,9 @@ class FoldingManager(object):
             lf = move_leg(self.last_motor_position.left_front, None, 60, 240)
             lm = move_leg(self.last_motor_position.left_middle, None, 60, 240)
             lr = move_leg(self.last_motor_position.left_rear, None, 60, 240)
-            rf = move_leg(self.last_motor_position.left_front, None, 240, 60)
-            rm = move_leg(self.last_motor_position.left_middle, None, 240, 60)
-            rr = move_leg(self.last_motor_position.left_rear, None, 240, 60)
+            rf = move_leg(self.last_motor_position.right_front, None, 240, 60)
+            rm = move_leg(self.last_motor_position.right_middle, None, 240, 60)
+            rr = move_leg(self.last_motor_position.right_rear, None, 240, 60)
             self.body_controller.set_motors(self.last_motor_position)
             if lf and lm and lr and rf and rm and rr:
                 break

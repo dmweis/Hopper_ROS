@@ -261,15 +261,16 @@ class GaitEngine(object):
         super(GaitEngine, self).__init__()
         self.gait_sequencer = gait_sequencer
         self._last_used_lifted_legs = LegFlags.LEFT_TRIPOD
+        self.stand_up_leg_order = [LegFlags.MIDDLE, LegFlags.FRONT & LegFlags.REAR]
         # time each step takes in seconds
         self._default_cycle_time = 1.0
 
     def stand_up(self):
         rospy.loginfo("Hexapod gait engine started")
         self.gait_sequencer.read_current_position()
-        for leg in LegFlags.get_legs_as_list(LegFlags.ALL):
+        for leg in self.stand_up_leg_order:
             new_position = self.gait_sequencer.last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
-            self.gait_sequencer.execute_move(new_position, 6)
+            self.gait_sequencer.execute_move(new_position, 9)
         self.gait_sequencer.execute_move(WIDER_RELAXED_POSITION.clone(), 6)
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)

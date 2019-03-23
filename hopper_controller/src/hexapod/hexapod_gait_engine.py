@@ -266,6 +266,7 @@ class GaitEngine(object):
 
     def stand_up(self):
         rospy.loginfo("Hexapod gait engine started")
+        self.gait_sequencer.read_current_position()
         for leg in LegFlags.get_legs_as_list(LegFlags.ALL):
             new_position = self.gait_sequencer.last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
             self.gait_sequencer.execute_move(new_position, 6)
@@ -352,6 +353,9 @@ class TripodGait(object):
     def reset_relaxed_body_pose(self, speed_override=None):
         self.current_relaxed_position = RELAXED_POSITION.clone()
         self.execute_move(self.current_relaxed_position, speed_override)
+
+    def read_current_position(self):
+        self.last_written_position = self._ik_driver.read_current_leg_positions()
 
     def execute_step(self, velocity, theta, lifted_legs, cycle_length, leg_lift_height=2.0):
         """

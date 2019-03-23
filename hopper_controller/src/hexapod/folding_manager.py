@@ -113,10 +113,17 @@ class FoldingManager(object):
                 break
         while True:
             rospy.sleep(0.01)
-            lm = move_leg(self.last_motor_position.right_front, coxa=150, tibia=90)
-            rm = move_leg(self.last_motor_position.right_rear, coxa=150, tibia=90)
+            rf = move_leg(self.last_motor_position.right_front, coxa=150)
+            rr = move_leg(self.last_motor_position.right_rear, coxa=150)
             self.body_controller.set_motors(self.last_motor_position)
-            if lm and rm:
+            if rf and rr:
+                break
+        while True:
+            rospy.sleep(0.01)
+            rf = move_leg(self.last_motor_position.right_front, tibia=90)
+            rr = move_leg(self.last_motor_position.right_rear, tibia=90)
+            self.body_controller.set_motors(self.last_motor_position)
+            if rf and rr:
                 break
         while True:
             rospy.sleep(0.01)

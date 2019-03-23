@@ -24,7 +24,7 @@ def move_leg(leg, coxa=None, femur=None, tibia=None, step=0.6):
     return coxa_done and femur_done and tibia_done
 
 
-def is_leg_close(leg, coxa=None, femur=None, tibia=None, tolerance=15):
+def is_leg_close(leg, coxa=None, femur=None, tibia=None, tolerance=20):
     coxa_close = True
     femur_close = True
     tibia_close = True
@@ -75,23 +75,21 @@ class FoldingManager(object):
         self.position_femur_tibia()
         current_position = self.body_controller.read_hexapod_motor_positions()
         self.last_motor_position = current_position
-        left_middle_backwards = current_position.left_middle.coxa > 150.0
-        right_middle_backwards = current_position.right_middle.coxa < 150.0
         while True:
             rospy.sleep(0.01)
             lf = False
             lr = False
             rf = False
             rr = False
-            if self.last_motor_position.left_middle.coxa > 130:
+            if self.last_motor_position.left_middle.coxa > 120:
                 lf = move_leg(self.last_motor_position.left_front, 150)
             lm = move_leg(self.last_motor_position.left_middle, 150)
-            if self.last_motor_position.left_middle.coxa < 170:
+            if self.last_motor_position.left_middle.coxa < 180:
                 lr = move_leg(self.last_motor_position.left_rear, 150)
-            if self.last_motor_position.right_middle.coxa < 170:
+            if self.last_motor_position.right_middle.coxa < 180:
                 rf = move_leg(self.last_motor_position.right_front, 150)
             rm = move_leg(self.last_motor_position.right_middle, 150)
-            if self.last_motor_position.right_middle.coxa > 130:
+            if self.last_motor_position.right_middle.coxa > 120:
                 rr = move_leg(self.last_motor_position.right_rear, 150)
             self.body_controller.set_motors(self.last_motor_position)
             if lf and lm and lr and rf and rm and rr:

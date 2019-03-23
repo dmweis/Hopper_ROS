@@ -11,7 +11,7 @@ def move_towards(target, current, step=0.4):
             return current - step, False
 
 
-def move_leg(leg, coxa=None, femur=None, tibia=None, step=0.4):
+def move_leg(leg, coxa=None, femur=None, tibia=None, step=0.6):
     coxa_done = True
     femur_done = True
     tibia_done = True
@@ -22,6 +22,19 @@ def move_leg(leg, coxa=None, femur=None, tibia=None, step=0.4):
     if tibia:
         leg.tibia, tibia_done = move_towards(tibia, leg.tibia, step)
     return coxa_done and femur_done and tibia_done
+
+
+def is_leg_close(leg, coxa=None, femur=None, tibia=None, tolerance=15):
+    coxa_close = True
+    femur_close = True
+    tibia_close = True
+    if coxa:
+        coxa_close = leg.coxa + tolerance > coxa > leg.coxa - tolerance
+    if femur:
+        femur_close = leg.femur + tolerance > femur > leg.femur - tolerance
+    if tibia:
+        tibia_close = leg.tibia + tolerance > tibia > leg.tibia - tolerance
+    return coxa_close and femur_close and tibia_close
 
 
 class FoldingManager(object):
@@ -45,6 +58,18 @@ class FoldingManager(object):
             if lf and lm and lr and rf and rm and rr:
                 break
         rospy.sleep(0.05)
+
+    def check_if_folded(self):
+        current_position = self.body_controller.read_hexapod_motor_positions()
+        self.last_motor_position = current_position
+        lf = is_leg_close(self.last_motor_position.left_front, 240)
+        lm = is_leg_close(self.last_motor_position.left_middle, 240) or is_leg_close(self.last_motor_position.left_middle, 60)
+        lr = is_leg_close(self.last_motor_position.left_rear, 60)
+
+        rf = is_leg_close(self.last_motor_position.right_front, 60)
+        rm = is_leg_close(self.last_motor_position.right_middle, 60) or is_leg_close(self.last_motor_position.right_middle, 240)
+        rr = is_leg_close(self.last_motor_position.right_rear, 240)
+        return lf  and lm and lr and rf and rm and rr
 
     def unfold(self):
         self.position_femur_tibia()
@@ -82,18 +107,21 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lf and lm and lr and rf and rm and rr:
                 break
+        rospy.sleep(0.5)
+        self.body_controller.set_torque(False)
 
     def fold(self):
         self.position_femur_tibia()
         current_position = self.body_controller.read_hexapod_motor_positions()
         self.last_motor_position = current_position
-        while True:
-            rospy.sleep(0.01)
-            lm = move_leg(self.last_motor_position.left_middle, 150)
-            rm = move_leg(self.last_motor_position.right_middle, 150)
-            self.body_controller.set_motors(self.last_motor_position)
-            if lm and rm:
-                break
+        if not self.check_if_folded():
+            while True:
+                rospy.sleep(0.01)
+                lm = move_leg(self.last_motor_position.left_middle, 150)
+                rm = move_leg(self.last_motor_position.right_middle, 150)
+                self.body_controller.set_motors(self.last_motor_position)
+                if lm and rm:
+                    break
         while True:
             rospy.sleep(0.01)
             lf = move_leg(self.last_motor_position.left_front, 240)
@@ -110,6 +138,8 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lm and rm:
                 break
+        rospy.sleep(0.5)
+        self.body_controller.set_torque(False)
 
     def unfold_on_ground(self):
         self.position_femur_tibia()
@@ -185,6 +215,8 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lm:
                 break
+        rospy.sleep(0.5)
+        self.body_controller.set_torque(False)
 
     def fold_on_ground(self):
         current_position = self.body_controller.read_hexapod_motor_positions()
@@ -270,3 +302,5 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lm and rm:
                 break
+        rospy.sleep(0.5)
+        self.body_controller.set_torque(False)

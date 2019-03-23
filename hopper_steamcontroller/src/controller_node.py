@@ -173,22 +173,22 @@ class SteamControllerRosHandler(object):
         else:
             if buttons_pressed & SCButtons.A:
                 if not self.standing:
-                    self.fold_command_publisher.publish(FoldCommand(FoldCommand.FOLD))
+                    self.fold_command_publisher.publish(FoldCommand(FoldCommand.UNFOLD_GROUNDED))
                 else:
                     self.robot_height_offset -= 0.01
             if buttons_pressed & SCButtons.Y:
                 if not self.standing:
-                    self.fold_command_publisher.publish(FoldCommand(FoldCommand.UNFOLD))
+                    self.fold_command_publisher.publish(FoldCommand(FoldCommand.FOLD))
                 else:
                     self.robot_height_offset += 0.01
             if buttons_pressed & SCButtons.B:
                 if not self.standing:
-                    self.fold_command_publisher.publish(FoldCommand(FoldCommand.FOLD_GROUNDED))
+                    self.fold_command_publisher.publish(FoldCommand(FoldCommand.UNFOLD))
                 else:
                     self.robot_height_offset = 0
             if buttons_pressed & SCButtons.X:
                 if not self.standing:
-                    self.fold_command_publisher.publish(FoldCommand(FoldCommand.UNFOLD_GROUNDED))
+                    self.fold_command_publisher.publish(FoldCommand(FoldCommand.FOLD_GROUNDED))
                 else:
                     self.idle_animations_enabled = not self.idle_animations_enabled
                     self.enable_idle_animations_publisher.publish(Bool(self.idle_animations_enabled))

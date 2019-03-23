@@ -116,13 +116,13 @@ class MovementController(object):
             if self.currently_standing:
                 self.moving_mode_loop_tick()
             elif self.folding_operation:
-                if self.folding_operation == FoldCommand.FOLD:
+                if self.folding_operation == FoldCommand.FOLD and not self.folding_manager.check_if_folded():
                     self.folding_manager.fold()
-                elif self.folding_operation == FoldCommand.UNFOLD:
+                elif self.folding_operation == FoldCommand.UNFOLD and self.folding_manager.check_if_folded():
                     self.folding_manager.unfold()
-                elif self.folding_operation == FoldCommand.FOLD_GROUNDED:
+                elif self.folding_operation == FoldCommand.FOLD_GROUNDED and not self.folding_manager.check_if_folded():
                     self.folding_manager.fold_on_ground()
-                elif self.folding_operation == FoldCommand.UNFOLD_GROUNDED:
+                elif self.folding_operation == FoldCommand.UNFOLD_GROUNDED and self.folding_manager.check_if_folded():
                     self.folding_manager.unfold_on_ground()
                 self.folding_operation = None
         if self.currently_standing:
@@ -261,7 +261,7 @@ class GaitEngine(object):
         super(GaitEngine, self).__init__()
         self.gait_sequencer = gait_sequencer
         self._last_used_lifted_legs = LegFlags.LEFT_TRIPOD
-        self.stand_up_leg_order = [LegFlags.MIDDLE, LegFlags.FRONT & LegFlags.REAR]
+        self.stand_up_leg_order = [LegFlags.MIDDLE, LegFlags.FRONT | LegFlags.REAR]
         # time each step takes in seconds
         self._default_cycle_time = 1.0
 

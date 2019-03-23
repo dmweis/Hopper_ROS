@@ -90,6 +90,7 @@ class FoldingManager(object):
         self.position_femur_tibia()
         current_position = self.body_controller.read_hexapod_motor_positions()
         self.last_motor_position = current_position
+        # lift middle legs
         while True:
             rospy.sleep(0.01)
             lm = move_leg(self.last_motor_position.left_middle, tibia=190)
@@ -97,6 +98,7 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lm and rm:
                 break
+        # fold out middle legs
         while True:
             rospy.sleep(0.01)
             lm = move_leg(self.last_motor_position.left_middle, coxa=150)
@@ -104,6 +106,7 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lm and rm:
                 break
+        # lower right leg
         while True:
             rospy.sleep(0.01)
             # lm = move_leg(self.last_motor_position.left_middle, femur=80, tibia=190)
@@ -111,6 +114,7 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if rm:
                 break
+        # unfold right legs
         while True:
             rospy.sleep(0.01)
             rf = move_leg(self.last_motor_position.right_front, coxa=150)
@@ -118,6 +122,7 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if rf and rr:
                 break
+        # lift right legs
         while True:
             rospy.sleep(0.01)
             rf = move_leg(self.last_motor_position.right_front, tibia=90)
@@ -125,12 +130,36 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if rf and rr:
                 break
+        # switch lifted side
         while True:
             rospy.sleep(0.01)
-            # lm = move_leg(self.last_motor_position.left_middle, femur=80, tibia=190)
-            rm = move_leg(self.last_motor_position.right_middle, femur=150, tibia=90)
+            lm = move_leg(self.last_motor_position.left_middle, femur=130, tibia=200)
+            rm = move_leg(self.last_motor_position.right_middle, femur=240, tibia=90)
             self.body_controller.set_motors(self.last_motor_position)
-            if rm:
+            if rm and lm:
+                break
+        # unfold left legs
+        while True:
+            rospy.sleep(0.01)
+            lf = move_leg(self.last_motor_position.left_front, coxa=150)
+            lr = move_leg(self.last_motor_position.left_rear, coxa=150)
+            self.body_controller.set_motors(self.last_motor_position)
+            if lf and lr:
+                break
+        # lift left legs
+        while True:
+            rospy.sleep(0.01)
+            lf = move_leg(self.last_motor_position.left_front, tibia=210)
+            lr = move_leg(self.last_motor_position.left_rear, tibia=210)
+            self.body_controller.set_motors(self.last_motor_position)
+            if lf and lr:
+                break
+        # lift middle left
+        while True:
+            rospy.sleep(0.01)
+            lm = move_leg(self.last_motor_position.left_middle, femur=60, tibia=210)
+            self.body_controller.set_motors(self.last_motor_position)
+            if lm:
                 break
 
     def fold(self):

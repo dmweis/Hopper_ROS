@@ -79,31 +79,20 @@ class FoldingManager(object):
         right_middle_backwards = current_position.right_middle.coxa < 150.0
         while True:
             rospy.sleep(0.01)
-            lf = True
-            lr = True
-            rf = True
-            rr = True
-            if left_middle_backwards:
+            lf = False
+            lr = False
+            rf = False
+            rr = False
+            if self.last_motor_position.left_middle.coxa > 130:
                 lf = move_leg(self.last_motor_position.left_front, 150)
             lm = move_leg(self.last_motor_position.left_middle, 150)
-            if not left_middle_backwards:
+            if self.last_motor_position.left_middle.coxa < 170:
                 lr = move_leg(self.last_motor_position.left_rear, 150)
-            if right_middle_backwards:
+            if self.last_motor_position.right_middle.coxa > 170:
                 rf = move_leg(self.last_motor_position.right_front, 150)
             rm = move_leg(self.last_motor_position.right_middle, 150)
-            if not right_middle_backwards:
+            if self.last_motor_position.right_middle.coxa > 130:
                 rr = move_leg(self.last_motor_position.right_rear, 150)
-            self.body_controller.set_motors(self.last_motor_position)
-            if lf and lm and lr and rf and rm and rr:
-                break
-        while True:
-            rospy.sleep(0.01)
-            lf = move_leg(self.last_motor_position.left_front, 150)
-            lm = move_leg(self.last_motor_position.left_middle, 150)
-            lr = move_leg(self.last_motor_position.left_rear, 150)
-            rf = move_leg(self.last_motor_position.right_front, 150)
-            rm = move_leg(self.last_motor_position.right_middle, 150)
-            rr = move_leg(self.last_motor_position.right_rear, 150)
             self.body_controller.set_motors(self.last_motor_position)
             if lf and lm and lr and rf and rm and rr:
                 break

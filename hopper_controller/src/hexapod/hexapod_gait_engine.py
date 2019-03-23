@@ -105,7 +105,11 @@ class MovementController(object):
         rospy.loginfo("Hexapod gait engine started")
         self._speech_service.say("initialized_successfully")
         while not rospy.is_shutdown() and self.keep_running:
-            self.folding_manager.unfold()
+            while True:
+                self.folding_manager.unfold()
+                rospy.sleep(1)
+                self.folding_manager.fold()
+                rospy.sleep(1)
             if self.stand_mode and not self.currently_standing:
                 self._gait_engine.stand_up()
                 self.currently_standing = True

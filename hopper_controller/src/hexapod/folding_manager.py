@@ -77,17 +77,33 @@ class FoldingManager(object):
                 break
         while True:
             rospy.sleep(0.01)
-            lf = move_leg(self.last_motor_position.left_front, None, 60, 240)
-            lm = move_leg(self.last_motor_position.left_middle, None, 60, 240)
-            lr = move_leg(self.last_motor_position.left_rear, None, 60, 240)
-            rf = move_leg(self.last_motor_position.right_front, None, 240, 60)
-            rm = move_leg(self.last_motor_position.right_middle, None, 240, 60)
-            rr = move_leg(self.last_motor_position.right_rear, None, 240, 60)
+            lf = move_leg(self.last_motor_position.left_front, 150)
+            lm = move_leg(self.last_motor_position.left_middle, 150)
+            lr = move_leg(self.last_motor_position.left_rear, 150)
+            rf = move_leg(self.last_motor_position.right_front, 150)
+            rm = move_leg(self.last_motor_position.right_middle, 150)
+            rr = move_leg(self.last_motor_position.right_rear, 150)
             self.body_controller.set_motors(self.last_motor_position)
             if lf and lm and lr and rf and rm and rr:
                 break
-        rospy.sleep(0.05)
-        self.body_controller.set_torque(False)
-        while not rospy.is_shutdown():
-            rospy.logerr(self.body_controller.read_hexapod_motor_positions())
 
+    def fold(self):
+        self.position_femur_tibia()
+        current_position = self.body_controller.read_hexapod_motor_positions()
+        self.last_motor_position = current_position
+        while True:
+            rospy.sleep(0.01)
+            lf = move_leg(self.last_motor_position.left_front, 240)
+            lr = move_leg(self.last_motor_position.left_rear, 60)
+            rf = move_leg(self.last_motor_position.right_front, 60)
+            rr = move_leg(self.last_motor_position.right_rear, 240)
+            self.body_controller.set_motors(self.last_motor_position)
+            if lf and lr and rf and rr:
+                break
+        while True:
+            rospy.sleep(0.01)
+            lm = move_leg(self.last_motor_position.left_middle, 240)
+            rm = move_leg(self.last_motor_position.right_middle, 60)
+            self.body_controller.set_motors(self.last_motor_position)
+            if lm and rm:
+                break

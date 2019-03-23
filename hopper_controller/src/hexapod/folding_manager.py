@@ -4,7 +4,7 @@ from hopper_controller.msg import HexapodMotorPositions, LegMotorPositions
 from .hexapod_ik_driver import LegFlags
 
 
-def move_towards(target, current, step=0.1):
+def move_towards(target, current, step=0.4):
     if abs(target-current) < step:
         return target, True
     else:
@@ -32,6 +32,16 @@ class FoldingManager(object):
             self.last_motor_position.right_middle.coxa, right_done = move_towards(150, self.last_motor_position.right_middle.coxa)
             self.body_controller.set_motors(self.last_motor_position)
             if left_done and right_done:
+                break
+        while True:
+            rospy.sleep(0.01)
+            self.last_motor_position.left_front.coxa, one = move_towards(150, self.last_motor_position.left_front.coxa)
+            self.last_motor_position.right_front.coxa, two = move_towards(150, self.last_motor_position.right_front.coxa)
+
+            self.last_motor_position.left_rear.coxa, three = move_towards(150, self.last_motor_position.left_rear.coxa)
+            self.last_motor_position.right_rear.coxa, four = move_towards(150, self.last_motor_position.right_rear.coxa)
+            self.body_controller.set_motors(self.last_motor_position)
+            if one and two and three and four:
                 break
         self.body_controller.set_torque(False)
         while True:

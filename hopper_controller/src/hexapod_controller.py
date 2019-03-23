@@ -11,6 +11,7 @@ from std_msgs.msg import String, Empty
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
 from hexapod.hexapod_ik_driver import Vector2, Vector3
+from hexapod.folding_manager import FoldingManager
 import ros_abstraction
 
 
@@ -21,11 +22,13 @@ class HexapodController(object):
         # build controller
         self.sound_on = rospy.get_param("~sound_on", True)
         ik_driver = ros_abstraction.IkController()
+        body_controller = ros_abstraction.HexapodBodyController()
         message_publisher = ros_abstraction.MessagePublisher()
         tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
                                  ros_abstraction.OdomPublisher(message_publisher))
         gait_engine = GaitEngine(tripod_gait)
-        self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer(self.sound_on))
+        folding_manager = FoldingManager(body_controller)
+        self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer(self.sound_on), folding_manager)
         self.halt_publisher = rospy.Publisher("halt", Empty, queue_size=1, latch=True)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)

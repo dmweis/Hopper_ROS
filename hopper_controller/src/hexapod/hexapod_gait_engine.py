@@ -62,13 +62,14 @@ def get_height_for_step(distance, full_step_length, height):
 
 
 class MovementController(object):
-    def __init__(self, gait_engine, speech_service):
+    def __init__(self, gait_engine, speech_service, folding_manager):
         """
         :type gait_engine: GaitEngine
         """
         super(MovementController, self).__init__()
         self.keep_running = True
         self._gait_engine = gait_engine
+        self.folding_manager = folding_manager
         self.choreographer = Choreographer(self._gait_engine)
         self._speech_service = speech_service
         self._relaxed = True
@@ -104,6 +105,7 @@ class MovementController(object):
         rospy.loginfo("Hexapod gait engine started")
         self._speech_service.say("initialized_successfully")
         while not rospy.is_shutdown() and self.keep_running:
+            self.folding_manager.unfold()
             if self.stand_mode and not self.currently_standing:
                 self._gait_engine.stand_up()
                 self.currently_standing = True

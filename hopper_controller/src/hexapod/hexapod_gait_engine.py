@@ -106,9 +106,9 @@ class MovementController(object):
         self._speech_service.say("initialized_successfully")
         while not rospy.is_shutdown() and self.keep_running:
             while True:
-                self.folding_manager.unflod_on_ground()
+                self.folding_manager.unfold_on_ground()
                 rospy.sleep(1)
-                self.folding_manager.fold()
+                self.folding_manager.fold_on_ground()
                 rospy.sleep(1)
             if self.stand_mode and not self.currently_standing:
                 self._gait_engine.stand_up()

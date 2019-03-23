@@ -27,7 +27,7 @@ class FoldingManager(object):
         left_middle_backwards = current_position.left_middle.coxa > 150.0
         right_middle_backwards = current_position.right_middle.coxa < 150.0
         while True:
-            rospy.sleep(0.3)
+            rospy.sleep(0.01)
             self.last_motor_position.left_middle.coxa, left_done = move_towards(150, self.last_motor_position.left_middle.coxa)
             self.last_motor_position.right_middle.coxa, right_done = move_towards(150, self.last_motor_position.right_middle.coxa)
             self.body_controller.set_motors(self.last_motor_position)

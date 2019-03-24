@@ -13,7 +13,7 @@ def move_towards(target, current, step=1):
             return current - step, False
 
 
-def move_leg(leg, coxa=None, femur=None, tibia=None, step=1.5):
+def move_leg(leg, coxa=None, femur=None, tibia=None, step=1.3):
     coxa_done = True
     femur_done = True
     tibia_done = True

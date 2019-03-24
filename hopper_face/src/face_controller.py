@@ -193,7 +193,7 @@ class LedController(object):
             self.port.write(data.to_data())
             # at this speed outer circle should take 7 seconds
             # 7 seconds is average boot time
-            sleep(0.29)
+            sleep(0.28)
             if self.controller_ready or rospy.is_shutdown():
                 break
         if not self.controller_ready:

@@ -63,7 +63,7 @@ def get_height_for_step(distance, full_step_length, height):
 
 
 class MovementController(object):
-    def __init__(self, gait_engine, speech_service, folding_manager):
+    def __init__(self, gait_engine, speech_service, folding_manager, state_telemetry_publisher):
         """
         :type gait_engine: GaitEngine
         """
@@ -71,8 +71,10 @@ class MovementController(object):
         self.keep_running = True
         self._gait_engine = gait_engine
         self.folding_manager = folding_manager
+        self.state_telemetry_publisher = state_telemetry_publisher
         self.choreographer = Choreographer(self._gait_engine)
         self._speech_service = speech_service
+
         self._relaxed = True
         self._velocity = Vector2()
         self._theta = 0
@@ -95,6 +97,7 @@ class MovementController(object):
         self.folding_operation = None
 
     def spin(self):
+        self.state_telemetry_publisher.ready()
         try:
             self._main_controller_loop()
         except Exception as e:

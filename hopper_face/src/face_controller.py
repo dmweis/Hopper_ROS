@@ -9,7 +9,7 @@ import rospy
 from cobs import cobs
 from colorsys import hsv_to_rgb, rgb_to_hsv
 from rospy import sleep
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 
 PIXEL_COUNT = 40
 
@@ -138,6 +138,9 @@ class LedController(object):
         self.modes = {}
         rospy.Subscriber("hopper/face/mode", String,
                          self.on_mode_change, queue_size=3)
+        # controller ready system
+        self.controller_ready = False
+        rospy.Subscriber("hopper/main_controller_ready", Bool, self.on_ready_msg, queue_size=2)
 
     def on_mode_change(self, msg):
         new_mode = msg.data.lower()
@@ -183,14 +186,25 @@ class LedController(object):
             port.write(ColorPacket().to_data())
 
     def count_down(self):
-        for i in range(24):
+        for i in range(PIXEL_COUNT):
             data = ColorPacket()
             for pixel in range(i):
                 data.set_pixel(pixel, COLORS["blue"])
             self.port.write(data.to_data())
-            sleep(0.28)
+            # at this speed outer circle should take 7 seconds
+            # 7 seconds is average boot time
+            sleep(0.29)
+            if self.controller_ready:
+                break
+        if not self.controller_ready:
+            self.port.write(ColorPacket(COLORS["red"]).to_data())
+            while not self.controller_ready:
+                sleep(0.2)
         self.port.write(ColorPacket(COLORS["green"]).to_data())
         sleep(1)
+
+    def on_ready_msg(self, msg):
+        self.controller_ready = msg.data
 
 
 class AnimationController(LedController):

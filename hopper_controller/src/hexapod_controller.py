@@ -24,11 +24,12 @@ class HexapodController(object):
         ik_driver = ros_abstraction.IkController()
         body_controller = ros_abstraction.HexapodBodyController()
         message_publisher = ros_abstraction.MessagePublisher()
+        controller_telemetry = ros_abstraction.ControllerTelemetryPublisher()
         tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
                                  ros_abstraction.OdomPublisher(message_publisher))
         gait_engine = GaitEngine(tripod_gait)
         folding_manager = FoldingManager(body_controller)
-        self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer(self.sound_on), folding_manager)
+        self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer(self.sound_on), folding_manager, controller_telemetry)
         self.halt_publisher = rospy.Publisher("halt", Empty, queue_size=1, latch=True)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)

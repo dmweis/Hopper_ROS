@@ -108,6 +108,8 @@ class MovementController(object):
         self._speech_service.say("initialized_successfully")
         while not rospy.is_shutdown() and self.keep_running:
             if self.stand_mode and not self.currently_standing:
+                if self.folding_manager.check_if_folded():
+                    self.folding_manager.unfold()
                 self._gait_engine.stand_up()
                 self.currently_standing = True
             elif not self.stand_mode and self.currently_standing:

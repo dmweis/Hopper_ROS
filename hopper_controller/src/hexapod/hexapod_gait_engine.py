@@ -110,7 +110,7 @@ class MovementController(object):
             if self.stand_mode and not self.currently_standing:
                 if self.folding_manager.check_if_folded():
                     self.folding_manager.unfold()
-                self._gait_engine.stand_up(speed=12)
+                self._gait_engine.stand_up()
                 self.currently_standing = True
             elif not self.stand_mode and self.currently_standing:
                 self._gait_engine.sit_down()
@@ -267,15 +267,15 @@ class GaitEngine(object):
         # time each step takes in seconds
         self._default_cycle_time = 1.0
 
-    def stand_up(self, speed=9):
+    def stand_up(self, speed=12):
         rospy.loginfo("Hexapod gait engine started")
         self.gait_sequencer.read_current_position()
         for leg in self.stand_up_leg_order:
             new_position = self.gait_sequencer.last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
             self.gait_sequencer.execute_move(new_position, speed)
         self.gait_sequencer.execute_move(WIDER_RELAXED_POSITION.clone(), speed)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, self._default_cycle_time)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, 1.5)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, 1.5)
         rospy.loginfo("Hexapod ready")
 
     def step(self, direction, rotation, cycle_time, lift_height=2.0):
@@ -305,11 +305,11 @@ class GaitEngine(object):
             speed = speed_override
         self.gait_sequencer.update_relaxed_body_pose(transform, rotation, speed, legs)
 
-    def sit_down(self):
-        self.gait_sequencer.reset_relaxed_body_pose(speed_override=9)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._default_cycle_time)
-        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, self._default_cycle_time)
-        self.gait_sequencer.execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), 3)
+    def sit_down(self, speed=12):
+        self.gait_sequencer.reset_relaxed_body_pose(speed_override=speed)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, 1.5)
+        self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), WIDER_RELAXED_POSITION, 1.5)
+        self.gait_sequencer.execute_move(GROUND_LEVEL_RELAXED_POSITION.clone(), speed)
         self.gait_sequencer.stop()
 
     def reset_relaxed_body_pose(self, speed_override=9):

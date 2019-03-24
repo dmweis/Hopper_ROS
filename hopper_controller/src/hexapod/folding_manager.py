@@ -107,7 +107,7 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lf and lm and lr and rf and rm and rr:
                 break
-        rospy.sleep(0.5)
+        rospy.sleep(0.2)
         self.body_controller.set_torque(False)
 
     def fold(self):
@@ -138,7 +138,7 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lm and rm:
                 break
-        rospy.sleep(0.5)
+        rospy.sleep(0.2)
         self.body_controller.set_torque(False)
 
     def unfold_on_ground(self):
@@ -215,7 +215,7 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lm:
                 break
-        rospy.sleep(0.5)
+        rospy.sleep(0.2)
         self.body_controller.set_torque(False)
 
     def fold_on_ground(self):
@@ -302,5 +302,5 @@ class FoldingManager(object):
             self.body_controller.set_motors(self.last_motor_position)
             if lm and rm:
                 break
-        rospy.sleep(0.5)
+        rospy.sleep(0.2)
         self.body_controller.set_torque(False)

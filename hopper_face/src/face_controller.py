@@ -8,7 +8,7 @@ import rospy
 
 from cobs import cobs
 from colorsys import hsv_to_rgb, rgb_to_hsv
-from time import sleep
+from rospy import sleep
 from std_msgs.msg import String
 
 PIXEL_COUNT = 40
@@ -168,6 +168,7 @@ class LedController(object):
         with serial.Serial('/dev/ttyUSB0', 115200) as port:
             self.port = port
             self.reset()
+            self.count_down()
             while not rospy.is_shutdown():
                 if not (self.selected_color and self.selected_mode):
                     sleep(0.2)
@@ -180,6 +181,14 @@ class LedController(object):
                         break
                 # set all off at the end
             port.write(ColorPacket().to_data())
+
+    def count_down(self):
+        for i in range(24):
+            data = ColorPacket()
+            for pixel in range(i):
+                data.set_pixel(pixel, COLORS["blue"])
+            self.port.write(data.to_data())
+            sleep(0.25)
 
 
 class AnimationController(LedController):

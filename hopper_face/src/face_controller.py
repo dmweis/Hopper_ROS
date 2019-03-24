@@ -188,7 +188,7 @@ class LedController(object):
             for pixel in range(i):
                 data.set_pixel(pixel, COLORS["blue"])
             self.port.write(data.to_data())
-            sleep(0.25)
+            sleep(0.28)
 
 
 class AnimationController(LedController):

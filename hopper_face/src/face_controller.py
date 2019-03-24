@@ -123,8 +123,8 @@ BRIGHT_COLORS = {
     "red": Color(180, 0, 0),
     "blue": Color(0, 0, 180),
     "green": Color(0, 180, 0),
-    "yellow": Color(150, 150, 0),
-    "purple": Color(150, 0, 150)
+    "yellow": Color(100, 100, 0),
+    "purple": Color(100, 0, 100)
 }
 
 
@@ -189,6 +189,8 @@ class LedController(object):
                 data.set_pixel(pixel, COLORS["blue"])
             self.port.write(data.to_data())
             sleep(0.28)
+        self.port.write(ColorPacket(COLORS["green"]).to_data())
+        sleep(1)
 
 
 class AnimationController(LedController):

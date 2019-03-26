@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN            4
+#define PIN            D5
 #define NUMPIXELS      40
 #define PIXELS_BIGGER 24
 #define PIXELS_SMALLER 16

@@ -2,6 +2,7 @@
 
 from __future__ import print_function, division
 
+from threading import Thread
 import serial
 import random
 import rospy
@@ -10,6 +11,7 @@ from cobs import cobs
 from colorsys import hsv_to_rgb, rgb_to_hsv
 from rospy import sleep
 from std_msgs.msg import String, Bool
+from sensor_msgs.msg import Imu
 
 PIXEL_COUNT = 40
 
@@ -141,6 +143,8 @@ class LedController(object):
         # controller ready system
         self.controller_ready = False
         rospy.Subscriber("hopper/main_controller_ready", Bool, self.on_ready_msg, queue_size=2)
+        # IMU
+        self.imu_publisher = rospy.Publisher("hopper/imu/data", Imu, queue_size=10)
 
     def on_mode_change(self, msg):
         new_mode = msg.data.lower()
@@ -167,10 +171,28 @@ class LedController(object):
     def reset(self):
         self.port.write(ColorPacket().to_data())
 
+    def read_loop(self):
+        while not rospy.is_shutdown():
+            line = self.port.readline()
+            data = line.split(',')
+            if len(data) != 8:
+                return
+            imu_msg = Imu()
+            imu_msg.header.frame_id = "hopper_imu"
+            imu_msg.header.stamp = rospy.Time.now()
+            imu_msg.orientation.x = float(data[0])
+            imu_msg.orientation.y = float(data[1])
+            imu_msg.orientation.z = float(data[2])
+            imu_msg.orientation.w = float(data[3])
+            self.imu_publisher.publish(imu_msg)
+
     def run(self):
         with serial.Serial('/dev/ttyUSB0', 115200) as port:
             self.port = port
             self.reset()
+            reader_thread = Thread(target=self.read_loop)
+            reader_thread.daemon = True
+            reader_thread.start()
             self.count_down()
             while not rospy.is_shutdown():
                 if not (self.selected_color and self.selected_mode):

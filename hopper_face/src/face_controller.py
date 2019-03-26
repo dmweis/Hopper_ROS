@@ -187,7 +187,7 @@ class LedController(object):
             self.imu_publisher.publish(imu_msg)
 
     def run(self):
-        with serial.Serial('/dev/ttyUSB0', 115200) as port:
+        with serial.Serial('/dev/hopper_face', 115200) as port:
             self.port = port
             self.reset()
             reader_thread = Thread(target=self.read_loop)

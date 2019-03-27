@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <rosparam file="$(find leap_motion)/config/listener_params.yaml" command="load" />
+    <node pkg="leap_motion" type="leap_motion_driver_node" name="leap_driver"/>
+    <node name="hoper_leap" pkg="hopper_leap" type="leap_listener.py"/>
+</launch>
+

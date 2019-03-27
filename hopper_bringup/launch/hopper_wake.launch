@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <node name="hopper_face" pkg="hopper_face" type="face_controller.py"/>
+    <node name="hopper_face" pkg="hopper_face" type="face_controller.py" respawn="true"/>
     <rosparam command="load" file="$(find hopper_controller)/params/hexapod.yaml" />
     <node name="keep_alive_node" pkg="hopper_keep_alive" type="keep_alive_node.py" required="true"/>
     <node name="hopper_body_controller" pkg="hopper_controller" type="body_controller_node.py"/>

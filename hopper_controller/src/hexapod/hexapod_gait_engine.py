@@ -275,7 +275,7 @@ class GaitEngine(object):
         self.gait_sequencer.read_current_position()
         for leg in self.stand_up_leg_order:
             new_position = self.gait_sequencer.last_written_position.clone().update_from_other(GROUND_LEVEL_RELAXED_POSITION, leg)
-            self.gait_sequencer.execute_move(new_position, speed)
+            self.gait_sequencer.execute_move(new_position, 15)
         self.gait_sequencer.execute_move(WIDER_RELAXED_POSITION.clone(), speed)
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, 0.5)
         self.gait_sequencer.go_to_relaxed(self._get_next_leg_combo(), self.gait_sequencer.current_relaxed_position, 0.5)

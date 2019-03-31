@@ -301,11 +301,11 @@ class SteamControllerRosHandler(object):
     def update_robot_command(self, x, y, rot, cycle_time, stance, single_leg_command, lift_height=2):
         move_command = HopperMoveCommand()
         tmp = x
-        distance_multiplier = linear_map(cycle_time, 0.25, 1.0, 4.0, 1.0)
+        distance_multiplier = linear_map(cycle_time, 0.25, 1.0, 3.0, 0.5)
         x = y * 0.1 * distance_multiplier
         y = tmp * 0.1 * distance_multiplier
         if abs(rot) > 0.2:
-            rot = -rot * 40 * linear_map(cycle_time, 0.25, 1, 4, 1)
+            rot = -rot * 20 * linear_map(cycle_time, 0.25, 1, 4, 2)
         move_command.direction.linear.x = x
         move_command.direction.linear.y = y
         move_command.direction.angular.z = math.radians(rot)

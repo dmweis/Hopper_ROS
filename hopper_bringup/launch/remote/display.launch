@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <include file="$(find hopper_bringup)/launch/remote/teleop.launch" />
+    <!-- <include file="$(find hopper_bringup)/launch/remote/teleop.launch" /> -->
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find hopper_description)/rviz/urdf.rviz" required="true" />
 </launch>

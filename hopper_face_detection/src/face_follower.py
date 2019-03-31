@@ -22,11 +22,18 @@ class FaceFollower(object):
         rospy.init_node("face_follower")
         self.current_x = 0
         self.current_y = 0
+        self.robot_height = 0
         self.tracking_enabled = False
         self.stance_publisher = rospy.Publisher("hopper/stance_translate", Twist, queue_size=1)
         rospy.Subscriber("camera/detected_face_position", Pose2D, self.on_new_face_pose, queue_size=1)
         rospy.Subscriber("hopper/face_tracking_enabled", Bool, self.on_tracking_enable_msg, queue_size=10)
+        rospy.Subscriber("hopper/stance_translate", Twist, self.on_stance_msg, queue_size=10)
         rospy.spin()
+
+    def on_stance_msg(self, msg):
+        if msg._connection_header["callerid"] == rospy.get_name():
+            return
+        self.robot_height = msg.linear.z
 
     def on_new_face_pose(self, msg):
         if self.tracking_enabled:
@@ -37,6 +44,7 @@ class FaceFollower(object):
             new_twist = Twist()
             new_twist.angular.z = new_x
             new_twist.angular.y = new_y
+            new_twist.linear.z = self.robot_height
             self.stance_publisher.publish(new_twist)
             self.current_x = new_x
             self.current_y = new_y

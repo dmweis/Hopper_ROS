@@ -57,6 +57,22 @@ void loop() {
   Serial.print(quat.w(), 4);
   Serial.print(", ");
 
+  imu::Vector<3> linear = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+  Serial.print(linear.x());
+  Serial.print(",");
+  Serial.print(linear.y());
+  Serial.print(",");
+  Serial.print(linear.z());
+  Serial.println(", ");
+
+  imu::Vector<3> rot = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+  Serial.print(rot.x());
+  Serial.print(",");
+  Serial.print(rot.y());
+  Serial.print(",");
+  Serial.print(rot.z());
+  Serial.println(", ");
+
   /* Display calibration status for each sensor. */
   uint8_t system, gyro, accel, mag = 0;
   bno.getCalibration(&system, &gyro, &accel, &mag);

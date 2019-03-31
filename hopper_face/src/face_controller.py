@@ -178,12 +178,13 @@ class LedController(object):
             if len(data) != 8:
                 return
             imu_msg = Imu()
-            imu_msg.header.frame_id = "hopper_imu"
+            imu_msg.header.frame_id = "imu"
             imu_msg.header.stamp = rospy.Time.now()
             imu_msg.orientation.x = float(data[0])
             imu_msg.orientation.y = float(data[1])
             imu_msg.orientation.z = float(data[2])
             imu_msg.orientation.w = float(data[3])
+            imu_msg.orientation_covariance[0] = -1
             self.imu_publisher.publish(imu_msg)
 
     def run(self):

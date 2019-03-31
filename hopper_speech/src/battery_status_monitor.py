@@ -39,13 +39,13 @@ class BatteryStatusMonitor(object):
                 self.first_check = False
                 self.lowest_recorded_voltage = mean_voltage
                 return
-            if mean_voltage < 10.5:
+            if mean_voltage < 10.5 or self.lowest_recorded_voltage < 10.5:
                 if self.last_critical_voltage_warning + self.critical_voltage_warning_period < rospy.Time.now():
                     self.speech_publisher.publish("battery_critical")
                     self.last_critical_voltage_warning = rospy.Time.now()
-            elif mean_voltage < 11 and self.lowest_recorded_voltage > 11:
+            elif mean_voltage < 11 and self.lowest_recorded_voltage >= 11:
                 self.speech_publisher.publish("battery_below_11")
-            elif mean_voltage < 12 and self.lowest_recorded_voltage > 12:
+            elif mean_voltage < 12 and self.lowest_recorded_voltage >= 12:
                 self.speech_publisher.publish("battery_below_12")
             self.lowest_recorded_voltage = mean_voltage
 

@@ -1,2 +1,2 @@
 sudo apt update
-sudo apt install -y ros-kinetic-urdf ros-kinetic-move-base ros-kinetic-rplidar-ros ros-kinetic-freenect-launch ros-kinetic-joy ros-kinetic-robot-pose-ekf ros-kinetic-gmapping
+sudo apt install -y ros-kinetic-urdf ros-kinetic-move-base ros-kinetic-rplidar-ros ros-kinetic-freenect-launch ros-kinetic-joy ros-kinetic-gmapping

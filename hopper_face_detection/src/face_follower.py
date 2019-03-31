@@ -55,6 +55,7 @@ class FaceFollower(object):
             new_twist = Twist()
             new_twist.angular.z = 0
             new_twist.angular.y = 0
+            new_twist.linear.z = self.robot_height
             self.stance_publisher.publish(new_twist)
             self.current_x = 0
             self.current_y = 0

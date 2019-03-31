@@ -6,7 +6,7 @@
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
 
-#define BNO055_SAMPLERATE_DELAY_MS (100)
+#define BNO055_SAMPLERATE_DELAY_MS (50)
 
 #define NEOPIXEL_PIN D5
 
@@ -63,7 +63,7 @@ void loop() {
   Serial.print(linear.y());
   Serial.print(",");
   Serial.print(linear.z());
-  Serial.println(", ");
+  Serial.print(", ");
 
   imu::Vector<3> rot = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
   Serial.print(rot.x());
@@ -71,7 +71,7 @@ void loop() {
   Serial.print(rot.y());
   Serial.print(",");
   Serial.print(rot.z());
-  Serial.println(", ");
+  Serial.print(", ");
 
   /* Display calibration status for each sensor. */
   uint8_t system, gyro, accel, mag = 0;

@@ -49,6 +49,13 @@
         <child link="laser" />
         <origin xyz="0.025 0 0.11" rpy="0 0 ${pi}"/>
     </joint>
+    <!-- IMU attachment -->
+    <link name="imu"/>
+    <joint name="body_imu_joint" type="fixed">
+        <parent link="body_link" />
+        <child link="imu" />
+        <origin xyz="0.025 0 0" rpy="0 0 ${pi}"/>
+    </joint>
     <!-- Stereo camera  -->
     <link name="stereo_camera"/>
     <joint name="body_camera_joint" type="fixed">

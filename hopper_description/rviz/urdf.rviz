@@ -1,13 +1,13 @@
 Panels:
   - Class: rviz/Displays
-    Help Height: 78
+    Help Height: 89
     Name: Displays
     Property Tree Widget:
       Expanded:
         - /Global Options1
         - /Status1
       Splitter Ratio: 0.57710278
-    Tree Height: 1041
+    Tree Height: 1674
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -80,6 +80,10 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        left_camera:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         left_front_coxa:
           Alpha: 1
           Show Axes: false
@@ -137,6 +141,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        right_camera:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         right_front_coxa:
           Alpha: 1
           Show Axes: false
@@ -194,6 +202,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        stereo_camera:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -217,6 +229,8 @@ Visualization Manager:
           Value: true
         laser:
           Value: true
+        left_camera:
+          Value: true
         left_front_coxa:
           Value: true
         left_front_femur:
@@ -241,7 +255,7 @@ Visualization Manager:
           Value: true
         left_rear_tibia:
           Value: true
-        odom:
+        right_camera:
           Value: true
         right_front_coxa:
           Value: true
@@ -267,7 +281,7 @@ Visualization Manager:
           Value: true
         right_rear_tibia:
           Value: true
-        scanmatcher_frame:
+        stereo_camera:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -275,47 +289,49 @@ Visualization Manager:
       Show Axes: false
       Show Names: false
       Tree:
-        odom:
-          base_footprint:
-            base_stabilized:
-              base_link:
-                arrow:
+        base_footprint:
+          base_stabilized:
+            base_link:
+              arrow:
+                {}
+              body_link:
+                laser:
                   {}
-                body_link:
-                  laser:
+                left_front_leg_base:
+                  left_front_coxa:
+                    left_front_femur:
+                      left_front_tibia:
+                        {}
+                left_middle_leg_base:
+                  left_middle_coxa:
+                    left_middle_femur:
+                      left_middle_tibia:
+                        {}
+                left_rear_leg_base:
+                  left_rear_coxa:
+                    left_rear_femur:
+                      left_rear_tibia:
+                        {}
+                right_front_leg_base:
+                  right_front_coxa:
+                    right_front_femur:
+                      right_front_tibia:
+                        {}
+                right_middle_leg_base:
+                  right_middle_coxa:
+                    right_middle_femur:
+                      right_middle_tibia:
+                        {}
+                right_rear_leg_base:
+                  right_rear_coxa:
+                    right_rear_femur:
+                      right_rear_tibia:
+                        {}
+                stereo_camera:
+                  left_camera:
                     {}
-                  left_front_leg_base:
-                    left_front_coxa:
-                      left_front_femur:
-                        left_front_tibia:
-                          {}
-                  left_middle_leg_base:
-                    left_middle_coxa:
-                      left_middle_femur:
-                        left_middle_tibia:
-                          {}
-                  left_rear_leg_base:
-                    left_rear_coxa:
-                      left_rear_femur:
-                        left_rear_tibia:
-                          {}
-                  right_front_leg_base:
-                    right_front_coxa:
-                      right_front_femur:
-                        right_front_tibia:
-                          {}
-                  right_middle_leg_base:
-                    right_middle_coxa:
-                      right_middle_femur:
-                        right_middle_tibia:
-                          {}
-                  right_rear_leg_base:
-                    right_rear_coxa:
-                      right_rear_femur:
-                        right_rear_tibia:
-                          {}
-          scanmatcher_frame:
-            {}
+                  right_camera:
+                    {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -362,7 +378,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: odom
+    Fixed Frame: base_footprint
     Frame Rate: 30
   Name: root
   Tools:
@@ -406,10 +422,10 @@ Visualization Manager:
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1377
+  Height: 2106
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd000000040000000000000367000004a2fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c0061007900730100000041000004a2000000bb00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000016c000004a2fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a005600690065007700730100000041000004a2000000a000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000a0000000058fc0100000002fb0000000800540069006d0065010000000000000a000000022600fffffffb0000000800540069006d0065010000000000000450000000000000000000000521000004a200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000035400000743fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000007c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c0061007900730100000069000007430000011200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000017000000743fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000006900000743000000f000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000efc00000058fc0100000002fb0000000800540069006d0065010000000000000efc000004c300fffffffb0000000800540069006d0065010000000000000450000000000000000000000a200000074300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -418,6 +434,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 2560
+  Width: 3836
   X: 0
-  Y: 30
+  Y: 0

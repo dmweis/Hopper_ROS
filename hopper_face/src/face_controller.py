@@ -175,7 +175,7 @@ class LedController(object):
         while not rospy.is_shutdown():
             line = self.port.readline()
             data = line.split(',')
-            if len(data) != 8:
+            if len(data) != 14:
                 return
             imu_msg = Imu()
             imu_msg.header.frame_id = "imu"
@@ -185,6 +185,16 @@ class LedController(object):
             imu_msg.orientation.z = float(data[2])
             imu_msg.orientation.w = float(data[3])
             imu_msg.orientation_covariance[0] = -1
+
+            imu_msg.linear_acceleration.x = float(data[4])
+            imu_msg.linear_acceleration.y = float(data[5])
+            imu_msg.linear_acceleration.z = float(data[6])
+            imu_msg.linear_acceleration_covariance[0] = -1
+
+            imu_msg.angular_velocity.x = float(data[7])
+            imu_msg.angular_velocity.y = float(data[8])
+            imu_msg.angular_velocity.z = float(data[9])
+            imu_msg.angular_velocity_covariance[0] = -1
             self.imu_publisher.publish(imu_msg)
 
     def run(self):

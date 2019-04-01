@@ -3,10 +3,14 @@
 from __future__ import print_function
 
 import rospy
+import numpy
 
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Quaternion, Vector3
 from tf import transformations
+
+
+quat_msg_to_array = lambda q: numpy.array([q.x, q.y, q.z, q.w])
 
 
 class ImuChecker(object):
@@ -21,7 +25,7 @@ class ImuChecker(object):
         if not self.initial_orientation:
             self.initial_orientation = msg.orientation
             return
-        current_orientation = msg.orientation - self.initial_orientation
+        current_orientation = transformations.quaternion_multiply(quat_msg_to_array(msg.orientation), quat_msg_to_array(self.initial_orientation))
         print(transformations.euler_from_quaternion(current_orientation))
 
 

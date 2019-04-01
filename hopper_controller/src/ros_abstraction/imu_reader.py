@@ -29,7 +29,7 @@ class ImuReader(object):
         current_orientation = transformations.quaternion_multiply(
             quat_msg_to_array(msg.orientation),
             transformations.quaternion_inverse(quat_msg_to_array(self.initial_orientation)))
-        data = map(lambda v: degrees(v), transformations.euler_from_quaternion(current_orientation))
+        data = transformations.euler_from_quaternion(current_orientation)
         self.orientation = Vector3(data[0], data[1], data[2])
 
     def on_imu_zero(self, _):

@@ -34,7 +34,7 @@ class BatteryStatusMonitor(object):
             voltages = self.voltages.values()
             self.voltages.clear()
             mean_voltage = mean(voltages)
-            # skip the first check so that you don't get a warning if battery is alredy bellow some value
+            # skip the first check so that you don't get a warning if battery is already bellow some value
             if self.first_check:
                 self.first_check = False
                 self.lowest_recorded_voltage = mean_voltage

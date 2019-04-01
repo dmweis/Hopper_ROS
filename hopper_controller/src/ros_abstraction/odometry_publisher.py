@@ -36,8 +36,9 @@ transform_broadcaster = tf2_ros.TransformBroadcaster()
 
 
 class OdomPublisher(object):
-    def __init__(self, message_publisher, parent_link_name="odom", child_link_name="base_footprint"):
+    def __init__(self, message_publisher, imu_reader, parent_link_name="odom", child_link_name="base_footprint"):
         super(OdomPublisher, self).__init__()
+        self.imu_reader = imu_reader
         self._publish_to_tf = rospy.get_param("~publish_odometry_to_tf", True)
         self._transform_broadcaster = transform_broadcaster
         self._odom_publisher = rospy.Publisher('robot_odom', Odometry, queue_size=10)
@@ -50,6 +51,34 @@ class OdomPublisher(object):
         # init odometry message
         self._last_odom_msg = create_empty_odometry_msg(self._parent_link_name, self._child_link_name)
         message_publisher.register_publisher(self)
+
+    def update_move(self, motion):
+        """
+        :type motion: Vector2
+        """
+        current_orientation = transformations.quaternion_from_euler(0, 0, self.imu_reader.get_yaw())
+        current_rotation = transformations.euler_from_quaternion(current_orientation)[2]
+        self.odometry_position += motion.rotate_by_angle_rad(current_rotation)
+        tf_message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)
+        tf_message.transform.translation.x = self.odometry_position.x / 100
+        tf_message.transform.translation.y = self.odometry_position.y / 100
+        tf_message.transform.rotation.x = current_orientation[0]
+        tf_message.transform.rotation.y = current_orientation[1]
+        tf_message.transform.rotation.z = current_orientation[2]
+        tf_message.transform.rotation.w = current_orientation[3]
+        odom_message = create_empty_odometry_msg(self._parent_link_name, self._child_link_name)
+        odom_message.pose.pose.position.x = self.odometry_position.x / 100
+        odom_message.pose.pose.position.y = self.odometry_position.y / 100
+        odom_message.pose.pose.orientation.x = current_orientation[0]
+        odom_message.pose.pose.orientation.y = current_orientation[1]
+        odom_message.pose.pose.orientation.z = current_orientation[2]
+        odom_message.pose.pose.orientation.w = current_orientation[3]
+        odom_message.twist.twist.linear.x = self._last_odom_msg.twist.twist.linear.x
+        odom_message.twist.twist.linear.y = self._last_odom_msg.twist.twist.linear.y
+        odom_message.twist.twist.angular.z = self._last_odom_msg.twist.twist.angular.z
+        odom_message.pose.covariance[0] = -1
+        self._last_tf_odometry_message = tf_message
+        self._last_odom_msg = odom_message
 
     def update_translation(self, direction, rotation):
         """

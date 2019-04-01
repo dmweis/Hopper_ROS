@@ -25,7 +25,9 @@ class ImuChecker(object):
         if not self.initial_orientation:
             self.initial_orientation = msg.orientation
             return
-        current_orientation = transformations.quaternion_multiply(quat_msg_to_array(msg.orientation), quat_msg_to_array(self.initial_orientation))
+        current_orientation = transformations.quaternion_multiply(
+            quat_msg_to_array(msg.orientation),
+            transformations.quaternion_inverse(quat_msg_to_array(self.initial_orientation)))
         print(transformations.euler_from_quaternion(current_orientation))
 
 

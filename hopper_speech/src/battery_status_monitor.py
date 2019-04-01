@@ -47,7 +47,8 @@ class BatteryStatusMonitor(object):
                 self.speech_publisher.publish("battery_below_11")
             elif mean_voltage < 12 and self.lowest_recorded_voltage >= 12:
                 self.speech_publisher.publish("battery_below_12")
-            self.lowest_recorded_voltage = mean_voltage
+            if mean_voltage < self.lowest_recorded_voltage:
+                self.lowest_recorded_voltage = mean_voltage
 
 
 if __name__ == '__main__':

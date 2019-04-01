@@ -76,6 +76,7 @@ class OdomPublisher(object):
         odom_message.twist.twist.linear.x = self._last_odom_msg.twist.twist.linear.x
         odom_message.twist.twist.linear.y = self._last_odom_msg.twist.twist.linear.y
         odom_message.twist.twist.angular.z = self._last_odom_msg.twist.twist.angular.z
+        odom_message.pose.covariance[0] = -1
         self._last_tf_odometry_message = tf_message
         self._last_odom_msg = odom_message
 

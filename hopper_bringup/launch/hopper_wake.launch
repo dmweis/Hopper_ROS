@@ -6,7 +6,7 @@
     <node name="hopper_body_controller" pkg="hopper_controller" type="body_controller_node.py"/>
     <node name="hopper_ik_controller" pkg="hopper_controller" type="ik_controller_node.py"/>
     <node name="hopper_controller" pkg="hopper_controller" type="hexapod_controller.py" respawn="true" >
-        <param name="publish_odometry_to_tf" value="false"/>
+        <param name="publish_odometry_to_tf" value="true"/>
         <param name="sound_on" value="false"/>
     </node>
     <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />

@@ -18,7 +18,7 @@ class ImuChecker(object):
         super(ImuChecker, self).__init__()
         rospy.init_node("IMU_checker")
         self.initial_orientation = None
-        rospy.Subscriber("hopper/Imu/data", Imu, self.on_imu_msg, queue_size=10)
+        rospy.Subscriber("hopper/imu/data", Imu, self.on_imu_msg, queue_size=10)
         rospy.spin()
 
     def on_imu_msg(self, msg):

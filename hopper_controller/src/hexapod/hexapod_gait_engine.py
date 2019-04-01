@@ -390,6 +390,7 @@ class TripodGait(object):
             .transform(Vector3(-distance.x / 2, -distance.y / 2, 0), grounded_legs) \
             .turn(-angle / 2, grounded_legs)
         self._step_to_position(lifted_legs, target_position, cycle_length, leg_lift_height)
+        self._velocity_publisher.update_move(velocity * cycle_length)
         self._velocity_publisher.update_velocity(Vector2(), 0)
 
     def go_to_relaxed(self, lifted_legs, target_stance, cycle_length, leg_lift_height=2):

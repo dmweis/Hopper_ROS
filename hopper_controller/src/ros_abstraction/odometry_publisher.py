@@ -36,8 +36,9 @@ transform_broadcaster = tf2_ros.TransformBroadcaster()
 
 
 class OdomPublisher(object):
-    def __init__(self, message_publisher, parent_link_name="odom", child_link_name="base_footprint"):
+    def __init__(self, message_publisher, imu_reader, parent_link_name="odom", child_link_name="base_footprint"):
         super(OdomPublisher, self).__init__()
+        self.imu_reader = imu_reader
         self._publish_to_tf = rospy.get_param("~publish_odometry_to_tf", True)
         self._transform_broadcaster = transform_broadcaster
         self._odom_publisher = rospy.Publisher('robot_odom', Odometry, queue_size=10)
@@ -50,6 +51,9 @@ class OdomPublisher(object):
         # init odometry message
         self._last_odom_msg = create_empty_odometry_msg(self._parent_link_name, self._child_link_name)
         message_publisher.register_publisher(self)
+
+    def update_move(self, motion):
+        self.update_translation(motion, self.imu_reader.get_yaw())
 
     def update_translation(self, direction, rotation):
         """

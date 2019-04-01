@@ -26,7 +26,7 @@ class HexapodController(object):
         message_publisher = ros_abstraction.MessagePublisher()
         controller_telemetry = ros_abstraction.ControllerTelemetryPublisher()
         tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
-                                 ros_abstraction.OdomPublisher(message_publisher))
+                                 ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
         gait_engine = GaitEngine(tripod_gait)
         folding_manager = FoldingManager(body_controller)
         self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer(self.sound_on), folding_manager, controller_telemetry)

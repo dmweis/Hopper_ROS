@@ -1,28 +1,26 @@
-#!/usr/bin/env python
-
-from __future__ import print_function
 
 import rospy
 import numpy
 
 from math import degrees
+from std_msgs.msg import Empty
 from sensor_msgs.msg import Imu
-from geometry_msgs.msg import Quaternion, Vector3
+from geometry_msgs.msg import Quaternion
 from tf import transformations
+from hexapod import Vector3, Vector2
 
 
 def quat_msg_to_array(msg):
     return numpy.array([msg.x, msg.y, msg.z, msg.w])
 
 
-class ImuChecker(object):
+class ImuReader(object):
     def __init__(self):
-        super(ImuChecker, self).__init__()
-        rospy.init_node("IMU_checker")
+        super(ImuReader, self).__init__()
         self.initial_orientation = Quaternion(0, 0, 0, 1)
+        self.orientation = Vector3()
         rospy.Subscriber("hopper/imu/data", Imu, self.on_imu_msg, queue_size=10)
-        print("Starting")
-        rospy.spin()
+        rospy.Subscriber("hopper/imu/zero", Empty, self.on_imu_zero, queue_size=1)
 
     def on_imu_msg(self, msg):
         if self.initial_orientation is None:
@@ -31,9 +29,11 @@ class ImuChecker(object):
         current_orientation = transformations.quaternion_multiply(
             quat_msg_to_array(msg.orientation),
             transformations.quaternion_inverse(quat_msg_to_array(self.initial_orientation)))
-        print(map(lambda v: degrees(v), transformations.euler_from_quaternion(current_orientation)))
-        print(map(lambda v: degrees(v), transformations.euler_from_quaternion(quat_msg_to_array(msg.orientation))))
-        print("")
+        data = map(lambda v: degrees(v), transformations.euler_from_quaternion(current_orientation))
+        self.orientation = Vector3(data[0], data[1], data[2])
 
-if __name__ == "__main__":
-    ImuChecker()
+    def on_imu_zero(self, _):
+        self.initial_orientation = None
+
+    def get_yaw(self):
+        return self.orientation.z

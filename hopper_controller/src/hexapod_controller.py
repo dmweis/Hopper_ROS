@@ -15,6 +15,15 @@ from hexapod.folding_manager import FoldingManager
 import ros_abstraction
 
 
+def linear_map(value, inMin, inMax, outMin, outMax):
+    return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+
+def constrain(value, a, b):
+    min_value = min(a, b)
+    max_value = max(a, b)
+    return min(max_value, max(min_value, value))
+
+
 class HexapodController(object):
     def __init__(self):
         super(HexapodController, self).__init__()
@@ -64,11 +73,15 @@ class HexapodController(object):
 
     def on_nav_system_move_command(self, move_command):
         # convert directions from meter to cm
-        max_theta = 0.2
-        max_vel = 0.1
-        if abs(move_command.angular.z) > max_theta:
-            rospy.logerr("Max angular vel {0:.2f} was breached to {1:.2f}".format(max_theta, move_command.angular.z))
-            move_command.angular.z = math.copysign(max_theta, move_command.angular.z)
+        max_theta_vel = rospy.get_param("hopper/max_theta_vel", default=0.2)
+        max_vel = rospy.get_param("hopper/max_linear_vel", default=0.3)
+        speed = math.sqrt(move_command.linear.x**2 + move_command.linear.y **2)
+        cycle_time = linear_map(speed, 0, 0.3, 1, 0.25)
+        cycle_time = constrain(cycle_time, 1, 0.25)
+
+        if abs(move_command.angular.z) > max_theta_vel:
+            rospy.logerr("Max angular vel {0:.2f} was breached to {1:.2f}".format(max_theta_vel, move_command.angular.z))
+            move_command.angular.z = math.copysign(max_theta_vel, move_command.angular.z)
         if abs(move_command.linear.x) > max_vel:
             rospy.logerr("Max linear x vel {0:.2f} was breached to {1:.2f}".format(max_vel, move_command.linear.x))
             move_command.linear.x = math.copysign(max_vel, move_command.linear.x)
@@ -79,7 +92,7 @@ class HexapodController(object):
         rotation = move_command.angular.z
         self.controller.set_move_command(velocity,
                                          math.degrees(rotation),
-                                         HopperMoveCommand.DEFAULT_CYCLE_TIME,
+                                         cycle_time,
                                          HopperMoveCommand.DEFAULT_LIFT_HEIGHT)
 
     def update_pose(self, twist):

@@ -277,7 +277,7 @@ class SteamControllerRosHandler(object):
             stance_pose.angular.y = math.radians(y * 12)
             # print "Stick is at X:{0:.3f} Y:{1:.3f}".format(x, y)
 
-        lift_height = 2
+        lift_height = HopperMoveCommand.DEFAULT_LIFT_HEIGHT
         cycle_time = 1
         # triggers
         if controller_data.ltrig != 0:
@@ -292,31 +292,27 @@ class SteamControllerRosHandler(object):
         rate = rospy.Rate(60)
         while not rospy.is_shutdown():
             if self._new_command_available:
-                self.pub.publish(self._hopper_move_command_msg)
+                self._new_command_available = False
                 self.stance_translate.publish(self.last_stance_msg)
                 self.single_leg_publisher.publish(self.last_single_leg_msg)
-                self._new_command_available = False
+                self.pub.publish(self._hopper_move_command_msg)
             rate.sleep()
 
-    def update_robot_command(self, x, y, rot, cycle_time, stance, single_leg_command, lift_height=2):
+    def update_robot_command(self, x, y, rot, cycle_time, stance, single_leg_command, lift_height=HopperMoveCommand.DEFAULT_LIFT_HEIGHT):
         move_command = HopperMoveCommand()
         tmp = x
         distance_multiplier = linear_map(cycle_time, 0.25, 1.0, 3.0, 0.5)
         x = y * 0.1 * distance_multiplier
         y = tmp * 0.1 * distance_multiplier
         if abs(rot) > 0.2:
-            rot = -rot * 20 * linear_map(cycle_time, 0.25, 1, 8, 1)
+            rot = -rot * 20 * linear_map(cycle_time, 0.25, 1, 6, 1)
         move_command.direction.linear.x = x
         move_command.direction.linear.y = y
         move_command.direction.angular.z = math.radians(rot)
         move_command.lift_height = lift_height
         move_command.cycle_time = cycle_time
         # check if message has changed
-        message_changed = (self._hopper_move_command_msg.direction.linear.x != move_command.direction.linear.x or
-        self._hopper_move_command_msg.direction.linear.y != move_command.direction.linear.y or
-        self._hopper_move_command_msg.direction.angular.z != move_command.direction.angular.z or
-        self._hopper_move_command_msg.lift_height != move_command.lift_height or
-        self._hopper_move_command_msg.cycle_time != move_command.cycle_time or
+        message_changed = (self._hopper_move_command_msg != move_command or
         self.last_stance_msg != stance or
         self.last_single_leg_msg != single_leg_command)
         if message_changed:

@@ -73,10 +73,16 @@ class HexapodController(object):
 
     def on_nav_system_move_command(self, move_command):
         # convert directions from meter to cm
-        max_theta_vel = rospy.get_param("hopper/max_theta_vel", default=0.2)
-        max_vel = rospy.get_param("hopper/max_linear_vel", default=0.3)
+        # max_theta_vel = rospy.get_param("hopper/max_theta_vel", default=2)
+        # max_vel = rospy.get_param("hopper/max_linear_vel", default=0.3)
+        max_theta_vel = 2
+        max_vel = 0.3
         speed = math.sqrt(move_command.linear.x**2 + move_command.linear.y **2)
-        cycle_time = linear_map(speed, 0, 0.3, 1, 0.25)
+        cycle_time = 1.0
+        if abs(speed) > 0.05:
+            cycle_time = linear_map(speed, 0, 0.3, 1, 0.25)
+        if abs(move_command.angular.z) > 0.1:
+            cycle_time = linear_map(speed, 0, 2, 1, 0.25)
         cycle_time = constrain(cycle_time, 1, 0.25)
 
         if abs(move_command.angular.z) > max_theta_vel:

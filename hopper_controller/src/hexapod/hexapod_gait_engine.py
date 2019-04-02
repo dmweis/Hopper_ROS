@@ -389,7 +389,7 @@ class TripodGait(object):
             .transform(grounded_legs_vector_to_relaxed, grounded_legs) \
             .transform(Vector3(-distance.x / 2, -distance.y / 2, 0), grounded_legs) \
             .turn(-angle / 2, grounded_legs)
-        self._step_to_position(lifted_legs, target_position, cycle_length, leg_lift_height)
+        self._step_to_position(lifted_legs, target_position, cycle_length, leg_lift_height, velocity)
         self._velocity_publisher.update_move(velocity * cycle_length)
         self._velocity_publisher.update_velocity(Vector2(), 0)
 
@@ -398,7 +398,7 @@ class TripodGait(object):
         target_position = start_position.update_from_other(target_stance, lifted_legs)
         self._step_to_position(lifted_legs, target_position, cycle_length, leg_lift_height)
 
-    def _step_to_position(self, lifted_legs, target_position, cycle_length, leg_lift_height):
+    def _step_to_position(self, lifted_legs, target_position, cycle_length, leg_lift_height, velocity=Vector2()):
         start_position = self.last_written_position.clone()
         start_time = rospy.get_time()
         step_time = 0.0
@@ -415,6 +415,7 @@ class TripodGait(object):
                                                                       leg_lift_height)
             self.last_written_position = new_position
             self._ik_driver.move_legs_synced(self.last_written_position)
+            self._velocity_publisher.temporary_update_move(velocity * cycle_length * step_portion)
             self.publish_height()
             self._ros_rate.sleep()
 

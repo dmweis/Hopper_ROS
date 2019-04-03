@@ -150,7 +150,7 @@ class OdomPublisher(object):
     def publish(self):
         if not self.init_direction_known:
             yaw = self.imu_reader.get_yaw()
-            if yaw not None:
+            if yaw is not None:
                 # if yaw is known
                 current_orientation = transformations.quaternion_from_euler(0, 0, yaw)
                 # set tf message

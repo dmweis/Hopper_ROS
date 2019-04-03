@@ -57,7 +57,10 @@ class OdomPublisher(object):
         """
         :type motion: Vector2
         """
-        current_orientation = transformations.quaternion_from_euler(0, 0, self.imu_reader.get_yaw())
+        yaw = self.imu_reader.get_yaw()
+        if yaw is None:
+            yaw = 0
+        current_orientation = transformations.quaternion_from_euler(0, 0, yaw)
         current_rotation = transformations.euler_from_quaternion(current_orientation)[2]
         temporary_odometry_position = self.odometry_position + motion.rotate_by_angle_rad(current_rotation)
         tf_message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)
@@ -85,7 +88,10 @@ class OdomPublisher(object):
         """
         :type motion: Vector2
         """
-        current_orientation = transformations.quaternion_from_euler(0, 0, self.imu_reader.get_yaw())
+        yaw = self.imu_reader.get_yaw()
+        if yaw is None:
+            yaw = 0
+        current_orientation = transformations.quaternion_from_euler(0, 0, yaw)
         current_rotation = transformations.euler_from_quaternion(current_orientation)[2]
         self.odometry_position += motion.rotate_by_angle_rad(current_rotation)
         tf_message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)

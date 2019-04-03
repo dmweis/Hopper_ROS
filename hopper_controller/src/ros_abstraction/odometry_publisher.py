@@ -44,6 +44,7 @@ class OdomPublisher(object):
         self._odom_publisher = rospy.Publisher('robot_odom', Odometry, queue_size=10)
         self._parent_link_name = parent_link_name
         self._child_link_name = child_link_name
+        self.init_direction_known = False
         # initialize default tf transform
         self._last_tf_odometry_message = create_empty_transform_stamped(self._parent_link_name, self._child_link_name)
         self.odometry_rotation = transformations.quaternion_from_euler(0, 0, 0)
@@ -147,6 +148,22 @@ class OdomPublisher(object):
         self._last_odom_msg.twist.twist.angular.z = math.radians(theta)
 
     def publish(self):
+        if not self.init_direction_known:
+            yaw = self.imu_reader.get_yaw()
+            if yaw not None:
+                # if yaw is known
+                current_orientation = transformations.quaternion_from_euler(0, 0, yaw)
+                # set tf message
+                self._last_tf_odometry_message.transform.rotation.x = current_orientation[0]
+                self._last_tf_odometry_message.transform.rotation.y = current_orientation[1]
+                self._last_tf_odometry_message.transform.rotation.z = current_orientation[2]
+                self._last_tf_odometry_message.transform.rotation.w = current_orientation[3]
+                # set odom msg
+                self._last_odom_msg.pose.pose.orientation.x = current_orientation[0]
+                self._last_odom_msg.pose.pose.orientation.y = current_orientation[1]
+                self._last_odom_msg.pose.pose.orientation.z = current_orientation[2]
+                self._last_odom_msg.pose.pose.orientation.w = current_orientation[3]
+                self.init_direction_known = True
         now = rospy.Time.now()
         self._last_tf_odometry_message.header.stamp = now
         self._last_odom_msg.header.stamp = now

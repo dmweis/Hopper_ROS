@@ -18,7 +18,7 @@ class ImuReader(object):
     def __init__(self):
         super(ImuReader, self).__init__()
         self.initial_orientation = Quaternion(0, 0, 0, 1)
-        self.orientation = Vector3()
+        self.orientation = None
         rospy.Subscriber("hopper/imu/data", Imu, self.on_imu_msg, queue_size=10)
         rospy.Subscriber("hopper/imu/zero", Empty, self.on_imu_zero, queue_size=1)
 
@@ -36,4 +36,5 @@ class ImuReader(object):
         self.initial_orientation = None
 
     def get_yaw(self):
-        return self.orientation.z
+        if self.orientation is not None:
+            return self.orientation.z

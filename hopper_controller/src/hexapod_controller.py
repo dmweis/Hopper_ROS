@@ -81,7 +81,7 @@ class HexapodController(object):
         cycle_time = 1.0
         if abs(speed) > 0.05:
             cycle_time = linear_map(speed, 0, 0.3, 1, 0.25)
-        if abs(move_command.angular.z) > 0.1:
+        elif abs(move_command.angular.z) > 0.1:
             cycle_time = linear_map(speed, 0, 2, 1, 0.25)
         cycle_time = constrain(cycle_time, 1, 0.25)
 

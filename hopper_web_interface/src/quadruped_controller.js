@@ -3,11 +3,11 @@ const isLinux = process.platform.toLowerCase() === "linux";
 var hopperMoveCommandPublisher;
 var hopperStanceTranslateCommandPublisher;
 var hopperWalkingModePublisher;
-var hopperTelemetricsSubscriber;
-var telemetricsSubscribers = [];
+var hopperTelemetrySubscriber;
+var telemetrySubscribers = [];
 
-function telemetricsHandler(msg) {
-    telemetricsSubscribers.forEach(function (subscriber) {
+function telemetryHandler(msg) {
+    telemetrySubscribers.forEach(function (subscriber) {
         subscriber(msg);
     });
 }
@@ -18,13 +18,13 @@ if (isLinux) {
         .then((node) => {
             hopperMoveCommandPublisher = node.advertise('/hopper/move_command', 'hopper_msgs/HopperMoveCommand');
             hopperStanceTranslateCommandPublisher = node.advertise('/hopper/stance_translate', 'geometry_msgs/Twist');
-            hopperTelemetricsSubscriber = node.subscribe('/hopper_telemetrics', 'hopper_msgs/HexapodTelemetrics', telemetricsHandler);
+            hopperTelemetrySubscriber = node.subscribe('/hopper_telemetry', 'hopper_msgs/HexapodTelemetry', telemetryHandler);
         });
 }
 
-exports.registerForTelemetrics = function (callback) {
+exports.registerForTelemetry = function (callback) {
     if (isLinux) {
-        telemetricsSubscribers.push(callback);
+        telemetrySubscribers.push(callback);
     }
     else {
         console.log("Can not listen for topics if not on ROS platform");

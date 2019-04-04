@@ -3,7 +3,7 @@
 from threading import Lock
 import rospy
 
-from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
+from hopper_msgs.msg import ServoTelemetry, HexapodTelemetry
 from hopper_controller.msg import HexapodMotorPositions, LegMotorPositions, MotorCompliance, MotorSpeed, MotorTorque
 from hopper_controller.srv import ReadHexapodMotorPositions, ReadHexapodMotorPositionsResponse
 from dynamixel import DynamixelDriver, search_usb_2_ax_port
@@ -26,15 +26,15 @@ class BodyMotorController(object):
         rospy.Subscriber("hopper/body/motor_speed", MotorSpeed, self.on_speed_command, queue_size=5)
         rospy.Subscriber("hopper/body/motor_torque", MotorTorque, self.on_torque_command, queue_size=20)
         self.body_motor_positions_service = rospy.Service("hopper/read_hexapod_motor_positions", ReadHexapodMotorPositions, self.read_hexapod_motor_positions)
-        self.telementrics_publisher = rospy.Publisher('hopper_telemetrics', HexapodTelemetrics, queue_size=5)
-        telemetrics_update_interval = rospy.Duration.from_sec(0.5)
-        self.telemetrics_motor_id_index = 0
+        self.telementrics_publisher = rospy.Publisher('hopper_telemetry', HexapodTelemetry, queue_size=5)
+        telemetry_update_interval = rospy.Duration.from_sec(0.5)
+        self.telemetry_motor_id_index = 0
         while not rospy.is_shutdown():
-            rospy.sleep(telemetrics_update_interval)
+            rospy.sleep(telemetry_update_interval)
             try:
-                self.read_motor_telemetrics()
+                self.read_motor_telemetry()
             except IOError as e:
-                rospy.logerr("IOError on telemetrics read " + str(e))
+                rospy.logerr("IOError on telemetry read " + str(e))
         with self.driver_lock:
             for servo_id in self.servo_ids:
                 self.servo_driver.set_torque(servo_id, False)
@@ -105,17 +105,17 @@ class BodyMotorController(object):
             msg.right_rear = read_leg(self.leg_data["right_rear"])
         return ReadHexapodMotorPositionsResponse(msg)
 
-    def read_motor_telemetrics(self):
-        robot_telemetrics = HexapodTelemetrics()
+    def read_motor_telemetry(self):
+        robot_telemetry = HexapodTelemetry()
         with self.driver_lock:
-            servo_id = self.servo_ids[self.telemetrics_motor_id_index]
+            servo_id = self.servo_ids[self.telemetry_motor_id_index]
             voltage = self.servo_driver.read_voltage(servo_id)
             temperature = self.servo_driver.read_temperature(servo_id)
-            robot_telemetrics.servos.append(ServoTelemetrics(servo_id, temperature, voltage))
-        self.telemetrics_motor_id_index += 1
-        if self.telemetrics_motor_id_index > len(self.servo_ids) - 1:
-            self.telemetrics_motor_id_index = 0
-        self.telementrics_publisher.publish(robot_telemetrics)
+            robot_telemetry.servos.append(ServoTelemetry(servo_id, temperature, voltage))
+        self.telemetry_motor_id_index += 1
+        if self.telemetry_motor_id_index > len(self.servo_ids) - 1:
+            self.telemetry_motor_id_index = 0
+        self.telementrics_publisher.publish(robot_telemetry)
 
 
 if __name__ == '__main__':

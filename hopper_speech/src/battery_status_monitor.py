@@ -5,7 +5,7 @@ from __future__ import division
 import rospy
 
 from std_msgs.msg import String
-from hopper_msgs.msg import ServoTelemetrics, HexapodTelemetrics
+from hopper_msgs.msg import ServoTelemetry, HexapodTelemetry
 
 def mean(numbers):
     return sum(numbers) / max(len(numbers), 1)
@@ -23,11 +23,11 @@ class BatteryStatusMonitor(object):
         self.voltages = {}
         self.first_check = True
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
-        self.telemetrics_sub = rospy.Subscriber("hopper_telemetrics", HexapodTelemetrics, self.on_new_telemetrics, queue_size=1)
+        self.telemetry_sub = rospy.Subscriber("hopper_telemetry", HexapodTelemetry, self.on_new_telemetry, queue_size=1)
         self.last_critical_voltage_warning = rospy.Time.now() + self.critical_voltage_warning_period
         rospy.spin()
 
-    def on_new_telemetrics(self, message):
+    def on_new_telemetry(self, message):
         for servo in message.servos:
             self.voltages[servo.id] = servo.voltage
         if len(self.voltages) == SERVO_COUNT:

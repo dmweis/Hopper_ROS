@@ -34,8 +34,8 @@ app.get('/fastStance', function (req, res) {
     res.sendFile(__dirname + "/fastStance.html");
 });
 
-robot.registerForTelemetrics(function (msg) {
-    io.sockets.emit('telemetrics', msg);
+robot.registerForTelemetry(function (msg) {
+    io.sockets.emit('telemetry', msg);
 });
 
 io.on('connection', function (socket) {

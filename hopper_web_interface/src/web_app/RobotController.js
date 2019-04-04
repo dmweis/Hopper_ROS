@@ -1,7 +1,7 @@
 ﻿var socket = createSocketIOConnection();
 
-const telemetricsVm = new Vue({
-    el: '#telemetrics_display',
+const telemetryVm = new Vue({
+    el: '#telemetry_display',
     data: {
         averageTemperature: 0,
         averageVoltage: 0,
@@ -21,16 +21,16 @@ const telemetricsVm = new Vue({
 });
 
 setInterval(function () {
-    telemetricsVm.connected = socket.connected;
+    telemetryVm.connected = socket.connected;
 }, 250);
 
-socket.on('telemetrics', function (msg) {
+socket.on('telemetry', function (msg) {
     const voltageSum = msg.servos.reduce(function (acum, servo) { return acum + servo.voltage; }, 0);
     const temperatureSum = msg.servos.reduce(function (acum, servo) { return acum + servo.temperature; }, 0);
     const averageVoltage = voltageSum / msg.servos.length;
     const averageTemperature = temperatureSum / msg.servos.length;
-    telemetricsVm.averageVoltage = averageVoltage;
-    telemetricsVm.averageTemperature = averageTemperature;
+    telemetryVm.averageVoltage = averageVoltage;
+    telemetryVm.averageTemperature = averageTemperature;
 });
 
 const movementJoystick = createJoystick({

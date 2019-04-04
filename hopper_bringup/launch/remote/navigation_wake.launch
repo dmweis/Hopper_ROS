@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <include file="$(find hopper_bringup)/launch/remote/teleop.launch" />
+    <!-- <include file="$(find hopper_bringup)/launch/remote/teleop.launch" /> -->
     <include file="$(find hopper_bringup)/launch/remote/gmapping.launch" />
-    <node name="move_base" pkg="move_base" type="move_base">
+    <node name="move_base" pkg="move_base" type="move_base" output="screen">
         <rosparam file="$(find hopper_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
         <rosparam file="$(find hopper_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find hopper_navigation)/config/local_costmap_params.yaml" command="load" />

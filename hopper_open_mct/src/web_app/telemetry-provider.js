@@ -42,12 +42,25 @@ function TelemetryPlugin() {
                     });
                     console.log("Subscribing to " + domainObject.identifier.key)
                     hopper_voltage_topic.subscribe(function (message) {
-                        // console.log('Received message on ' + hopper_voltage_topic.name + ': ' + JSON.stringify(message));
                         callback({ "id": "property.battery", "value": message.voltage, "percentage":message.percentage, "timestamp": new Date() });
-                        // If desired, we can unsubscribe from the topic as well.
                     });
                     return function () {
                         hopper_voltage_topic.unsubscribe();
+                        console.log("Unsubscribed from hopper");
+                    }
+                } else if (domainObject.identifier.key === "property.controller.active"){
+                    var hopper_face_tracking_on = new ROSLIB.Topic({
+                        ros: ros,
+                        name: 'hopper/face_tracking_enabled',
+                        messageType: 'std_msgs/Bool'
+                    });
+                    console.log("Subscribing to " + domainObject.identifier.key)
+                    hopper_face_tracking_on.subscribe(function (message) {
+                        var data = message.data ? "Enabled" : "Disabled";
+                        callback({ "id": "property.controller.active", "value": data, "timestamp": new Date() });
+                    });
+                    return function () {
+                        hopper_face_tracking_on.unsubscribe();
                         console.log("Unsubscribed from hopper");
                     }
                 }

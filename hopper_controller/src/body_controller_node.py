@@ -27,7 +27,7 @@ class BodyMotorController(object):
         rospy.Subscriber("hopper/body/motor_torque", MotorTorque, self.on_torque_command, queue_size=20)
         self.body_motor_positions_service = rospy.Service("hopper/read_hexapod_motor_positions", ReadHexapodMotorPositions, self.read_hexapod_motor_positions)
         self.telementrics_publisher = rospy.Publisher('hopper_telemetry', HexapodTelemetry, queue_size=5)
-        telemetry_update_interval = rospy.Duration.from_sec(0.5)
+        telemetry_update_interval = rospy.Duration.from_sec(0.1)
         self.telemetry_motor_id_index = 0
         while not rospy.is_shutdown():
             rospy.sleep(telemetry_update_interval)

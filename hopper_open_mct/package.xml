@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>hopper_open_mct/</name>
+  <version>0.0.0</version>
+  <description>The hopper_open_mct/ package</description>
+
+  <maintainer email="ubuntu@todo.todo">ubuntu</maintainer>
+
+
+  <license>MIT</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>geometry_msgs</depend>
+  <depend>hopper_msgs</depend>
+
+
+  <export>
+
+  </export>
+</package>

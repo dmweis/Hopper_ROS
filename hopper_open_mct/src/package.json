@@ -1,0 +1,18 @@
+{
+  "name": "hopper_open_mct",
+  "version": "0.0.0",
+  "description": "open MCT interface for hopper",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "David Weis",
+  "license": "MIT",
+  "dependencies": {
+    "eventemitter2": "^5.0.1",
+    "express": "^4.16.4",
+    "openmct": "github:nasa/openmct",
+    "roslib": "^1.0.1"
+  }
+}

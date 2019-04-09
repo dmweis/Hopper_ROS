@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Open MCT Tutorials</title>
+    <script src="openmct/openmct.js"></script>
+    <script src="http.js"></script>
+    <script src="eventemitter2/eventemitter2.js"></script>
+    <script src="roslib/roslib.js"></script>
+    <script src="hopper-plugin.js"></script>
+    <script src="telemetry-provider.js"></script>
+</head>
+
+<body>
+    <script>
+        openmct.setAssetPath('openmct');
+        openmct.install(openmct.plugins.LocalStorage());
+        openmct.install(openmct.plugins.MyItems());
+        openmct.install(openmct.plugins.UTCTimeSystem());
+        // openmct.time.clock('local', { start: -15 * 60 * 1000, end: 0 });
+        openmct.time.clock('local', { start: -1, end: 0 });
+        openmct.time.timeSystem('utc');
+        openmct.install(openmct.plugins.Espresso());
+
+        openmct.install(HopperPlugin());
+        openmct.install(TelemetryPlugin());
+        // openmct.install(HistoricalTelemetryPlugin());
+        // openmct.install(RealtimeTelemetryPlugin());
+
+        openmct.start();
+    </script>
+</body>
+
+</html>

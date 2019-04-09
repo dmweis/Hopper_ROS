@@ -1,0 +1,58 @@
+{
+    "name": "Hopper",
+    "key": "hopper",
+    "measurements": [
+        {
+            "name": "Battery voltage",
+            "key": "property.battery.voltage",
+            "values": [
+                {
+                    "key": "value",
+                    "name": "Voltage",
+                    "units": "Volts",
+                    "format": "float",
+                    "min": 0,
+                    "max": 100,
+                    "hints": {
+                        "range": 1
+                    }
+                },
+                {
+                    "key": "utc",
+                    "source": "timestamp",
+                    "name": "Timestamp",
+                    "format": "utc",
+                    "hints": {
+                        "domain": 1
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Battery percentage",
+            "key": "property.battery.percentage",
+            "values": [
+                {
+                    "key": "percentage",
+                    "name": "Percentage",
+                    "units": "%",
+                    "format": "float",
+                    "min": 0,
+                    "max": 100,
+                    "hints": {
+                        "range": 1
+                    }
+                },
+                {
+                    "key": "utc",
+                    "source": "timestamp",
+                    "name": "Timestamp",
+                    "format": "utc",
+                    "hints": {
+                        "domain": 1
+                    }
+                }
+            ]
+        }
+    ]
+}

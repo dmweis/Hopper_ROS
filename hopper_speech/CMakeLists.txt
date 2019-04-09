@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   hopper_msgs
+  sensor_msgs
 )
 
 include_directories(

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py"/>
+    <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>
+    <node name="hopper_battery_mock" pkg="hopper_speech" type="fake_battery_simulator.py"/>
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+</launch>
+

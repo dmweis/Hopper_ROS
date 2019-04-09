@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>hopper_open_mct/</name>
+  <name>hopper_open_mct</name>
   <version>0.0.0</version>
-  <description>The hopper_open_mct/ package</description>
+  <description>The hopper_open_mct package</description>
 
-  <maintainer email="ubuntu@todo.todo">ubuntu</maintainer>
+  <maintainer email="davidmichaelweis@gmail.com">David Weis</maintainer>
 
 
   <license>MIT</license>

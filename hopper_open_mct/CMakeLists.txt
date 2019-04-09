@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(hopper_open_mct/)
+project(hopper_open_mct)
 
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs

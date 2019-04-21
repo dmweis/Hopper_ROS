@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <arg name="model" default="$(find hopper_description)/urdf/hopper.xarco"/>
+    <arg name="model" default="$(find hopper_description)/urdf/hopper.xacro"/>
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
     <node name="join_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
     <param name="use_gui" value="true"/>

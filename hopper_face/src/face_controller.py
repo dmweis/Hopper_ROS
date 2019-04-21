@@ -176,7 +176,7 @@ class LedController(object):
             line = self.port.readline()
             data = line.split(',')
             if len(data) != 14:
-                return
+                continue
             imu_msg = Imu()
             imu_msg.header.frame_id = "imu"
             imu_msg.header.stamp = rospy.Time.now()

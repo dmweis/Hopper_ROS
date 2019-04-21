@@ -6,12 +6,14 @@ from threading import Thread
 import serial
 import random
 import rospy
+import tf2_ros
 
 from cobs import cobs
 from colorsys import hsv_to_rgb, rgb_to_hsv
 from rospy import sleep
 from std_msgs.msg import String, Bool
 from sensor_msgs.msg import Imu
+from geometry_msgs.msg import TransformStamped
 
 PIXEL_COUNT = 40
 
@@ -172,6 +174,7 @@ class LedController(object):
         self.port.write(ColorPacket().to_data())
 
     def read_loop(self):
+        transform_broadcaster = tf2_ros.TransformBroadcaster()
         while not rospy.is_shutdown():
             line = self.port.readline()
             data = line.split(',')
@@ -196,6 +199,17 @@ class LedController(object):
             imu_msg.angular_velocity.z = float(data[9])
             imu_msg.angular_velocity_covariance[0] = -1
             self.imu_publisher.publish(imu_msg)
+
+            transform_stamped = TransformStamped()
+            transform_stamped.header.frame_id = "imu"
+            transform_stamped.child_frame_id = "imu_plane"
+            transform_stamped.header.stamp = rospy.Time.now()
+            transform_stamped.transform.rotation.x = float(data[0])
+            transform_stamped.transform.rotation.y = float(data[1])
+            transform_stamped.transform.rotation.z = float(data[2])
+            transform_stamped.transform.rotation.w = float(data[3])
+            transform_broadcaster.sendTransform(transform_stamped)
+
 
     def run(self):
         with serial.Serial('/dev/hopper_face', 115200) as port:

@@ -212,8 +212,12 @@ class BodyOrientationPublisher(object):
             imu_transform = self.tf_buffer.lookup_transform('base_link', 'imu_plane', rospy.Time())
             imu_rotation = imu_transform.transform.rotation
             euler = transformations.euler_from_quaternion([imu_rotation.x, imu_rotation.y, imu_rotation.z, imu_rotation.w])
-            rospy.logerr(map(math.degrees, euler))
+            new_orientation = transformations.quaternion_from_euler([-euler[0], euler[1], 0])
+            self.last_message.rotation.x = new_orientation[0]
+            self.last_message.rotation.y = new_orientation[1]
+            self.last_message.rotation.z = new_orientation[2]
+            self.last_message.rotation.w = new_orientation[3]
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             return
         self.last_message.header.stamp = rospy.Time.now()
-        #self.transform_broadcaster.sendTransform(self._last_message)
+        self.transform_broadcaster.sendTransform(self.last_message)

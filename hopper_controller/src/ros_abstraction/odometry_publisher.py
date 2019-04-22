@@ -199,7 +199,7 @@ class BodyOrientationPublisher(object):
     def __init__(self, message_publisher, parent_link_name="base_stabilized", child_link_name="base_link"):
         super(BodyOrientationPublisher, self).__init__()
         self.tf_buffer = tf2_ros.Buffer()
-        self.tf_listener = tf2_ros.TransformListener(tfBuffer)
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
         self.transform_broadcaster = transform_broadcaster
         self.parent_link_name = parent_link_name
         self.child_link_name = child_link_name

@@ -7,7 +7,7 @@ class MessagePublisher(Thread):
         super(MessagePublisher, self).__init__()
         self.keep_running = True
         self.publishers = []
-        self.publish_rate = rospy.Rate(30)
+        self.publish_rate = rospy.Rate(60)
         self.start()
 
     def register_publisher(self, publisher):

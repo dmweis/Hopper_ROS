@@ -6,6 +6,7 @@ from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
 import tf2_ros
 from hexapod import Vector3, Vector2
+from threading import Thread
 
 
 def create_empty_transform_stamped(parent_name, child_name):
@@ -195,9 +196,11 @@ class HeightPublisher(object):
         self._last_message.header.stamp = rospy.Time.now()
         self._transform_broadcaster.sendTransform(self._last_message)
 
-class BodyOrientationPublisher(object):
-    def __init__(self, message_publisher, parent_link_name="base_stabilized", child_link_name="base_link"):
+
+class BodyOrientationPublisher(Thread):
+    def __init__(self, parent_link_name="base_stabilized", child_link_name="base_link"):
         super(BodyOrientationPublisher, self).__init__()
+        self.publish_rate = rospy.Rate(60)
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
         self.transform_broadcaster = transform_broadcaster
@@ -205,7 +208,14 @@ class BodyOrientationPublisher(object):
         self.child_link_name = child_link_name
         # initialize default tf transform
         self.last_message = create_empty_transform_stamped(self.parent_link_name, self.child_link_name)
-        message_publisher.register_publisher(self)
+
+    def run(self):
+        while not rospy.is_shutdown() and self.keep_running:
+            self.publish()
+            self.publish_rate.sleep()
+
+    def stop(self):
+        self.keep_running = False
 
     def publish(self):
         try:

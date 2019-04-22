@@ -194,3 +194,25 @@ class HeightPublisher(object):
     def publish(self):
         self._last_message.header.stamp = rospy.Time.now()
         self._transform_broadcaster.sendTransform(self._last_message)
+
+class BodyOrientationPublisher(object):
+    def __init__(self, message_publisher, parent_link_name="base_stabilized", child_link_name="base_link"):
+        super(BodyOrientationPublisher, self).__init__()
+        self.tf_buffer = tf2_ros.Buffer()
+        self.tf_listener = tf2_ros.TransformListener(tfBuffer)
+        self.transform_broadcaster = transform_broadcaster
+        self.parent_link_name = parent_link_name
+        self.child_link_name = child_link_name
+        # initialize default tf transform
+        self.last_message = create_empty_transform_stamped(self.parent_link_name, self.child_link_name)
+        message_publisher.register_publisher(self)
+
+    def publish(self):
+        try:
+            imu_transform = self.tf_buffer.lookup_transform("base_link", 'imu_plane', rospy.Time())
+            euler = transformations.euler_from_quaternion(imu_transform.x, imu_transform.y, imu_transform.z, imu_transform.w)
+            rospy.logerr(euler)
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+            return
+        self.last_message.header.stamp = rospy.Time.now()
+        self.transform_broadcaster.sendTransform(self._last_message)

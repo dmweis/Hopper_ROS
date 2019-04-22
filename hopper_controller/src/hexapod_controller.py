@@ -34,6 +34,7 @@ class HexapodController(object):
         body_controller = ros_abstraction.HexapodBodyController()
         message_publisher = ros_abstraction.MessagePublisher()
         controller_telemetry = ros_abstraction.ControllerTelemetryPublisher()
+        self.orientation_publisher = ros_abstraction.BodyOrientationPublisher(message_publisher)
         tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
                                  ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
         gait_engine = GaitEngine(tripod_gait)

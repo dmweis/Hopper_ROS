@@ -54,7 +54,7 @@
     <joint name="body_imu_joint" type="fixed">
         <parent link="body_link" />
         <child link="imu" />
-        <origin xyz="0.025 0 0" rpy="0 0 ${pi}"/>
+        <origin xyz="0.025 0 0" rpy="${pi} 0 ${pi}"/>
     </joint>
     <!-- Stereo camera  -->
     <link name="stereo_camera"/>

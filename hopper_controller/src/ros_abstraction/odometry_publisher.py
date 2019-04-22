@@ -212,7 +212,7 @@ class BodyOrientationPublisher(object):
             imu_transform = self.tf_buffer.lookup_transform('base_link', 'imu_plane', rospy.Time())
             imu_rotation = imu_transform.transform.rotation
             euler = transformations.euler_from_quaternion([imu_rotation.x, imu_rotation.y, imu_rotation.z, imu_rotation.w])
-            new_orientation = transformations.quaternion_from_euler([-euler[0], euler[1], 0])
+            new_orientation = transformations.quaternion_from_euler(-euler[0], euler[1], 0)
             self.last_message.rotation.x = new_orientation[0]
             self.last_message.rotation.y = new_orientation[1]
             self.last_message.rotation.z = new_orientation[2]

@@ -208,6 +208,7 @@ class BodyOrientationPublisher(Thread):
         self.child_link_name = child_link_name
         # initialize default tf transform
         self.last_message = create_empty_transform_stamped(self.parent_link_name, self.child_link_name)
+        self.start()
 
     def run(self):
         while not rospy.is_shutdown() and self.keep_running:

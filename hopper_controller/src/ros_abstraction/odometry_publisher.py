@@ -200,6 +200,7 @@ class HeightPublisher(object):
 class BodyOrientationPublisher(Thread):
     def __init__(self, parent_link_name="base_stabilized", child_link_name="base_link"):
         super(BodyOrientationPublisher, self).__init__()
+        self.keep_running = True
         self.publish_rate = rospy.Rate(60)
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)

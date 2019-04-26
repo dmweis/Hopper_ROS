@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>hopper_laser</name>
+  <version>0.0.0</version>
+  <description>The hopper_laser package</description>
+
+  <maintainer email="dweis7@gmail.com">dweis</maintainer>
+
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>geometry_msgs</depend>
+  <depend>laser_assembler</depend>
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>tf</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>

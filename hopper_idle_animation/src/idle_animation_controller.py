@@ -79,6 +79,8 @@ class IdleAnimationController(object):
 
     def on_idle_animations_enabled(self, msg):
         self.animations_enabled = msg.data
+        if not self.animations_enabled:
+            self.reset_breathing_height()
 
     def idler_check(self):
         if self.animations_enabled and self.is_idle():
@@ -96,6 +98,11 @@ class IdleAnimationController(object):
             msg = Twist()
             msg.linear.z = cos(pi * current_progress) * self.breathing_variation + self.robot_height
             self.translation_publisher.publish(msg)
+    
+    def reset_breathing_height(self):
+        msg = Twist()
+        msg.linear.z = self.robot_height
+        self.translation_publisher.publish(msg)
 
 
 if __name__ == "__main__":

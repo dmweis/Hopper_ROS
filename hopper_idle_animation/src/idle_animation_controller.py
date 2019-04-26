@@ -44,10 +44,11 @@ class IdleAnimationController(object):
         rospy.Subscriber("hopper_schedule_move", String, self.on_move_scheduled, queue_size=1)
         self.animation_publisher = rospy.Publisher("hopper_schedule_move", String, queue_size=5)
         self.translation_publisher = rospy.Publisher("hopper/stance_translate", Twist, queue_size=5)
+        rate = rospy.Rate(30)
         while not rospy.is_shutdown():
             self.idler_check()
             self.breathing_tick()
-            rospy.sleep(0.01)
+            rate.sleep()
 
     def on_move_command(self, msg):
         moving = msg.direction.linear.x != 0 or \

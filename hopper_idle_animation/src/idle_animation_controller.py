@@ -64,7 +64,6 @@ class IdleAnimationController(object):
             return
         self.last_action_time = rospy.Time.now()
         self.robot_height = msg.linear.z
-        self.current_breathing_offset = 0.0
 
     def on_move_scheduled(self, msg):
         if msg._connection_header["callerid"] == rospy.get_name():
@@ -90,6 +89,7 @@ class IdleAnimationController(object):
     def breathing_tick(self):
         if self.animations_enabled and rospy.Time.now() - self.last_action_time > self.idle_timeout:
             if rospy.get_time() - self.last_breathing_direction_change_time >= self.breathing_period:
+                self.last_breathing_direction_change = rospy.get_time()
                 self.breathing_variation = -self.breathing_variation
             current_progress = (rospy.get_time() - self.last_breathing_direction_change_time) / self.breathing_period
             msg = Twist()

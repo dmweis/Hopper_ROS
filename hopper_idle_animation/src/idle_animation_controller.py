@@ -93,7 +93,7 @@ class IdleAnimationController(object):
                 self.breathing_variation = -self.breathing_variation
             current_progress = (rospy.get_time() - self.last_breathing_direction_change_time) / self.breathing_period
             msg = Twist()
-            msg.linear.z = cos(pi * current_progress) * self.breathing_variation * self.robot_height
+            msg.linear.z = cos(pi * current_progress) * self.breathing_variation + self.robot_height
             self.translation_publisher.publish(msg)
 
 

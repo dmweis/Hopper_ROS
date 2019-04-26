@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
+from __future__ import division
+
 import random
 import rospy
 
 from random import randint
+from math import cos, pi
 from hopper_msgs.msg import HopperMoveCommand
 from std_msgs.msg import String, Bool
 from geometry_msgs.msg import Twist
@@ -17,19 +20,8 @@ IDLE_ANIMATIONS = [
 ]
 
 
-def move_towards(target, current, step=1):
-    if abs(target-current) < step:
-        return target, True
-    else:
-        if target > current:
-            return current + step, False
-        else:
-            return current - step, False
-
-
 class IdleAnimationController(object):
-
-    breathing_variation = 0.005
+    breathing_period = 3.0
 
     def __init__(self):
         super(IdleAnimationController, self).__init__()
@@ -42,9 +34,9 @@ class IdleAnimationController(object):
         self.idle_action_timeout = rospy.Duration(randint(15, 30))
 
         self.robot_height = 0.0
-        self.current_breathing_offset = 0.0
-        self.breathing_up = True
-        
+        self.last_breathing_direction_change_time = rospy.get_time()
+        self.breathing_variation = 0.005
+
         self.animations_enabled = rospy.get_param("idle_enabled_startup", False)
         rospy.Subscriber("hopper/idle_animations/enabled", Bool, self.on_idle_animations_enabled, queue_size=10)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command, queue_size=10)
@@ -97,14 +89,11 @@ class IdleAnimationController(object):
 
     def breathing_tick(self):
         if self.animations_enabled and rospy.Time.now() - self.last_action_time > self.idle_timeout:
-            current_target = self.breathing_variation
-            if not self.breathing_up:
-                current_target = -current_target
-            self.current_breathing_offset, done = move_towards(current_target, self.current_breathing_offset, 0.0001)
-            if done:
-                self.breathing_up = not self.breathing_up
+            if rospy.get_time() - self.last_breathing_direction_change_time >= self.breathing_period:
+                self.breathing_variation = -self.breathing_variation
+            current_progress = (rospy.get_time() - self.last_breathing_direction_change_time) / self.breathing_period
             msg = Twist()
-            msg.linear.z = self.robot_height + self.current_breathing_offset
+            msg.linear.z = cos(pi * current_progress) * self.breathing_variation * self.robot_height
             self.translation_publisher.publish(msg)
 
 

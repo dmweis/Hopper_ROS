@@ -21,7 +21,7 @@ IDLE_ANIMATIONS = [
 
 
 class IdleAnimationController(object):
-    breathing_period = 3.0
+    breathing_period = 2.0
 
     def __init__(self):
         super(IdleAnimationController, self).__init__()
@@ -87,9 +87,9 @@ class IdleAnimationController(object):
             self.last_idle_action_time = rospy.Time.now()
 
     def breathing_tick(self):
-        if self.animations_enabled and rospy.Time.now() - self.last_action_time > self.idle_timeout:
-            if rospy.get_time() - self.last_breathing_direction_change_time >= self.breathing_period:
-                self.last_breathing_direction_change = rospy.get_time()
+        if self.animations_enabled:
+            if rospy.get_time() - self.last_breathing_direction_change_time > self.breathing_period:
+                self.last_breathing_direction_change_time = rospy.get_time()
                 self.breathing_variation = -self.breathing_variation
             current_progress = (rospy.get_time() - self.last_breathing_direction_change_time) / self.breathing_period
             msg = Twist()

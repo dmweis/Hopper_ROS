@@ -52,6 +52,11 @@ class LaserScanner(object):
 
     def on_scanner_active_msg(self, msg):
         self.scanner_active = msg.data
+        if not self.scanner_active:
+            rospy.sleep(0.5)
+            self.robot_pose.angular.y = 0
+            self.stance_translate.publish(self.robot_pose)
+
 
     def on_scanner_time(self, msg):
         self.scan_time = msg.data

@@ -17,5 +17,6 @@
     <include file="$(find hopper_bringup)/launch/sensors/face_tracking.launch"/>
     <include file="$(find hopper_bringup)/launch/sensors/laser_wake.launch" />
     <include file="$(find hopper_bringup)/launch/description/description.launch" />
+    <include file="$(find hopper_bringup)/launch/testing/laser_assemble.launch" />
 </launch>
 

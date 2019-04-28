@@ -27,6 +27,8 @@ Panels:
     Name: Time
     SyncMode: 0
     SyncSource: LaserScan
+Toolbars:
+  toolButtonStyle: 2
 Visualization Manager:
   Class: ""
   Displays:
@@ -67,15 +69,15 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        base_stabilized:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         body_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+        imu:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         laser:
           Alpha: 1
           Show Axes: false
@@ -227,6 +229,10 @@ Visualization Manager:
           Value: true
         body_link:
           Value: true
+        imu:
+          Value: true
+        imu_plane:
+          Value: true
         laser:
           Value: true
         left_camera:
@@ -254,6 +260,8 @@ Visualization Manager:
         left_rear_leg_base:
           Value: true
         left_rear_tibia:
+          Value: true
+        odom:
           Value: true
         right_camera:
           Value: true
@@ -289,49 +297,53 @@ Visualization Manager:
       Show Axes: false
       Show Names: false
       Tree:
-        base_footprint:
-          base_stabilized:
-            base_link:
-              arrow:
-                {}
-              body_link:
-                laser:
+        odom:
+          base_footprint:
+            base_stabilized:
+              base_link:
+                arrow:
                   {}
-                left_front_leg_base:
-                  left_front_coxa:
-                    left_front_femur:
-                      left_front_tibia:
-                        {}
-                left_middle_leg_base:
-                  left_middle_coxa:
-                    left_middle_femur:
-                      left_middle_tibia:
-                        {}
-                left_rear_leg_base:
-                  left_rear_coxa:
-                    left_rear_femur:
-                      left_rear_tibia:
-                        {}
-                right_front_leg_base:
-                  right_front_coxa:
-                    right_front_femur:
-                      right_front_tibia:
-                        {}
-                right_middle_leg_base:
-                  right_middle_coxa:
-                    right_middle_femur:
-                      right_middle_tibia:
-                        {}
-                right_rear_leg_base:
-                  right_rear_coxa:
-                    right_rear_femur:
-                      right_rear_tibia:
-                        {}
-                stereo_camera:
-                  left_camera:
+                body_link:
+                  imu:
+                    imu_plane:
+                      {}
+                  laser:
                     {}
-                  right_camera:
-                    {}
+                  left_front_leg_base:
+                    left_front_coxa:
+                      left_front_femur:
+                        left_front_tibia:
+                          {}
+                  left_middle_leg_base:
+                    left_middle_coxa:
+                      left_middle_femur:
+                        left_middle_tibia:
+                          {}
+                  left_rear_leg_base:
+                    left_rear_coxa:
+                      left_rear_femur:
+                        left_rear_tibia:
+                          {}
+                  right_front_leg_base:
+                    right_front_coxa:
+                      right_front_femur:
+                        right_front_tibia:
+                          {}
+                  right_middle_leg_base:
+                    right_middle_coxa:
+                      right_middle_femur:
+                        right_middle_tibia:
+                          {}
+                  right_rear_leg_base:
+                    right_rear_coxa:
+                      right_rear_femur:
+                        right_rear_tibia:
+                          {}
+                  stereo_camera:
+                    left_camera:
+                      {}
+                    right_camera:
+                      {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -374,6 +386,36 @@ Visualization Manager:
       Unreliable: false
       Use Timestamp: false
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 1.64946389
+        Min Value: -0.471604943
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: AxisColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 47
+      Min Color: 0; 0; 0
+      Min Intensity: 47
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.00999999978
+      Style: Flat Squares
+      Topic: /hopper/assembled_scan
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -414,10 +456,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.75039804
+      Pitch: 0.685398042
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.12858105
+      Yaw: 2.20539474
     Saved: ~
 Window Geometry:
   Displays:

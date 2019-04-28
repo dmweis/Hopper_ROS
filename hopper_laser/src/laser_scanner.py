@@ -7,6 +7,7 @@ import rospy
 from math import cos, pi, radians
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import PointCloud2
+from std_msgs.msg import Bool
 from laser_assembler.srv import AssembleScans2, AssembleScans2Request
 
 class LaserScanner(object):
@@ -14,10 +15,11 @@ class LaserScanner(object):
         super(LaserScanner, self).__init__()
         rospy.init_node("hopper_laser_scanner")
         rospy.wait_for_service("assemble_scans2")
-        print "Service available"
+        self.scanner_active = rospy.get_param("laser_scanner_active_startup", default=False)
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
-        rospy.Subscriber("hopper/stance_translate", Twist, self.on_stance_msg, queue_size=10)
         self.point_cloud_publisher = rospy.Publisher("hopper/assembled_scan", PointCloud2, queue_size=2)
+        rospy.Subscriber("hopper/stance_translate", Twist, self.on_stance_msg, queue_size=10)
+        rospy.Subscriber("hopper/laser_scanner/active", Bool, self.on_scanner_active_msg, queue_size=10)
         self.assemble_scan = rospy.ServiceProxy("assemble_scans2", AssembleScans2, persistent=True)
         self.robot_pose = Twist()
         scan_time = 5.0
@@ -25,6 +27,9 @@ class LaserScanner(object):
         scan_start = rospy.get_time()
         update_rate = rospy.Rate(30)
         while not rospy.is_shutdown():
+            if not self.scanner_active:
+                rospy.sleep(0.5)
+                continue
             if rospy.get_time() - scan_start > scan_time:
                 request = AssembleScans2Request()
                 request.begin = rospy.Time.now() - rospy.Duration(scan_time)
@@ -43,6 +48,9 @@ class LaserScanner(object):
         if msg._connection_header["callerid"] == rospy.get_name():
             return
         self.robot_pose.linear.z = msg.linear.z
+
+    def on_scanner_active_msg(self, msg):
+        self.scanner_active = msg.data
 
 
 if __name__ == "__main__":

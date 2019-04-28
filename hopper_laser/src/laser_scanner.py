@@ -24,6 +24,8 @@ class LaserScanner(object):
         rospy.Subscriber("hopper/laser_scanner/scan_time", Float32, self.on_scanner_time, queue_size=10)
         self.assemble_scan = rospy.ServiceProxy("assemble_scans2", AssembleScans2, persistent=True)
         self.robot_pose = Twist()
+        last_pointcloud_time = rospy.get_time()
+        pointcloud_timeout = 0.5
         max_tilt_angle = radians(12.0)
         scan_start = rospy.get_time()
         update_rate = rospy.Rate(30)
@@ -31,12 +33,14 @@ class LaserScanner(object):
             if not self.scanner_active:
                 rospy.sleep(0.5)
                 continue
-            if rospy.get_time() - scan_start > self.scan_time:
+            if rospy.get_time() - last_pointcloud_time > pointcloud_timeout:
+                last_pointcloud_time = rospy.get_time()
                 request = AssembleScans2Request()
                 request.begin = rospy.Time.now() - rospy.Duration(self.scan_time)
                 request.end = rospy.Time.now()
                 point_cloud = self.assemble_scan(request).cloud
                 self.point_cloud_publisher.publish(point_cloud)
+            if rospy.get_time() - scan_start > self.scan_time:
                 scan_start = rospy.get_time()
                 max_tilt_angle = -max_tilt_angle
             current_progress = (rospy.get_time() - scan_start) / self.scan_time

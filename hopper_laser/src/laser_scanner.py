@@ -7,13 +7,14 @@ import rospy
 from math import cos, pi, radians
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import PointCloud2
-from laser_assembler.srv import AssembleScans2
+from laser_assembler.srv import AssembleScans2, AssembleScans2Request
 
 class LaserScanner(object):
     def __init__(self):
         super(LaserScanner, self).__init__()
         rospy.init_node("hopper_laser_scanner")
-        #rospy.wait_for_service("assemble_scans2")
+        rospy.wait_for_service("assemble_scans2")
+        print "Service available"
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
         rospy.Subscriber("hopper/stance_translate", Twist, self.on_stance_msg, queue_size=10)
         self.point_cloud_publisher = rospy.Publisher("hopper/assembled_scan", PointCloud2, queue_size=2)
@@ -25,8 +26,11 @@ class LaserScanner(object):
         update_rate = rospy.Rate(30)
         while not rospy.is_shutdown():
             if rospy.get_time() - scan_start > scan_time:
-                #point_cloud = self.assemble_scan()
-                #self.point_cloud_publisher.publish(point_cloud)
+                request = AssembleScans2Request()
+                request.begin = rospy.Time.now() - rospy.Duration(5)
+                request.end = rospy.Time.now()
+                point_cloud = self.assemble_scan(request).cloud
+                self.point_cloud_publisher.publish(point_cloud)
                 scan_start = rospy.get_time()
                 max_tilt_angle = -max_tilt_angle
             current_progress = (rospy.get_time() - scan_start) / scan_time

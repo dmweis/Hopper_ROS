@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <node name="hopper_laser_assembler" pkg="laser_assembler" type="laser_scan_assembler">
+        <param name="fixed_frame" type="string" value="base_footprint"/>
+    </node>
+</launch>

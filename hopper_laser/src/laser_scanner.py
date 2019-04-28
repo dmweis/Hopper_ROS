@@ -27,7 +27,7 @@ class LaserScanner(object):
         while not rospy.is_shutdown():
             if rospy.get_time() - scan_start > scan_time:
                 request = AssembleScans2Request()
-                request.begin = rospy.Time.now() - rospy.Duration(5)
+                request.begin = rospy.Time.now() - rospy.Duration(scan_time)
                 request.end = rospy.Time.now()
                 point_cloud = self.assemble_scan(request).cloud
                 self.point_cloud_publisher.publish(point_cloud)

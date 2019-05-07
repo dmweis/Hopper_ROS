@@ -96,6 +96,8 @@ class SteamControllerRosHandler(object):
         self.enable_idle_animations_publisher = rospy.Publisher("hopper/idle_animations/enabled", Bool, queue_size=10)
         self.face_color_publisher = rospy.Publisher("hopper/face/mode", String, queue_size=3)
         self.fold_command_publisher = rospy.Publisher("hopper/fold_command", FoldCommand, queue_size=5)
+        self.enable_laser_scanner = rospy.Publisher("hopper/laser_scanner/active", Bool, queue_size=5)
+        self.laser_scan_status = False
         self._hopper_move_command_msg = HopperMoveCommand()
         self.last_stance_msg = Twist()
         self.last_single_leg_msg = SingleLegCommand()
@@ -150,6 +152,9 @@ class SteamControllerRosHandler(object):
                 self.speech_pub.publish("windows_startup")
             if buttons_pressed & SCButtons.LB:
                 self.hacklab_play.publish("portal/")
+            if buttons_pressed & SCButtons.RB:
+                self.laser_scan_status = not self.laser_scan_status
+                self.enable_laser_scanner.publish(self.laser_scan_status)
         elif right_grip_down:
             if buttons_pressed & SCButtons.LB:
                 self.move_pub.publish("random")

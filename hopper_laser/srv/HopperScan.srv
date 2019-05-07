@@ -1,5 +1,6 @@
 bool front
 float32 scan_time
+float32 vertical_fov
 ---
 bool success
 sensor_msgs/PointCloud2 cloud

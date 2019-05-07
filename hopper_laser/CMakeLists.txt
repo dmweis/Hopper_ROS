@@ -15,11 +15,19 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-catkin_package()
-
 add_service_files(
   FILES
   HopperScan.srv
+)
+
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
+)
+
+catkin_package(
+  CATKIN_DEPENDS
+  message_runtime
 )
 
 include_directories(

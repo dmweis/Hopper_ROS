@@ -12,9 +12,15 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   tf2
   tf2_ros
+  message_generation
 )
 
 catkin_package()
+
+add_service_files(
+  FILES
+  HopperScan.srv
+)
 
 include_directories(
   ${catkin_INCLUDE_DIRS}

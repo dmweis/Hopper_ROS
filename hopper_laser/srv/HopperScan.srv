@@ -1,0 +1,5 @@
+bool front
+float32 scan_time
+---
+bool success
+sensor_msgs/PointCloud2 cloud

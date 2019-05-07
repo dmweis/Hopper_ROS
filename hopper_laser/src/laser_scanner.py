@@ -85,20 +85,23 @@ class LaserScanner(object):
                 assemble_request.end = rospy.Time.now()
                 point_cloud = self.assemble_scan(assemble_request).cloud
                 self.point_cloud_publisher.publish(point_cloud)
+            if rospy.get_time() - scan_start > request.scan_time:
+                last_pointcloud_time = rospy.get_time()
+                assemble_request = AssembleScans2Request()
+                assemble_request.begin = rospy.Time.now() - rospy.Duration(request.scan_time)
+                assemble_request.end = rospy.Time.now()
+                point_cloud = self.assemble_scan(assemble_request).cloud
                 response.cloud = point_cloud
                 response.success = True
                 self.robot_pose.angular.y = 0
                 self.robot_pose.angular.x = 0
                 self.stance_translate.publish(self.robot_pose)
                 return response
-            if rospy.get_time() - scan_start > request.scan_time:
-                scan_start = rospy.get_time()
-                max_tilt_angle = -max_tilt_angle
             current_progress = (rospy.get_time() - scan_start) / request.scan_time
             if request.front:
                 self.robot_pose.angular.y = max_tilt_angle * cos(current_progress * pi)
             else:
-                self.robot_pose.angular.x = max_tilt_angle * sin(current_progress * pi)
+                self.robot_pose.angular.x = max_tilt_angle * cos(current_progress * pi)
             self.stance_translate.publish(self.robot_pose)
             update_rate.sleep()
         response.success = False

@@ -74,7 +74,7 @@ class LaserScanner(object):
             return response
         last_pointcloud_time = rospy.get_time()
         pointcloud_timeout = 0.5
-        max_tilt_angle = request.vertical_fov if not request.vertical_fov else radians(12.0)
+        max_tilt_angle = request.vertical_fov if request.vertical_fov else radians(12.0)
         scan_start = rospy.get_time()
         update_rate = rospy.Rate(30)
         while not rospy.is_shutdown() and not self.scanner_active:

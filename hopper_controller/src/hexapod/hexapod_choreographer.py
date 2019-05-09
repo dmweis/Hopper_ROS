@@ -107,11 +107,11 @@ class Choreographer(object):
             legs_random = LegFlags.get_legs_as_list(LegFlags.ALL)
             random.shuffle(legs_random)
             squirming_legs = self.gait_engine.get_relaxed_pose() \
-                .transform(Vector3(x=random.randint(-2, 2), z=random.randint(-4, 2)), legs_random[0]) \
+                .rotate(Vector3(x=random.randint(-10, 10), z=random.randint(-20, 10)), legs_random[0]) \
                 .transform(Vector3(y=random.randint(-2, 2)), legs_random[1]) \
                 .transform(Vector3(z=random.randint(-4, 2)), legs_random[2]) \
                 .transform(Vector3(x=random.randint(-2, 2)), legs_random[3]) \
-                .transform(Vector3(y=random.randint(-2, 2), z=random.randint(-4, 2)), legs_random[4]) \
+                .rotate(Vector3(y=random.randint(-10, 10), z=random.randint(-20, 10)), legs_random[4]) \
                 .transform(Vector3(z=random.randint(-4, 2)), legs_random[5])
             self.gait_engine.move_to_new_pose(squirming_legs, speed)
             self.check_cancel()

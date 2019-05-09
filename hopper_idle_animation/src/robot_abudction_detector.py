@@ -33,7 +33,7 @@ class AbductionDetector(object):
             self.on_right_side_up()
 
     def on_upside_down(self):
-        self.move_pub.publish("happy_spin")
+        self.move_pub.publish("panic_squirm")
         if self.is_upside_down:
             return
         else:

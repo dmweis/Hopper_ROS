@@ -24,7 +24,8 @@ class Choreographer(object):
             "bored_looking_around": self.bored_looking_around,
             "bored_stretch": self.bored_stretch,
             "bored_lift_leg": self.bored_lift_leg,
-            "high_five": self.high_five
+            "high_five": self.high_five,
+            "panic_squirm": self.panic_squirm
         }
         child_safe = rospy.get_param("child_safe_mode", True)
         if not child_safe:
@@ -96,6 +97,23 @@ class Choreographer(object):
         for i in range(random.randint(4, 6)):
             self.gait_engine.move_to_new_pose(turned_left, speed)
             self.gait_engine.move_to_new_pose(turned_right, speed)
+            self.check_cancel()
+        self.gait_engine.move_to_new_pose(relaxed_pose, speed)
+
+    def panic_squirm(self):
+        speed = 18
+        relaxed_pose = self.gait_engine.get_relaxed_pose()
+        for i in range(random.randint(4, 6)):
+            legs_random = LegFlags.get_legs_as_list(LegFlags.ALL)
+            random.shuffle(legs_random)
+            squirming_legs = self.gait_engine.get_relaxed_pose() \
+                .transform(Vector3(x=random.randint(-2, 2)), legs_random[0]) \
+                .transform(Vector3(y=random.randint(-2, 2)), legs_random[1]) \
+                .transform(Vector3(z=random.randint(-2, 2)), legs_random[2]) \
+                .transform(Vector3(x=random.randint(-2, 2)), legs_random[3]) \
+                .transform(Vector3(y=random.randint(-2, 2)), legs_random[4]) \
+                .transform(Vector3(z=random.randint(-2, 2)), legs_random[5])
+            self.gait_engine.move_to_new_pose(squirming_legs, speed)
             self.check_cancel()
         self.gait_engine.move_to_new_pose(relaxed_pose, speed)
 

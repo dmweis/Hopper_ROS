@@ -39,7 +39,7 @@ class Choreographer(object):
         except KeyError:
             rospy.logerr("Key: (%s) not present in moves dictionary", choreography_name)
         except RuntimeWarning:
-            rospy.logerr("Operation interrupted")
+            rospy.logwarn("Operation interrupted")
             self.gait_engine.move_to_new_pose(original_pose, 15)
 
     def cancel_move(self):

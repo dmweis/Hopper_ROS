@@ -11,8 +11,8 @@ from std_msgs.msg import String
 
 
 class AbductionDetector(object):
-    tilt_limit = 40
-    speech_time_limit = 5
+    tilt_limit = 55
+    speech_time_limit = 25
 
     def __init__(self):
         super(AbductionDetector, self).__init__()

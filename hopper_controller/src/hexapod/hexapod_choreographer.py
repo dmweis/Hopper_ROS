@@ -40,7 +40,7 @@ class Choreographer(object):
         except KeyError:
             rospy.logerr("Key: (%s) not present in moves dictionary", choreography_name)
         except RuntimeWarning:
-            rospy.logwarn("Operation interrupted")
+            rospy.loginfo("Scheduled move interrupted")
             self.gait_engine.move_to_new_pose(original_pose, 15)
 
     def cancel_move(self):
@@ -107,6 +107,7 @@ class Choreographer(object):
             legs_random = LegFlags.get_legs_as_list(LegFlags.ALL)
             random.shuffle(legs_random)
             squirming_legs = self.gait_engine.get_relaxed_pose() \
+                .transform(Vector3(z=-3), LegFlags.ALL) \
                 .transform(Vector3(x=random.randint(-2, 2)), legs_random[0]) \
                 .transform(Vector3(y=random.randint(-2, 2)), legs_random[1]) \
                 .transform(Vector3(z=random.randint(-2, 2)), legs_random[2]) \

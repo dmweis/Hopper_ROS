@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
+    <arg name="r2d2" default="true" />
     <node name="hopper_face" pkg="hopper_face" type="face_controller.py" respawn="true"/>
     <rosparam command="load" file="$(find hopper_controller)/params/hexapod.yaml" />
     <node name="keep_alive_node" pkg="hopper_keep_alive" type="keep_alive_node.py" required="true"/>
@@ -10,7 +11,8 @@
         <param name="sound_on" value="false"/>
     </node>
     <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />
-    <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py"/>
+    <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py" unless="$(arg r2d2)"/>
+    <node name="hopper_speech" pkg="hopper_speech" type="r2d2_speak.py" if="$(arg r2d2)"/>
     <!-- <node name="hacklab_speech" pkg="hopper_speech" type="hacklab_speak.py"/> -->
     <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>
     <node name="hopper_idle_animation" pkg="hopper_idle_animation" type="idle_animation_controller.py"/>

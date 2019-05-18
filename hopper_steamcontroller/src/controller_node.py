@@ -108,13 +108,13 @@ class SteamControllerRosHandler(object):
         self._new_command_available = True
         self.sc = RosSteamController(self.on_controller_data)
         # activate IMU
-        self.sc._sendControl(struct.pack('>' + 'I' * 6,
-                                        0x87153284,
-                                        0x03180000,
-                                        0x31020008,
-                                        0x07000707,
-                                        0x00301400,
-                                        0x2f010000))
+        # self.sc._sendControl(struct.pack('>' + 'I' * 6,
+        #                                 0x87153284,
+        #                                 0x03180000,
+        #                                 0x31020008,
+        #                                 0x07000707,
+        #                                 0x00301400,
+        #                                 0x2f010000))
         self.publisher_thread = Thread(target=self.publisher_loop)
         self.publisher_thread.start()
         self.sc.run()
@@ -218,29 +218,6 @@ class SteamControllerRosHandler(object):
         
         single_leg_command.single_leg_mode_on = self.single_leg_mode_on
         single_leg_command.selected_leg = ALL_LEGS[self.slected_single_index]
-        # # buttons
-        # for button in list(SCButtons):
-        #     if button & buttons:
-        #         if button == SCButtons.LPAD:
-        #             pass
-        #         # button is down
-        #     if button & buttons_pressed:
-        #         # button was pressed this event
-        #         if button == SCButtons.A:
-        #             self.speech_pub.publish("bender")
-        #         elif button == SCButtons.B:
-        #             self.speech_pub.publish("rick_and_morty")
-        #         elif button == SCButtons.X:
-        #             self.speech_pub.publish("i_am_sorry")
-        #         elif button == SCButtons.Y:
-        #             self.speech_pub.publish("ultron")
-        #         elif button == SCButtons.RGRIP:
-        #             self.speech_pub.publish("take_your_paws")
-        #         elif button == SCButtons.RB:
-        #             pass
-        #     elif button & buttons_lifted:
-        #         pass
-        #         # button was released this event
 
         # pads
         robot_x = 0

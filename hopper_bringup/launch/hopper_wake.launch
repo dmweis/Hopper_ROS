@@ -13,6 +13,7 @@
     <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />
     <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py" unless="$(arg r2d2)"/>
     <node name="hopper_speech" pkg="hopper_speech" type="r2d2_speak.py" if="$(arg r2d2)"/>
+    <node name="hopper_system_telemetry" pkg="hopper_system_telemetry" type="hopper_system_telemetry.py"/>
     <!-- <node name="hacklab_speech" pkg="hopper_speech" type="hacklab_speak.py"/> -->
     <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>
     <node name="hopper_idle_animation" pkg="hopper_idle_animation" type="idle_animation_controller.py"/>

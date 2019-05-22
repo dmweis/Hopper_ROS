@@ -17,7 +17,7 @@ class R2D2Speech(object):
         rospy.spin()
 
     def on_play_sound(self, string):
-        self.speaker.speak(string.data)
+        self.speaker.speak(string.data.lower()[:8])
 
 
 if __name__ == '__main__':

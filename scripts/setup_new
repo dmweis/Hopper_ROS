@@ -1,0 +1,32 @@
+sudo adduser dweis
+sudo usermod -aG sudo dweis
+
+sudo apt update
+sudo apt install mosh tree iperf nmap tmux
+
+
+sudo deluser --remove-home pi
+
+cat <<EOT >> ~/.bashrc
+alias use_hacklab_ip='source ~/bin/hacklab_ip'
+alias use_mobile_ip='source ~/bin/hacklab_ip'
+alias use_home_ip='source ~/bin/home_ip'
+alias use_hopper='cd ~/hopper_ws; source ros'
+alias hopper_src='use_hopper; cd ~/hopper_ws/src/Hopper_ROS'
+EOT
+source ~/.bashrc
+
+
+git config --global push.default simple
+git config --global credential.helper store
+git config --global user.name "David Weis"
+git config --global user.email "davidmicahelweis@gmail.com"
+
+
+mkdir -p ~/ros/hopper/src
+cd ~/ros/hopper/src
+git clone https://github.com/dmweis/Hopper_ROS.git
+cd ..
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+catkin_make

@@ -42,7 +42,7 @@ tar xzvf boost_1_58_0.tar.gz
 cd boost_1_58_0/
 
 sudo apt-get update
-sudo apt-get install build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev libboost-all-dev
+sudo apt-get install build-essential g++ python-dev autotools-dev libicu-dev build-essential libbz2-dev libboost-all-dev -y
 
 ./bootstrap.sh --prefix=/usr/
 
@@ -70,3 +70,6 @@ rosdep install --from-paths src --ignore-src --rosdistro kinetic -y -r --os=debi
 sudo ./src/catkin/bin/catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release --install-space /opt/ros/kinetic
 
 #end install more packages
+
+
+rosinstall_generator tf2 tf move_base xacro --rosdistro kinetic --deps --wet-only --tar > kinetic-custom_ros.rosinstall

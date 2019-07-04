@@ -1,10 +1,18 @@
 echo "writing udev rules to /etc/udev/rules.d/hopper.rules"
 
-cat <<EOT | sudo tee /etc/udev/rules.d/hopper.rules > /dev/null
+cat <<EOT | sudo tee /etc/udev/rules.d/40-hopper.rules > /dev/null
+# steam controller
 SUBSYSTEM=="usb", ATTRS{idVendor}=="28de", GROUP="dweis", MODE="0660"
 KERNEL=="uinput", MODE="0660", GROUP="dweis", OPTIONS+="static_node=uinput"
+
+# rplidar
 KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0777", SYMLINK+="rplidar"
-KERNEL=="ttyUSB*", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE:="0777", SYMLINK+="hopper_face"
+
+# sensors
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", KERNELS=="1-1.2", MODE:="0777", SYMLINK+="hopper_face"
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", KERNELS=="1-1.3.4", MODE:="0777", SYMLINK+="hopper_feet"
+
+# other devices
 KERNEL=="ttyUSB[0-9]*",MODE="0666"
 KERNEL=="ttyACM[0-9]*",MODE="0666"
 KERNEL=="video[0-9]*",MODE="0666"

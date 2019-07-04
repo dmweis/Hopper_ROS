@@ -304,7 +304,7 @@ class AnimationController(LedController):
             yield i
 
     def flash(self):
-        self.port.write(ColorPacket(lambda:COLORS[self.selected_color]).to_data())
+        self.port.write(ColorPacket(COLORS[self.selected_color]).to_data())
         for i in range(10):
             sleep(0.1)
             yield i

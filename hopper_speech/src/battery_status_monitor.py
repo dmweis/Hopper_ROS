@@ -27,6 +27,7 @@ class BatteryStatusMonitor(object):
         self.first_check = True
         self.speech_publisher = rospy.Publisher('hopper_play_sound', String, queue_size=5)
         self.battery_publisher = rospy.Publisher("hopper/battery_status", BatteryState, queue_size=5)
+        self.face_color_publisher = rospy.Publisher("hopper/face/mode", String, queue_size=3)
         self.telemetry_sub = rospy.Subscriber("hopper_telemetry", HexapodTelemetry, self.on_new_telemetry, queue_size=1)
         self.last_critical_voltage_warning = rospy.Time.now() + self.critical_voltage_warning_period
         rospy.spin()
@@ -62,6 +63,7 @@ class BatteryStatusMonitor(object):
             if mean_voltage < 10.5:
                 if self.last_critical_voltage_warning + self.critical_voltage_warning_period < rospy.Time.now():
                     self.speech_publisher.publish("battery_critical")
+                    self.face_color_publisher.publish("flash:red")
                     self.last_critical_voltage_warning = rospy.Time.now()
             elif mean_voltage < 11 and self.lowest_recorded_voltage >= 11:
                 self.speech_publisher.publish("battery_below_11")

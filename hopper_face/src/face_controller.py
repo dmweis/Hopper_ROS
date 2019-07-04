@@ -266,7 +266,8 @@ class AnimationController(LedController):
             "breathing": self.breathing,
             "fade_out": self.fade_out,
             "larson_scanner": self.larson_scanner,
-            "larson_scanner_2": self.larson_scanner_2
+            "larson_scanner_2": self.larson_scanner_2,
+            "flash": self.flash,
         }
         self.run()
 
@@ -300,6 +301,16 @@ class AnimationController(LedController):
 
     def breathing(self):
         for i in self.breathing_animation(lambda:COLORS[self.selected_color], 0.05):
+            yield i
+
+    def flash(self):
+        self.port.write(ColorPacket(lambda:COLORS[self.selected_color]).to_data())
+        for i in range(10):
+            sleep(0.1)
+            yield i
+        self.port.write(ColorPacket().to_data())
+        for i in range(10):
+            sleep(0.1)
             yield i
 
     def color_transitions(self, color_a, color_b, steps, delay):

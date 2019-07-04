@@ -1,4 +1,4 @@
-echo "writing udev rules to /etc/udev/rules.d/hopper.rules"
+echo "writing udev rules to /etc/udev/rules.d/40-hopper.rules"
 
 cat <<EOT | sudo tee /etc/udev/rules.d/40-hopper.rules > /dev/null
 # steam controller

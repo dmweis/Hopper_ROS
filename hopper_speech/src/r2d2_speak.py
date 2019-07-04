@@ -12,7 +12,7 @@ class R2D2Speech(object):
         super(R2D2Speech, self).__init__()
         self.speaker = TTAstromech()
         rospy.init_node("hopper_r2d2_speech_core", anonymous=True)
-        rospy.Subscriber("hopper_play_sound", String, self.on_play_sound)
+        rospy.Subscriber("hopper_play_sound", String, self.on_play_sound, queue_size=2)
         rospy.Subscriber("hopper/sound/play_random", String, self.on_play_sound)
         rospy.spin()
 

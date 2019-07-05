@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   hopper_msgs
   tf
+  tf2
+  tf2_ros
   message_generation
 )
 
@@ -32,6 +34,8 @@ add_service_files(
   FILES
   ReadHexapodMotorPositions.srv
   ReadHexapodLegPositions.srv
+  MoveLegsToPosition.srv
+  MoveCoreToPosition.srv
 )
 
 generate_messages(

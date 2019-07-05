@@ -38,8 +38,9 @@ class HexapodController(object):
         tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
                                  ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
         gait_engine = GaitEngine(tripod_gait)
+        leg_controller = ros_abstraction.LegController(gait_engine)
         folding_manager = FoldingManager(body_controller)
-        self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer(self.sound_on), folding_manager, controller_telemetry)
+        self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer(self.sound_on), folding_manager, controller_telemetry, leg_controller)
         self.halt_publisher = rospy.Publisher("halt", Empty, queue_size=1, latch=True)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)

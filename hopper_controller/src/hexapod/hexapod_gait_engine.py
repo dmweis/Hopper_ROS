@@ -63,7 +63,7 @@ def get_height_for_step(distance, full_step_length, height):
 
 
 class MovementController(object):
-    def __init__(self, gait_engine, speech_service, folding_manager, state_telemetry_publisher):
+    def __init__(self, gait_engine, speech_service, folding_manager, state_telemetry_publisher, leg_controller):
         """
         :type gait_engine: GaitEngine
         """
@@ -74,6 +74,7 @@ class MovementController(object):
         self.state_telemetry_publisher = state_telemetry_publisher
         self.choreographer = Choreographer(self._gait_engine)
         self._speech_service = speech_service
+        self.leg_controller = leg_controller
 
         self._relaxed = True
         self._velocity = Vector2()
@@ -137,6 +138,8 @@ class MovementController(object):
     def moving_mode_loop_tick(self):
         if self.single_leg_mode_on:
             self.handle_single_leg_mode()
+        elif self.leg_controller.is_motion_queued():
+            self.leg_controller.execute_motion()
         elif self.selected_leg_switched:
             self.selected_leg_switched = False
             self._gait_engine.move_to_new_pose(self._gait_engine.get_relaxed_pose(), 15)
@@ -320,6 +323,9 @@ class GaitEngine(object):
 
     def get_relaxed_pose(self):
         return self.gait_sequencer.current_relaxed_position.clone()
+
+    def get_current_leg_positions(self):
+        return self.gait_sequencer.last_written_position
 
     def _get_next_leg_combo(self):
         self._last_used_lifted_legs = LegFlags.RIGHT_TRIPOD if self._last_used_lifted_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD

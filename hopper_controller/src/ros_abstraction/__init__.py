@@ -6,3 +6,4 @@ from odometry_publisher import OdomPublisher, HeightPublisher, BodyOrientationPu
 from telemetry_updater import MessagePublisher
 from controller_state_proxy import ControllerTelemetryPublisher
 from imu_reader import ImuReader
+from leg_controller import LegController

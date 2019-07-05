@@ -442,13 +442,11 @@ class LegPositions(hopper_controller.msg.HexapodLegPositions):
 
 
 class IkDriver(object):
-    def __init__(self, body_controller, joint_state_publisher):
+    def __init__(self, body_controller):
         """
         :type body_controller: HexapodBodyController
-        :type joint_state_publisher: JointStatePublisher
         """
         self.body_controller = body_controller
-        self.joint_state_publisher = joint_state_publisher
         self.coxa_length = rospy.get_param("coxa_length")
         self.femur_length = rospy.get_param("femur_length")
         self.tibia_length = rospy.get_param("tibia_length")
@@ -472,11 +470,9 @@ class IkDriver(object):
         motor_positions.left_rear = self.calculate_ik_for_leg(leg_positions.left_rear, self.legs["left_rear"])
         motor_positions.right_rear = self.calculate_ik_for_leg(leg_positions.right_rear, self.legs["right_rear"])
         self.body_controller.set_motors(motor_positions)
-        self.joint_state_publisher.update_joint_states(motor_positions)
 
     def read_current_leg_positions(self):
         motor_positions = self.body_controller.read_hexapod_motor_positions()
-        self.joint_state_publisher.update_joint_states(motor_positions)
         return LegPositions(
             self.calculate_fk_for_leg(motor_positions.left_front, self.legs["left_front"]),
             self.calculate_fk_for_leg(motor_positions.right_front, self.legs["right_front"]),

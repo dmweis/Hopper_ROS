@@ -7,6 +7,7 @@ from hopper_msgs.msg import ServoTelemetry, HexapodTelemetry
 from hopper_controller.msg import HexapodMotorPositions, LegMotorPositions, MotorCompliance, MotorSpeed, MotorTorque
 from hopper_controller.srv import ReadHexapodMotorPositions, ReadHexapodMotorPositionsResponse
 from dynamixel import DynamixelDriver, search_usb_2_ax_port
+from ros_abstraction import JointStatePublisher, MessagePublisher
 
 
 class BodyMotorController(object):
@@ -21,6 +22,8 @@ class BodyMotorController(object):
             self.servo_ids.append(self.leg_data[leg]["femur_id"])
             self.servo_ids.append(self.leg_data[leg]["tibia_id"])
         self.servo_driver = DynamixelDriver(search_usb_2_ax_port())
+        self.message_publisher = MessagePublisher()
+        self.joint_state_publisher = JointStatePublisher(self.message_publisher)
         rospy.Subscriber("hopper/body/motor_command", HexapodMotorPositions, self.on_motor_command, queue_size=20)
         rospy.Subscriber("hopper/body/motor_compliance", MotorCompliance, self.on_compliance_command, queue_size=25)
         rospy.Subscriber("hopper/body/motor_speed", MotorSpeed, self.on_speed_command, queue_size=5)
@@ -69,6 +72,7 @@ class BodyMotorController(object):
         ]
         with self.driver_lock:
             self.servo_driver.group_sync_write_goal_degrees(commands)
+        self.joint_state_publisher.update_joint_states(msg)
 
     def on_compliance_command(self, command):
         with self.driver_lock:

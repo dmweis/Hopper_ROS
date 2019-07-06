@@ -5,7 +5,6 @@ from __future__ import print_function, division
 import serial
 import rospy
 
-from rospy import sleep
 from hopper_feet_sensors.msg import FeetSensorData
 
 

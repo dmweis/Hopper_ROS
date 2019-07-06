@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
     <!-- <include file="$(find hopper_bringup)/launch/remote/teleop.launch" /> -->
+    <node name="hopper_feet_visualizer" pkg="hopper_feet_sensors" type="feet_sensor_visualizer.py" respawn="true"/>
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find hopper_description)/rviz/urdf.rviz" required="true" />
 </launch>

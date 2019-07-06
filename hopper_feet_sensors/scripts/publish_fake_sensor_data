@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+from __future__ import print_function, division
+
+import rospy
+
+from hopper_feet_sensors.msg import FeetSensorData
+
+
+class FakeFeetSensor(object):
+    def __init__(self):
+        super(FakeFeetSensor, self).__init__()
+        rospy.init_node("fake_feet_sensors")
+        self.feet_publisher = rospy.Publisher("hopper/feet", FeetSensorData, queue_size=10)
+        rate = rospy.Rate(40)
+        while not rospy.is_shutdown():
+            new_msg = FeetSensorData()
+            new_msg.front_left = True
+            new_msg.front_right = False
+            new_msg.middle_left = False
+            new_msg.middle_right = True
+            new_msg.rear_left = False
+            new_msg.rear_right = False
+            self.feet_publisher.publish(new_msg)
+            rate.sleep()
+
+if __name__ == "__main__":
+    FakeFeetSensor()

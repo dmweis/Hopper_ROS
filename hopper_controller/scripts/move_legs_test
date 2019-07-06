@@ -11,7 +11,8 @@ if __name__ == "__main__":
     move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
     request = MoveLegsToPositionRequest()
     request.header.frame_id = "base_link"
-    request.selected_legs = 1
-    request.left_front = Vector3(0.08, 0.08, -0.05)
+    request.selected_legs = 16 | 32
+    request.left_middle = Vector3(0, 0.3, 0)
+    request.right_middle = Vector3(0, -0.3, 0)
     move_legs(request)
 

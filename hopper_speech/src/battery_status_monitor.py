@@ -38,16 +38,16 @@ class BatteryStatusMonitor(object):
         if len(self.voltages) == SERVO_COUNT:
             voltages = self.voltages.values()
             self.voltages.clear()
-            mean_voltage = mean(voltages)
+            voltage = max(voltages)
             battery_state = BatteryState()
             battery_state.header.stamp = rospy.Time.now()
-            battery_state.voltage = mean_voltage
+            battery_state.voltage = voltage
             battery_state.current = float("nan")
             battery_state.charge = float("nan")
             battery_state.capacity = float("nan")
             battery_state.design_capacity = float("nan")
-            battery_state.percentage = 100 - (MAX_VOLTAGE - mean_voltage) / (MAX_VOLTAGE - MIN_VOLTAGE) * 100
-            battery_state.power_supply_status = BatteryState.POWER_SUPPLY_STATUS_UNKNOWN
+            battery_state.percentage = 100 - (MAX_VOLTAGE - voltage) / (MAX_VOLTAGE - MIN_VOLTAGE) * 100
+            battery_state.power_supply_status = BatteryState.POWER_SUPPLY_STATUS_DISCHARGING
             battery_state.power_supply_health = BatteryState.POWER_SUPPLY_HEALTH_UNKNOWN
             battery_state.power_supply_technology = BatteryState.POWER_SUPPLY_TECHNOLOGY_LIPO
             battery_state.present = True
@@ -58,19 +58,19 @@ class BatteryStatusMonitor(object):
             # skip the first check so that you don't get a warning if battery is already bellow some value
             if self.first_check:
                 self.first_check = False
-                self.lowest_recorded_voltage = mean_voltage
+                self.lowest_recorded_voltage = voltage
                 return
-            if mean_voltage < 10.5:
+            if voltage < 10.2:
                 if self.last_critical_voltage_warning + self.critical_voltage_warning_period < rospy.Time.now():
                     self.speech_publisher.publish("battery_critical")
                     self.face_color_publisher.publish("flash:red")
                     self.last_critical_voltage_warning = rospy.Time.now()
-            elif mean_voltage < 11 and self.lowest_recorded_voltage >= 11:
+            elif voltage < 11 and self.lowest_recorded_voltage >= 11:
                 self.speech_publisher.publish("battery_below_11")
-            elif mean_voltage < 12 and self.lowest_recorded_voltage >= 12:
+            elif voltage < 12 and self.lowest_recorded_voltage >= 12:
                 self.speech_publisher.publish("battery_below_12")
-            if mean_voltage < self.lowest_recorded_voltage:
-                self.lowest_recorded_voltage = mean_voltage
+            if voltage < self.lowest_recorded_voltage:
+                self.lowest_recorded_voltage = voltage
 
 
 if __name__ == '__main__':

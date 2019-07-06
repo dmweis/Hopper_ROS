@@ -3,6 +3,7 @@
     xmlns:xacro="http://ros.org/wiki/xacro" name="Hopper">
     <xacro:property name="coxa_length" value="0.044" />
     <xacro:property name="femur_length" value="0.07" />
+    <xacro:property name="tibia_length" value="0.128" />
     <material name="white">
         <color rgba="1 1 1 1"/>
     </material>
@@ -131,6 +132,12 @@
             <child link="${side}_${position}_tibia" />
             <axis xyz="0.0 0.0 ${axis}" />
             <limit lower="-${pi}" upper="${pi}" effort="1000.0" velocity="1"/>
+        </joint>
+        <link name="${side}_${position}_button"/>
+        <joint name="${side}_${position}_tibia_button" type="fixed">
+            <origin xyz="${tibia_length} 0.0 0.0"/>
+            <parent link="${side}_${position}_tibia" />
+            <child link="${side}_${position}_button" />
         </joint>
     </xacro:macro>
     <!--build legs-->

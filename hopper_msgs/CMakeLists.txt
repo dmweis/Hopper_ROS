@@ -18,7 +18,6 @@ add_message_files(
   FILES
   ServoTelemetry.msg
   HexapodTelemetry.msg
-  SonarSweep.msg
   HopperMoveCommand.msg
   HaltCommand.msg
 )

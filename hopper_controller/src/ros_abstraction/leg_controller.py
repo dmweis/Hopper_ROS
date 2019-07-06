@@ -6,7 +6,7 @@ import tf2_ros
 from threading import Event
 from Queue import Queue, Empty
 from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition
-from .hexapod_ik_driver import LegPositions, Vector3, LegFlags
+from hexapod.hexapod_ik_driver import LegPositions, Vector3, LegFlags
 
 
 class LegController(object):

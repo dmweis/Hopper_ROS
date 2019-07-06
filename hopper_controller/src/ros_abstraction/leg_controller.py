@@ -38,7 +38,7 @@ class LegController(object):
         task_finished_event.wait()
         return true
 
-    def MoveCoreToPosition(self, move_legs_cmd):
+    def move_body(self, move_legs_cmd):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
         frame_transform = Vector3.ros_vector3_to_overload_vector(self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform.translation)

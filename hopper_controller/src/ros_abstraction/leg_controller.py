@@ -24,13 +24,13 @@ class LegController(object):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
         frame_transform = Vector3.ros_vector3_to_overload_vector(self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform.translation)
-        new_positions = LegPositions()
-        new_positions.left_front = (move_legs_cmd.left_front + frame_transform) / 100.0
-        new_positions.right_front = (move_legs_cmd.right_front + frame_transform) / 100.0
-        new_positions.left_middle = (move_legs_cmd.left_middle + frame_transform) / 100.0
-        new_positions.right_middle = (move_legs_cmd.right_middle + frame_transform) / 100.0
-        new_positions.left_rear = (move_legs_cmd.left_rear + frame_transform) / 100.0
-        new_positions.right_rear = (move_legs_cmd.right_rear + frame_transform) / 100.0
+        new_positions = LegPositions((move_legs_cmd.left_front + frame_transform) / 100.0
+            ,(move_legs_cmd.right_front + frame_transform) / 100.0
+            ,(move_legs_cmd.left_middle + frame_transform) / 100.0
+            ,(move_legs_cmd.right_middle + frame_transform) / 100.0
+            ,(move_legs_cmd.left_rear + frame_transform) / 100.0
+            ,(move_legs_cmd.right_rear + frame_transform) / 100.0
+        )
         current_positions = self.gait_engine.get_current_leg_positions()
         desired_position = current_positions.change(new_positions, LegFlags(move_legs_cmd.selected_legs))
         task_finished_event = Event()
@@ -42,13 +42,13 @@ class LegController(object):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
         frame_transform = Vector3.ros_vector3_to_overload_vector(self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform.translation)
-        new_positions = LegPositions()
-        new_positions.left_front = (move_legs_cmd.left_front - frame_transform) / 100.0
-        new_positions.right_front = (move_legs_cmd.right_front - frame_transform) / 100.0
-        new_positions.left_middle = (move_legs_cmd.left_middle - frame_transform) / 100.0
-        new_positions.right_middle = (move_legs_cmd.right_middle - frame_transform) / 100.0
-        new_positions.left_rear = (move_legs_cmd.left_rear - frame_transform) / 100.0
-        new_positions.right_rear = (move_legs_cmd.right_rear - frame_transform) / 100.0
+        new_positions = LegPositions((move_legs_cmd.left_front + frame_transform) / 100.0
+            ,(move_legs_cmd.right_front + frame_transform) / 100.0
+            ,(move_legs_cmd.left_middle + frame_transform) / 100.0
+            ,(move_legs_cmd.right_middle + frame_transform) / 100.0
+            ,(move_legs_cmd.left_rear + frame_transform) / 100.0
+            ,(move_legs_cmd.right_rear + frame_transform) / 100.0
+        )
         current_positions = self.gait_engine.get_current_leg_positions()
         desired_position = current_positions.change(new_positions, LegFlags(move_legs_cmd.selected_legs))
         task_finished_event = Event()

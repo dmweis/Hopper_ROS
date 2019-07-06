@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+import rospy
+
+from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest
+from geometry_msgs.msg import Vector3
+
+if __name__ == "__main__":
+    rospy.init_node("leg_move_tester")
+    rospy.wait_for_service("hopper/move_limbs_individual")
+    move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
+    request = MoveLegsToPositionRequest()
+    request.header.frame_id = "base_link"
+    request.selected_legs = 1
+    request.left_front = Vector3(8, 8, -5)
+    move_legs(request)
+

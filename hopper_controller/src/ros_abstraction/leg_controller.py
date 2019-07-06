@@ -24,7 +24,8 @@ class LegController(object):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
         frame_transform = Vector3.ros_vector3_to_overload_vector(self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform.translation)
-        new_positions = LegPositions((move_legs_cmd.left_front + frame_transform) / 100.0
+        new_positions = LegPositions(
+            (Vector3.ros_vector3_to_overload_vector(move_legs_cmd.left_front) + frame_transform) / 100.0
             ,(Vector3.ros_vector3_to_overload_vector(move_legs_cmd.right_front) + frame_transform) / 100.0
             ,(Vector3.ros_vector3_to_overload_vector(move_legs_cmd.left_middle) + frame_transform) / 100.0
             ,(Vector3.ros_vector3_to_overload_vector(move_legs_cmd.right_middle) + frame_transform) / 100.0
@@ -42,7 +43,8 @@ class LegController(object):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
         frame_transform = Vector3.ros_vector3_to_overload_vector(self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform.translation)
-        new_positions = LegPositions((move_legs_cmd.left_front + frame_transform) / 100.0
+        new_positions = LegPositions(
+            (Vector3.ros_vector3_to_overload_vector(move_legs_cmd.left_front) + frame_transform) / 100.0
             ,(Vector3.ros_vector3_to_overload_vector(move_legs_cmd.right_front) + frame_transform) / 100.0
             ,(Vector3.ros_vector3_to_overload_vector(move_legs_cmd.left_middle) + frame_transform) / 100.0
             ,(Vector3.ros_vector3_to_overload_vector(move_legs_cmd.right_middle) + frame_transform) / 100.0

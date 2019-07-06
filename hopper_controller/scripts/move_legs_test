@@ -12,6 +12,6 @@ if __name__ == "__main__":
     request = MoveLegsToPositionRequest()
     request.header.frame_id = "base_link"
     request.selected_legs = 1
-    request.left_front = Vector3(8, 8, -5)
+    request.left_front = Vector3(0.08, 0.08, -0.05)
     move_legs(request)
 

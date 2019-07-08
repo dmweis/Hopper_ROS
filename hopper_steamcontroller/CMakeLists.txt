@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   hopper_msgs
   hopper_controller
+  hopper_laser
 )
 
 catkin_package()

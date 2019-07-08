@@ -8,6 +8,7 @@ import rospy
 from geometry_msgs.msg import Twist, Quaternion, Vector3
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
 from hopper_controller.msg import SingleLegCommand, StandCommand, FoldCommand
+from hopper_laser.srv import HopperScan
 from std_msgs.msg import String, Bool
 from steamcontroller import SteamController, SCButtons, SCStatus, SCI_NULL
 import usb1
@@ -97,6 +98,7 @@ class SteamControllerRosHandler(object):
         self.face_color_publisher = rospy.Publisher("hopper/face/mode", String, queue_size=3)
         self.fold_command_publisher = rospy.Publisher("hopper/fold_command", FoldCommand, queue_size=5)
         self.enable_laser_scanner = rospy.Publisher("hopper/laser_scanner/active", Bool, queue_size=5)
+        self.scan_service = rospy.ServiceProxy("hopper/laser_scanner/scan", HopperScan)
         self.laser_scan_status = False
         self._hopper_move_command_msg = HopperMoveCommand()
         self.last_stance_msg = Twist()
@@ -151,7 +153,7 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.START:
                 self.speech_pub.publish("windows_startup")
             if buttons_pressed & SCButtons.LB:
-                self.hacklab_play.publish("portal/")
+                self.scan_service(True, 15, 0.4)
             if buttons_pressed & SCButtons.RB:
                 self.laser_scan_status = not self.laser_scan_status
                 self.enable_laser_scanner.publish(self.laser_scan_status)

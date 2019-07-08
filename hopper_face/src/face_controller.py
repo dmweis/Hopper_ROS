@@ -139,9 +139,11 @@ class LedController(object):
         self.port = None
         self.selected_mode = ""
         self.selected_color = ""
+        self.is_active = True
         self.modes = {}
         rospy.Subscriber("hopper/face/mode", String,
                          self.on_mode_change, queue_size=3)
+        rospy.Subscriber("hopper/face/active", Bool, self.on_active_msg, queue_size=10)
         # controller ready system
         self.controller_ready = False
         rospy.Subscriber("hopper/main_controller_ready", Bool, self.on_ready_msg, queue_size=2)
@@ -166,6 +168,9 @@ class LedController(object):
             self.selected_mode = new_mode
         else:
             rospy.logwarn("Mode: " + new_mode + " unknown")
+
+    def on_active_msg(self, active_msg):
+        self.is_active = active_msg.data
 
     def write(self, frame):
         self.port.write(frame.to_data())
@@ -220,6 +225,10 @@ class LedController(object):
             reader_thread.start()
             self.count_down()
             while not rospy.is_shutdown():
+                if not self.is_active:
+                    self.port.write(ColorPacket().to_data())
+                    sleep(0.2)
+                    continue
                 if not (self.selected_color and self.selected_mode):
                     sleep(0.2)
                     continue 

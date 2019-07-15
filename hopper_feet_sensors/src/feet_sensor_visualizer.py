@@ -20,7 +20,7 @@ class FeetSensorVisualizer(object):
 
     def on_feet_msg(self, feet_msg):
         marker = Marker()
-        marker.header.frame_id = "body_link"
+        marker.header.frame_id = "base_link"
         marker.header.stamp = rospy.Time.now()
         marker.type = Marker.SPHERE_LIST
         marker.action = Marker.ADD
@@ -33,7 +33,7 @@ class FeetSensorVisualizer(object):
         def lookup_for_foot(link_name, sensor_triggered):
             position = Point()
             try:
-                position = self.tf_buffer.lookup_transform("body_link", link_name, rospy.Time()).transform.translation
+                position = self.tf_buffer.lookup_transform(marker.header.frame_id, link_name, marker.header.stamp).transform.translation
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 pass
             marker.points.append(vector_to_point(position))

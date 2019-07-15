@@ -325,7 +325,7 @@ class GaitEngine(object):
         return self.gait_sequencer.current_relaxed_position.clone()
 
     def get_current_leg_positions(self):
-        return self.gait_sequencer.last_written_position
+        return self.gait_sequencer.last_written_position.clone()
 
     def _get_next_leg_combo(self):
         self._last_used_lifted_legs = LegFlags.RIGHT_TRIPOD if self._last_used_lifted_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD

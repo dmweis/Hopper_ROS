@@ -52,16 +52,9 @@ class LegController(object):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
         frame_transform = Vector3.ros_vector3_to_overload_vector(self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform.translation)
-        move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd)
-        new_positions = LegPositions(
-             (move_legs_overloaded.left_front + frame_transform) * 100.0
-            ,(move_legs_overloaded.right_front + frame_transform) * 100.0
-            ,(move_legs_overloaded.left_middle + frame_transform) * 100.0
-            ,(move_legs_overloaded.right_middle + frame_transform) * 100.0
-            ,(move_legs_overloaded.left_rear + frame_transform) * 100.0
-            ,(move_legs_overloaded.right_rear + frame_transform) * 100.0
-        )
+        move_vector_overload = (Vector3.ros_vector3_to_overload_vector(move_legs_cmd.core_movement) + frame_transform) * 100.0
         current_positions = self.gait_engine.get_current_leg_positions()
+        new_positions = current_positions.transform(move_vector_overload, LegFlags(used_legs))
         desired_position = current_positions.update_from_other(new_positions, LegFlags(move_legs_cmd.selected_legs))
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, desired_position))

@@ -91,27 +91,27 @@ class LegController(object):
         while not move_done:
             still_moving = False
             if not self.last_feet_msg.left_front:
-                still_moving = still_moving or midstep_positions.left_front.move_towards_at_speed(desired_position, move_dist)
+                still_moving = still_moving or midstep_positions.left_front.move_towards_at_speed(desired_position.left_front, move_dist)
             else:
                 colliding_legs |= LegFlags.LEFT_FRONT
             if not self.last_feet_msg.right_front:
-                still_moving = still_moving or midstep_positions.right_front.move_towards_at_speed(desired_position, move_dist)
+                still_moving = still_moving or midstep_positions.right_front.move_towards_at_speed(desired_position.right_front, move_dist)
             else:
                 colliding_legs |= LegFlags.RIGHT_FRONT
             if not self.last_feet_msg.left_middle:
-                still_moving = still_moving or midstep_positions.left_middle.move_towards_at_speed(desired_position, move_dist)
+                still_moving = still_moving or midstep_positions.left_middle.move_towards_at_speed(desired_position.left_middle, move_dist)
             else:
                 colliding_legs |= LegFlags.LEFT_MIDDLE
             if not self.last_feet_msg.right_middle:
-                still_moving = still_moving or midstep_positions.right_middle.move_towards_at_speed(desired_position, move_dist)
+                still_moving = still_moving or midstep_positions.right_middle.move_towards_at_speed(desired_position.right_middle, move_dist)
             else:
                 colliding_legs |= LegFlags.RIGHT_MIDDLE
             if not self.last_feet_msg.left_rear:
-                still_moving = still_moving or midstep_positions.left_rear.move_towards_at_speed(desired_position, move_dist)
+                still_moving = still_moving or midstep_positions.left_rear.move_towards_at_speed(desired_position.left_rear, move_dist)
             else:
                 colliding_legs |= LegFlags.LEFT_REAR
             if not self.last_feet_msg.right_rear:
-                still_moving = still_moving or midstep_positions.right_rear.move_towards_at_speed(desired_position, move_dist)
+                still_moving = still_moving or midstep_positions.right_rear.move_towards_at_speed(desired_position.right_rear, move_dist)
             else:
                 colliding_legs |= LegFlags.RIGHT_REAR
             if still_moving:

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import math
 import rospy
 import tf.transformations as transformations
-from geometry_msgs.msg import TransformStamped
+from geometry_msgs.msg import TransformStamped, Vector3 as ros_vector3
 from nav_msgs.msg import Odometry
 import tf2_ros
 from hexapod import Vector3, Vector2
@@ -42,6 +42,10 @@ class OdomPublisher(object):
         self.imu_reader = imu_reader
         self._publish_to_tf = rospy.get_param("~publish_odometry_to_tf", True)
         self._transform_broadcaster = transform_broadcaster
+        # external odometry subscribers
+        rospy.Subscriber("hopper/odometry/temporary_move", ros_vector3, self.on_external_odometry_temporary, queue_size=10)
+        rospy.Subscriber("hopper/odometry/move", ros_vector3, self.on_external_odometry, queue_size=10)
+
         self._odom_publisher = rospy.Publisher('robot_odom', Odometry, queue_size=10)
         self._parent_link_name = parent_link_name
         self._child_link_name = child_link_name
@@ -85,6 +89,12 @@ class OdomPublisher(object):
         self._last_tf_odometry_message = tf_message
         self._last_odom_msg = odom_message
 
+    def on_external_odometry_temporary(self, msg):
+        motion = Vector2()
+        motion.x = msg.x
+        motion.y = msg.y
+        self.temporary_update_move(motion)
+
     def update_move(self, motion):
         """
         :type motion: Vector2
@@ -115,6 +125,12 @@ class OdomPublisher(object):
         odom_message.pose.covariance[0] = -1
         self._last_tf_odometry_message = tf_message
         self._last_odom_msg = odom_message
+
+    def on_external_odometry(self, msg):
+        motion = Vector2()
+        motion.x = msg.x
+        motion.y = msg.y
+        self.update_move(motion)
 
     def update_translation(self, direction, rotation):
         """

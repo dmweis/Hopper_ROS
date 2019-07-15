@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2
   tf2_ros
   message_generation
+  hopper_feet_sensors
 )
 
 catkin_python_setup()
@@ -36,6 +37,7 @@ add_service_files(
   ReadHexapodLegPositions.srv
   MoveLegsToPosition.srv
   MoveCoreToPosition.srv
+  MoveLegsUntilCollision.srv
 )
 
 generate_messages(

@@ -18,6 +18,7 @@
   <depend>tf</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
+  <depend>hopper_feet_sensors</depend>
   <exec_depend>message_runtime</exec_depend>
 
 </package>

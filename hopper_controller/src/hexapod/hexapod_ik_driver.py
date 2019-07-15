@@ -86,7 +86,7 @@ class Vector3(geometry_msgs.msg.Vector3):
         Moves vector towards target vector traveling distance each step
         :param target: target vector towards which we are moving
         :param distance: max distance traveled with this step
-        :return: returns True is move is not finished
+        :return: returns True if move is not finished
         """
         transform = target - self
         transform_length = transform.length()
@@ -179,6 +179,7 @@ class Vector2(object):
 
 
 class LegFlags(IntEnum):
+    NONE = 0
     LEFT_FRONT = 1
     RIGHT_FRONT = 2
     LEFT_REAR = 4

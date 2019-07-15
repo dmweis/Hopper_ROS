@@ -38,12 +38,12 @@ class FeetSensorVisualizer(object):
                 pass
             marker.points.append(vector_to_point(position))
             marker.colors.append(ColorRGBA(0, 1, 0, 1) if sensor_triggered else ColorRGBA(1, 0, 0, 1))
-        lookup_for_foot("left_front_button", feet_msg.front_left)
-        lookup_for_foot("left_middle_button", feet_msg.middle_left)
-        lookup_for_foot("left_rear_button", feet_msg.rear_left)
-        lookup_for_foot("right_front_button", feet_msg.front_right)
-        lookup_for_foot("right_middle_button", feet_msg.middle_right)
-        lookup_for_foot("right_rear_button", feet_msg.middle_left)
+        lookup_for_foot("left_front_button", feet_msg.left_front)
+        lookup_for_foot("left_middle_button", feet_msg.left_middle)
+        lookup_for_foot("left_rear_button", feet_msg.left_rear)
+        lookup_for_foot("right_front_button", feet_msg.right_front)
+        lookup_for_foot("right_middle_button", feet_msg.right_middle)
+        lookup_for_foot("right_rear_button", feet_msg.right_rear)
         self.marker_publisher.publish(marker)
 
 if __name__ == "__main__":

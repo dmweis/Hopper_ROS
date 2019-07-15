@@ -19,12 +19,12 @@ class FeetSensor(object):
                 data = port.readline().strip().split(' ')
                 if len(data) == 6:
                     new_msg = FeetSensorData()
-                    new_msg.front_left = bool(int(data[5]))
-                    new_msg.front_right = bool(int(data[0]))
-                    new_msg.middle_left = bool(int(data[3]))
-                    new_msg.middle_right = bool(int(data[2]))
-                    new_msg.rear_left = bool(int(data[4]))
-                    new_msg.rear_right = bool(int(data[1]))
+                    new_msg.left_front = bool(int(data[5]))
+                    new_msg.right_front = bool(int(data[0]))
+                    new_msg.left_middle = bool(int(data[3]))
+                    new_msg.right_middle = bool(int(data[2]))
+                    new_msg.left_rear = bool(int(data[4]))
+                    new_msg.right_rear = bool(int(data[1]))
                     self.feet_publisher.publish(new_msg)
                 else:
                     rospy.logdebug("String format error")

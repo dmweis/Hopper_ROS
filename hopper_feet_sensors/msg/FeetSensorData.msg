@@ -1,6 +1,6 @@
-bool front_left
-bool front_right
-bool middle_left
-bool middle_right
-bool rear_left
-bool rear_right
+bool left_front
+bool right_front
+bool left_middle
+bool right_middle
+bool left_rear
+bool right_rear

@@ -15,12 +15,12 @@ class FakeFeetSensor(object):
         rate = rospy.Rate(40)
         while not rospy.is_shutdown():
             new_msg = FeetSensorData()
-            new_msg.front_left = True
-            new_msg.front_right = False
-            new_msg.middle_left = False
-            new_msg.middle_right = True
-            new_msg.rear_left = False
-            new_msg.rear_right = False
+            new_msg.left_front = True
+            new_msg.right_front = False
+            new_msg.left_middle = False
+            new_msg.right_middle = True
+            new_msg.left_rear = False
+            new_msg.right_rear = False
             self.feet_publisher.publish(new_msg)
             rate.sleep()
 

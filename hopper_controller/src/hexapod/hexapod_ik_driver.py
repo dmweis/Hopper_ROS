@@ -507,14 +507,14 @@ class IkDriver(object):
             # can still happen if target is right bellow me
             raise ArithmeticError("Target angle is " + str(target_angle))
         femur_angle = angle_by_femur + ground_to_target_angle_size
-        corrected_femur = math.fabs(leg_config["femur_correction"] + femur_angle)
-        corrected_tibia = math.fabs(leg_config["tibia_correction"] + angle_by_tibia)
+        corrected_femur = math.fabs(leg_config["femur_correction"] + self.femur_offset + femur_angle)
+        corrected_tibia = math.fabs(leg_config["tibia_correction"] + self.tibia_offset + angle_by_tibia)
         corrected_coxa = 150 + target_angle
         return LegMotorPositions(corrected_coxa, corrected_femur, corrected_tibia)
 
     def calculate_fk_for_leg(self, motor_positions, leg_config):
-        femur_angle = abs(motor_positions.femur - abs(leg_config["femur_correction"]))
-        tibia_angle = abs(motor_positions.tibia - abs(leg_config["tibia_correction"]))
+        femur_angle = abs(motor_positions.femur - abs(leg_config["femur_correction"] + self.femur_offset))
+        tibia_angle = abs(motor_positions.tibia - abs(leg_config["tibia_correction"] + self.tibia_offset))
         coxa_angle = motor_positions.coxa - 150 - leg_config["angle_offset"]
         base_x = math.cos(math.radians(coxa_angle))
         base_y = math.sin(math.radians(coxa_angle))

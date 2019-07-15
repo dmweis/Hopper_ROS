@@ -15,8 +15,8 @@ legs:
       x: 11.5
       y: 6.3
       z: 0
-    femur_correction: -235.1
-    tibia_correction: -235.2
+    femur_correction: -240
+    tibia_correction: -330
   right_front:
     coxa_id: 2
     femur_id: 4
@@ -26,8 +26,8 @@ legs:
       x: 11.5
       y: -6.3
       z: 0
-    femur_correction: 64.9
-    tibia_correction: 43.8
+    femur_correction: 60
+    tibia_correction: -30
   left_middle:
     coxa_id: 13
     femur_id: 15
@@ -37,8 +37,8 @@ legs:
       x: 0
       y: 10.3
       z: 0
-    femur_correction: -235.1
-    tibia_correction: -235.2
+    femur_correction: -240
+    tibia_correction: -330
   right_middle:
     coxa_id: 14
     femur_id: 16
@@ -48,8 +48,8 @@ legs:
       x: 0
       y: -10.3
       z: 0
-    femur_correction: 64.9
-    tibia_correction: 43.8
+    femur_correction: 60
+    tibia_correction: -30
   left_rear:
     coxa_id: 7
     femur_id: 9
@@ -59,8 +59,8 @@ legs:
       x: -11.5
       y: 6.3
       z: 0
-    femur_correction: -235.1
-    tibia_correction: -235.2
+    femur_correction: -240
+    tibia_correction: -330
   right_rear:
     coxa_id: 8
     femur_id: 10
@@ -70,5 +70,5 @@ legs:
       x: -11.5
       y: -6.3
       z: 0
-    femur_correction: 64.9
-    tibia_correction: 43.8
+    femur_correction: 60
+    tibia_correction: -30

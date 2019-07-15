@@ -25,6 +25,9 @@ class Vector3(geometry_msgs.msg.Vector3):
         elif isinstance(other, Number):
             return Vector3(self.x - other, self.y - other, self.z - other)
 
+    def __neg__(self):
+        return Vector3(-self.x, -self.y, -self.z)
+
     def __mul__(self, other):
         if isinstance(other, Vector3):
             return Vector3(self.x * other.x, self.y * other.y, self.z * other.z)

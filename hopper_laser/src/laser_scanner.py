@@ -8,6 +8,7 @@ from math import cos, sin, pi, radians
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import PointCloud2
 from std_msgs.msg import Bool, Float32
+from std_srvs.srv import Empty
 from laser_assembler.srv import AssembleScans2, AssembleScans2Request
 from hopper_laser.srv import HopperScan, HopperScanResponse
 
@@ -21,6 +22,7 @@ class LaserScanner(object):
         self.past_point_cloud_data_time = rospy.get_param("past_point_cloud_data_time", default=1.0)
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
         self.point_cloud_publisher = rospy.Publisher("hopper/assembled_scan", PointCloud2, queue_size=2)
+        self.local_octomap_reset = rospy.ServiceProxy("local/octomap_server/reset", Empty)
         rospy.Subscriber("hopper/stance_translate", Twist, self.on_stance_msg, queue_size=10)
         rospy.Subscriber("hopper/laser_scanner/active", Bool, self.on_scanner_active_msg, queue_size=10)
         rospy.Subscriber("hopper/laser_scanner/scan_time", Float32, self.on_scanner_time, queue_size=10)
@@ -76,6 +78,10 @@ class LaserScanner(object):
         last_pointcloud_time = rospy.get_time()
         pointcloud_timeout = 0.5
         max_tilt_angle = request.vertical_fov if request.vertical_fov else radians(12.0)
+        try:
+            self.local_octomap_reset()
+        except rospy.ServiceException as exc:
+            rospy.logerr("Clearing local octomap failed: " +  str(exc))
         # tilt robot before starting scan
         if request.front:
             self.robot_pose.angular.y = max_tilt_angle

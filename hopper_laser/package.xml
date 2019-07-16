@@ -12,6 +12,7 @@
   <build_depend>message_generation</build_depend>
   <depend>geometry_msgs</depend>
   <depend>laser_assembler</depend>
+  <depend>octomap_msgs</depend>
   <depend>roscpp</depend>
   <depend>rospy</depend>
   <depend>sensor_msgs</depend>

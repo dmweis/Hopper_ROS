@@ -2,17 +2,34 @@
 
 import rospy
 
-from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest
+from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest, MoveLegsUntilCollision, MoveLegsUntilCollisionRequest, MoveCoreToPosition, MoveCoreToPositionRequest
 from geometry_msgs.msg import Vector3
 
 if __name__ == "__main__":
     rospy.init_node("leg_move_tester")
     rospy.wait_for_service("hopper/move_limbs_individual")
     move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
+    move_legs_until_collision = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
+    move_core = rospy.ServiceProxy("hopper/move_body_core", MoveCoreToPosition)
     request = MoveLegsToPositionRequest()
-    request.header.frame_id = "base_link"
-    request.selected_legs = 16 | 32
-    request.left_middle = Vector3(0, 0.3, 0)
-    request.right_middle = Vector3(0, -0.3, 0)
+    request.header.frame_id = "left_front_button"
+    request.selected_legs = MoveLegsToPositionRequest.LEFT_FRONT
+    request.left_front = Vector3(0, 0, 0)
+    request.left_middle = Vector3(0, 0, 0)
+    request.left_rear = Vector3(0, 0, 0)
+    request.right_front = Vector3(0, 0, 0)
+    request.right_middle = Vector3(0, 0, 0)
+    request.right_rear = Vector3(0, 0, 0)
     move_legs(request)
+    # until_request = MoveLegsUntilCollisionRequest()
+    # until_request.header.frame_id = "body_link"
+    # until_request.selected_legs = MoveLegsUntilCollisionRequest.LEFT_MIDDLE
+    # until_request.left_middle = Vector3(0, 0.25, -0.2)
+    # move_legs_until_collision(until_request)
 
+    # # core move
+    # body_request = MoveCoreToPositionRequest()
+    # body_request.header.frame_id = "body_link"
+    # body_request.used_legs = 63
+    # body_request.core_movement = Vector3(0.05, 0, 0)
+    # move_core(body_request)

@@ -18,6 +18,7 @@ class LaserScanner(object):
         rospy.wait_for_service("assemble_scans2")
         self.scanner_active = rospy.get_param("laser_scanner_active_startup", default=False)
         self.scan_time = rospy.get_param("laser_scanner_scan_time", default=5.0)
+        self.past_point_cloud_data_time = rospy.get_param("past_point_cloud_data_time", default=1.0)
         self.stance_translate = rospy.Publisher('hopper/stance_translate', Twist, queue_size=1)
         self.point_cloud_publisher = rospy.Publisher("hopper/assembled_scan", PointCloud2, queue_size=2)
         rospy.Subscriber("hopper/stance_translate", Twist, self.on_stance_msg, queue_size=10)
@@ -38,7 +39,7 @@ class LaserScanner(object):
             if rospy.get_time() - last_pointcloud_time > pointcloud_timeout:
                 last_pointcloud_time = rospy.get_time()
                 request = AssembleScans2Request()
-                request.begin = rospy.Time.now() - rospy.Duration(self.scan_time)
+                request.begin = rospy.Time.now() - rospy.Duration(self.past_point_cloud_data_time)
                 request.end = rospy.Time.now()
                 point_cloud = self.assemble_scan(request).cloud
                 self.point_cloud_publisher.publish(point_cloud)

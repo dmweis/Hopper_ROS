@@ -63,7 +63,7 @@ def get_height_for_step(distance, full_step_length, height):
 
 
 class MovementController(object):
-    def __init__(self, gait_engine, speech_service, folding_manager, state_telemetry_publisher, leg_controller):
+    def __init__(self, gait_engine, speech_service, folding_manager, state_telemetry_publisher, leg_controller, lidar_controller):
         """
         :type gait_engine: GaitEngine
         """
@@ -75,6 +75,7 @@ class MovementController(object):
         self.choreographer = Choreographer(self._gait_engine)
         self._speech_service = speech_service
         self.leg_controller = leg_controller
+        self.lidar_controller = lidar_controller
 
         self._relaxed = True
         self._velocity = Vector2()
@@ -123,12 +124,16 @@ class MovementController(object):
                 self.moving_mode_loop_tick()
             elif self.folding_operation:
                 if self.folding_operation == FoldCommand.FOLD and not self.folding_manager.check_if_folded():
+                    self.lidar_controller.stop()
                     self.folding_manager.fold()
                 elif self.folding_operation == FoldCommand.UNFOLD and self.folding_manager.check_if_folded():
+                    self.lidar_controller.start()
                     self.folding_manager.unfold()
                 elif self.folding_operation == FoldCommand.FOLD_GROUNDED and not self.folding_manager.check_if_folded():
+                    self.lidar_controller.stop()
                     self.folding_manager.fold_on_ground()
                 elif self.folding_operation == FoldCommand.UNFOLD_GROUNDED and self.folding_manager.check_if_folded():
+                    self.lidar_controller.start()
                     self.folding_manager.unfold_on_ground()
                 self.folding_operation = None
         if self.currently_standing:

@@ -90,7 +90,7 @@ class LaserScanner(object):
             if rospy.get_time() - last_pointcloud_time > pointcloud_timeout:
                 last_pointcloud_time = rospy.get_time()
                 assemble_request = AssembleScans2Request()
-                assemble_request.begin = scan_start
+                assemble_request.begin = rospy.Time.from_sec(scan_start)
                 assemble_request.end = rospy.Time.now()
                 point_cloud = self.assemble_scan(assemble_request).cloud
                 self.point_cloud_publisher.publish(point_cloud)

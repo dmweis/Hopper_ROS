@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <node  ns="local" name="octomap_server" pkg="octomap_server" type="octomap_server_node">
+    <node name="local_octomap_server" pkg="octomap_server" type="octomap_server_node">
         <param name="resolution" value="0.02" />
         <param name="frame_id" type="string" value="odom" />
-        <param name="base_frame_id" type="string" value="base_footprint" />
+        <param name="base_frame_id" type="string" value="laser" />
         <param name="sensor_model/max_range" value="5.0" />
         <remap from="cloud_in" to="/hopper/assembled_scan" />
     </node>

@@ -14,7 +14,7 @@ if __name__ == "__main__":
     request = MoveLegsToPositionRequest()
     request.header.frame_id = "left_front_button"
     request.selected_legs = MoveLegsToPositionRequest.LEFT_FRONT
-    request.left_front = Vector3(0, 0, 0)
+    request.left_front = Vector3(0, 0, 0.01)
     request.left_middle = Vector3(0, 0, 0)
     request.left_rear = Vector3(0, 0, 0)
     request.right_front = Vector3(0, 0, 0)

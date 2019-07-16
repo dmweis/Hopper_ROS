@@ -41,23 +41,23 @@ class JointStatePublisher(object):
         joint_positions = [
             motor_positions.left_front.coxa - 150,
             motor_positions.left_front.femur - 150 + self.femur_offset,
-            motor_positions.left_front.tibia - 150 + 45 - self.tibia_offset,
+            motor_positions.left_front.tibia - 150 - (90 - self.tibia_offset),
             motor_positions.right_front.coxa - 150,
             motor_positions.right_front.femur - 150 - self.femur_offset,
-            motor_positions.right_front.tibia - 150 - 45 + self.tibia_offset,
+            motor_positions.right_front.tibia - 150 + (90 - self.tibia_offset),
             motor_positions.left_middle.coxa - 150,
             motor_positions.left_middle.femur - 150 + self.femur_offset,
-            motor_positions.left_middle.tibia - 150 + 45 - self.tibia_offset,
+            motor_positions.left_middle.tibia - 150 - (90 - self.tibia_offset),
 
             motor_positions.right_middle.coxa - 150,
             motor_positions.right_middle.femur - 150 - self.femur_offset,
-            motor_positions.right_middle.tibia - 150 - 45 + self.tibia_offset,
+            motor_positions.right_middle.tibia - 150 + (90 - self.tibia_offset),
             motor_positions.left_rear.coxa - 150,
             motor_positions.left_rear.femur - 150 + self.femur_offset,
-            motor_positions.left_rear.tibia - 150 + 45 - self.tibia_offset,
+            motor_positions.left_rear.tibia - 150 - (90 - self.tibia_offset),
             motor_positions.right_rear.coxa - 150,
             motor_positions.right_rear.femur - 150 - self.femur_offset,
-            motor_positions.right_rear.tibia - 150 - 45 + self.tibia_offset
+            motor_positions.right_rear.tibia - 150 + (90 - self.tibia_offset)
         ]
         joint_state = JointState()
         joint_state.name = JOINT_NAMES

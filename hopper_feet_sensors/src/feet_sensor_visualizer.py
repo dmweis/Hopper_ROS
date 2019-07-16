@@ -21,7 +21,7 @@ class FeetSensorVisualizer(object):
     def on_feet_msg(self, feet_msg):
         marker = Marker()
         marker.header.frame_id = "base_link"
-        marker.header.stamp = rospy.Time.now()
+        marker.header.stamp = rospy.Time()
         marker.type = Marker.SPHERE_LIST
         marker.action = Marker.ADD
         marker.pose.orientation.w = 1.

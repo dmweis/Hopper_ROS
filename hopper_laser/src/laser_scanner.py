@@ -75,13 +75,21 @@ class LaserScanner(object):
         last_pointcloud_time = rospy.get_time()
         pointcloud_timeout = 0.5
         max_tilt_angle = request.vertical_fov if request.vertical_fov else radians(12.0)
+        # tilt robot before starting scan
+        if request.front:
+            self.robot_pose.angular.y = max_tilt_angle
+        else:
+            self.robot_pose.angular.x = max_tilt_angle
+        self.stance_translate.publish(self.robot_pose)
+        rospy.sleep(1)
+        # make sure robot is tilted
         scan_start = rospy.get_time()
         update_rate = rospy.Rate(30)
         while not rospy.is_shutdown() and not self.scanner_active:
             if rospy.get_time() - last_pointcloud_time > pointcloud_timeout:
                 last_pointcloud_time = rospy.get_time()
                 assemble_request = AssembleScans2Request()
-                assemble_request.begin = rospy.Time.now() - rospy.Duration(request.scan_time)
+                assemble_request.begin = scan_start
                 assemble_request.end = rospy.Time.now()
                 point_cloud = self.assemble_scan(assemble_request).cloud
                 self.point_cloud_publisher.publish(point_cloud)

@@ -153,7 +153,7 @@ class SteamControllerRosHandler(object):
             if buttons_pressed & SCButtons.START:
                 self.speech_pub.publish("windows_startup")
             if buttons_pressed & SCButtons.LB:
-                self.scan_service(True, 15, 0.4)
+                self.scan_service(True, 12, 0.35)
             if buttons_pressed & SCButtons.RB:
                 self.laser_scan_status = not self.laser_scan_status
                 self.enable_laser_scanner.publish(self.laser_scan_status)

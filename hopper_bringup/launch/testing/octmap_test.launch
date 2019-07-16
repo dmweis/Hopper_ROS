@@ -4,7 +4,7 @@
         <param name="resolution" value="0.02" />
         <param name="frame_id" type="string" value="odom" />
         <param name="base_frame_id" type="string" value="base_footprint" />
-        <param name="sensor_model/max_range" value="5.0" />
+        <param name="sensor_model/max_range" value="3.0" />
         <remap from="cloud_in" to="/hopper/assembled_scan" />
     </node>
 </launch>

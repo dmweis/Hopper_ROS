@@ -32,10 +32,10 @@ class HighFiveController(object):
         rospy.init_node("high_five_controller")
         # variables
         self.hand_touched = False
-        self.left_min_angle_limit = -pi
+        self.left_min_angle_limit = -pi + radians(2)
         self.left_max_angle_limit = -pi + radians(60)
         self.right_min_angle_limit = pi - radians(60)
-        self.right_max_angle_limit = pi
+        self.right_max_angle_limit = pi - radians(2)
         self.max_distance = 0.3
         # Subscribers
         self.marker_publisher = rospy.Publisher("hand_marker", Marker, queue_size=10)
@@ -63,6 +63,7 @@ class HighFiveController(object):
                 self.touch_point(x, y, False)
         if not left_success and not right_success:
             self.delete_all_markers()
+            self.return_home()
             self.hand_touched = False
 
     def detect_hand(self, start_index, stop_index, scan_msg):
@@ -106,6 +107,14 @@ class HighFiveController(object):
         point.z = 0
         request.left_front = point
         request.right_front = point
+        self.move_legs(request)
+
+    def return_home(self):
+        request = MoveLegsToPositionRequest()
+        request.header.frame_id = "base_link"
+        request.selected_legs = MoveLegsToPositionRequest.LEFT_FRONT | MoveLegsToPositionRequest.RIGHT_FRONT
+        request.left_front = Vector3(0.18, 0.15, -0.09)
+        request.right_front = Vector3(0.18, -0.15, -0.09)
         self.move_legs(request)
 
     def display_marker(self, x, y):

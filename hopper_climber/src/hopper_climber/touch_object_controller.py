@@ -40,7 +40,7 @@ class TouchPointController(object):
         self.move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
         self.move_legs_until_collision = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
         self.move_body_core_service = rospy.ServiceProxy("hopper/move_body_core", MoveCoreToPosition)
-        rospy.Subscriber("hopper/touch_point_controller/selecte_foot", Int32, self.on_select_foot_msg, queue_size=10)
+        rospy.Subscriber("hopper/touch_point_controller/select_foot", Int32, self.on_select_foot_msg, queue_size=10)
         rospy.Subscriber("clicked_point", PointStamped, self.on_clicked_point, queue_size=1)
         rospy.spin()
 

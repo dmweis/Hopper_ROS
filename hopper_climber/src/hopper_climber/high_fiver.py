@@ -7,6 +7,7 @@ import numpy as np
 
 from math import radians, ceil, degrees, pi, cos, sin
 from sensor_msgs.msg import LaserScan
+from std_msgs.msg import Bool
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Vector3
 from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest
@@ -27,20 +28,25 @@ class HighFiveController(object):
         super(HighFiveController, self).__init__()
         rospy.init_node("high_five_controller")
         # variables
+        self.active = False
         self.hand_touched = False
-        self.left_min_angle_limit = -pi
+        self.left_min_angle_limit = -pi + radians(2)
         self.left_max_angle_limit = -pi + radians(60)
         self.right_min_angle_limit = pi - radians(60)
-        self.right_max_angle_limit = pi
+        self.right_max_angle_limit = pi - radians(2)
         self.max_distance = 0.3
+        self.high_five_time = 0.3
         # Subscribers
         self.marker_publisher = rospy.Publisher("hand_marker", Marker, queue_size=10)
         rospy.wait_for_service("hopper/move_limbs_individual")
         self.move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
+        rospy.Subscriber("hopper/high_five/enabled", Bool, self.on_active_msg, queue_size=10)
         rospy.Subscriber("scan", LaserScan, self.on_laser_msg, queue_size=1)
         rospy.spin()
 
     def on_laser_msg(self, scan_msg):
+        if not self.active:
+            return
         left_start_index = heading_to_index(self.left_min_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
         left_stop_index = heading_to_index(self.left_max_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
         left_success, x, y = self.detect_hand(left_start_index, left_stop_index, scan_msg)
@@ -49,6 +55,8 @@ class HighFiveController(object):
             if not self.hand_touched:
                 self.hand_touched = True
                 self.touch_point(x, y, True)
+                rospy.sleep(self.high_five_time)
+                self.return_home()
         right_start_index = heading_to_index(self.right_min_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
         right_stop_index = heading_to_index(self.right_max_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
         right_success, x, y = self.detect_hand(right_start_index, right_stop_index, scan_msg)
@@ -57,6 +65,8 @@ class HighFiveController(object):
             if not self.hand_touched:
                 self.hand_touched = True
                 self.touch_point(x, y, False)
+                rospy.sleep(self.high_five_time)
+                self.return_home()
         if not left_success and not right_success:
             self.delete_all_markers()
             self.hand_touched = False
@@ -102,6 +112,14 @@ class HighFiveController(object):
         request.right_front = point
         self.move_legs(request)
 
+    def return_home(self):
+        request = MoveLegsToPositionRequest()
+        request.header.frame_id = "base_link"
+        request.selected_legs = MoveLegsToPositionRequest.LEFT_FRONT | MoveLegsToPositionRequest.RIGHT_FRONT
+        request.left_front = Vector3(0.18, 0.15, -0.09)
+        request.right_front = Vector3(0.18, -0.15, -0.09)
+        self.move_legs(request)
+
     def display_marker(self, x, y):
         marker = Marker()
         marker.header.frame_id = "laser"
@@ -129,6 +147,9 @@ class HighFiveController(object):
         marker.action = Marker.DELETEALL
         marker.lifetime = rospy.Duration(0)
         self.marker_publisher.publish(marker)
+
+    def on_active_msg(self, msg):
+        self.active = msg.data
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ import tf2_ros
 from threading import Event
 from Queue import Queue, Empty
 from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision
+from visualization_msgs.msg import Marker
 from hexapod.hexapod_ik_driver import LegPositions, Vector3, LegFlags
 from hopper_feet_sensors.msg import FeetSensorData
 from pyquaternion import Quaternion
@@ -19,6 +20,8 @@ class LegController(object):
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
         self.last_feet_msg = FeetSensorData()
+
+        self.marker_publisher = rospy.Publisher("leg_move_marker", Marker, queue_size=10)
         # Subscribers
         rospy.Subscriber("hopper/feet", FeetSensorData, self.on_feet_msg, queue_size=10)
 
@@ -34,22 +37,24 @@ class LegController(object):
         command_frame = move_legs_cmd.header.frame_id
         ros_transform = self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform
         frame_translation_ros, frame_rotation_ros = ros_transform.translation, ros_transform.rotation
-        frame_rotation = Quaternion(frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z, frame_rotation_ros.w)
+        frame_rotation = Quaternion(frame_rotation_ros.w, frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z)
         frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
         move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd)
         new_positions = LegPositions(
-             (move_legs_overloaded.left_front + frame_translation).rotate(frame_rotation) * 100.0
-            ,(move_legs_overloaded.right_front + frame_translation).rotate(frame_rotation) * 100.0
-            ,(move_legs_overloaded.left_middle + frame_translation).rotate(frame_rotation) * 100.0
-            ,(move_legs_overloaded.right_middle + frame_translation).rotate(frame_rotation) * 100.0
-            ,(move_legs_overloaded.left_rear + frame_translation).rotate(frame_rotation) * 100.0
-            ,(move_legs_overloaded.right_rear + frame_translation).rotate(frame_rotation) * 100.0
+             (move_legs_overloaded.left_front * frame_rotation + frame_translation ) * 100.0
+            ,(move_legs_overloaded.right_front * frame_rotation + frame_translation ) * 100.0
+            ,(move_legs_overloaded.left_middle * frame_rotation + frame_translation ) * 100.0
+            ,(move_legs_overloaded.right_middle * frame_rotation + frame_translation ) * 100.0
+            ,(move_legs_overloaded.left_rear * frame_rotation + frame_translation ) * 100.0
+            ,(move_legs_overloaded.right_rear * frame_rotation + frame_translation ) * 100.0
         )
         current_positions = self.gait_engine.get_current_leg_positions()
         desired_position = current_positions.update_from_other(new_positions, LegFlags(move_legs_cmd.selected_legs))
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, desired_position))
         task_finished_event.wait()
+        # debug marker
+        # self.display_marker(desired_position.left_front.x / 100, desired_position.left_front.y / 100, desired_position.left_front.z / 100)
         return True
 
     def move_body(self, move_legs_cmd):
@@ -128,3 +133,24 @@ class LegController(object):
 
     def is_motion_queued(self):
         return not self.motion_queue.empty()
+
+    def display_marker(self, x, y, z):
+        marker = Marker()
+        marker.header.frame_id = "base_link"
+        marker.header.stamp = rospy.Time()
+        marker.type = Marker.SPHERE
+        marker.action = Marker.ADD
+        marker.pose.orientation.w = 1.
+        marker.pose.position.x = x
+        marker.pose.position.y = y
+        marker.pose.position.z = z
+        marker.scale.x = 0.1
+        marker.scale.y = 0.1
+        marker.scale.z = 0.1
+        marker.color.a = 1.0
+        marker.color.r = 0.0
+        marker.color.g = 1.0
+        marker.color.b = 0.0
+        marker.lifetime = rospy.Duration(0)
+        marker.frame_locked = True
+        self.marker_publisher.publish(marker)

@@ -11,10 +11,6 @@ from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Vector3
 from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest
 
-def rotate_around_z(x, y, angle):
-        new_x = x * cos(angle) - y * sin(angle)
-        new_y = x * sin(angle) + y * cos(angle)
-        return new_x, new_y
 
 def mean(data):
     return float(sum(data)) / max(len(data), 1)
@@ -99,10 +95,8 @@ class HighFiveController(object):
         request.header.frame_id = "laser"
         request.selected_legs = MoveLegsToPositionRequest.LEFT_FRONT if is_left else MoveLegsToPositionRequest.RIGHT_FRONT
         point = Vector3()
-        # cheat because laser is inverted
-        new_x, new_y = rotate_around_z(x, y, pi)
-        point.x = new_x
-        point.y = new_y
+        point.x = x
+        point.y = y
         point.z = 0
         request.left_front = point
         request.right_front = point

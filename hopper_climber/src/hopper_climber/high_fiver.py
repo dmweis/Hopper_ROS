@@ -8,7 +8,16 @@ import numpy as np
 from math import radians, ceil, degrees, pi, cos, sin
 from sensor_msgs.msg import LaserScan
 from visualization_msgs.msg import Marker
+from geometry_msgs.msg import Vector3
+from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest
 
+def rotate_around_z(x, y, angle):
+        new_x = x * cos(angle) - y * sin(angle)
+        new_y = x * sin(angle) + y * cos(angle)
+        return new_x, new_y
+
+def mean(data):
+    return float(sum(data)) / max(len(data), 1)
 
 def index_to_heading(index, angle_min, angle_increment):
     return angle_min + index * angle_increment
@@ -16,33 +25,46 @@ def index_to_heading(index, angle_min, angle_increment):
 def heading_to_index(heading, angle_min, angle_increment):
     return max(int(ceil((heading - angle_min) / angle_increment)), 0)
 
+
 class HighFiveController(object):
     def __init__(self):
         super(HighFiveController, self).__init__()
         rospy.init_node("high_five_controller")
         # variables
+        self.hand_touched = False
         self.left_min_angle_limit = -pi
         self.left_max_angle_limit = -pi + radians(60)
         self.right_min_angle_limit = pi - radians(60)
         self.right_max_angle_limit = pi
-        self.max_distance = 0.4
+        self.max_distance = 0.3
         # Subscribers
-        rospy.Subscriber("scan", LaserScan, self.on_laser_msg, queue_size=1)
         self.marker_publisher = rospy.Publisher("hand_marker", Marker, queue_size=10)
+        rospy.wait_for_service("hopper/move_limbs_individual")
+        self.move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
+        rospy.Subscriber("scan", LaserScan, self.on_laser_msg, queue_size=1)
         rospy.spin()
 
     def on_laser_msg(self, scan_msg):
         left_start_index = heading_to_index(self.left_min_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
         left_stop_index = heading_to_index(self.left_max_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
-        success, x, y = self.detect_hand(left_start_index, left_stop_index, scan_msg)
-        if success:
+        left_success, x, y = self.detect_hand(left_start_index, left_stop_index, scan_msg)
+        if left_success:
             self.display_marker(x, y)
+            if not self.hand_touched:
+                self.hand_touched = True
+                self.touch_point(x, y, True)
         right_start_index = heading_to_index(self.right_min_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
         right_stop_index = heading_to_index(self.right_max_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
-        success, x, y = self.detect_hand(right_start_index, right_stop_index, scan_msg)
-        if success:
+        right_success, x, y = self.detect_hand(right_start_index, right_stop_index, scan_msg)
+        if right_success:
             self.display_marker(x, y)
-    
+            if not self.hand_touched:
+                self.hand_touched = True
+                self.touch_point(x, y, False)
+        if not left_success and not right_success:
+            self.delete_all_markers()
+            self.hand_touched = False
+
     def detect_hand(self, start_index, stop_index, scan_msg):
         detected_points = map(lambda dist: dist < self.max_distance, scan_msg.ranges[start_index:stop_index])
         if True not in detected_points:
@@ -60,9 +82,9 @@ class HighFiveController(object):
                     tmp_start_point = None
         if tmp_start_point is not None:
             detected_groups.append((tmp_start_point, len(detected_points)-1))
-        group_widths = map(lambda (start, stop): abs(stop-start), detected_groups)
+        group_distances = map(lambda (start, stop): mean(scan_msg.ranges[start+start_index:stop+start_index]), detected_groups)
         # TODO: less ugly
-        largest_group = detected_groups[group_widths.index(max(group_widths))]
+        largest_group = detected_groups[group_distances.index(min(group_distances))]
         index_middle_largest_group = int((largest_group[0] + largest_group[1]) / 2) + start_index
         heading = index_to_heading(index_middle_largest_group, scan_msg.angle_min, scan_msg.angle_increment)
         distance = scan_msg.ranges[index_middle_largest_group]
@@ -71,6 +93,20 @@ class HighFiveController(object):
         y = distance * sin(heading)
 
         return True, x, y
+
+    def touch_point(self, x, y, is_left):
+        request = MoveLegsToPositionRequest()
+        request.header.frame_id = "laser"
+        request.selected_legs = MoveLegsToPositionRequest.LEFT_FRONT if is_left else MoveLegsToPositionRequest.RIGHT_FRONT
+        point = Vector3()
+        # cheat because laser is inverted
+        new_x, new_y = rotate_around_z(x, y, pi)
+        point.x = new_x
+        point.y = new_y
+        point.z = 0
+        request.left_front = point
+        request.right_front = point
+        self.move_legs(request)
 
     def display_marker(self, x, y):
         marker = Marker()
@@ -90,6 +126,14 @@ class HighFiveController(object):
         marker.color.b = 0.0
         marker.lifetime = rospy.Duration(0)
         marker.frame_locked = True
+        self.marker_publisher.publish(marker)
+
+    def delete_all_markers(self):
+        marker = Marker()
+        marker.header.frame_id = "laser"
+        marker.header.stamp = rospy.Time()
+        marker.action = Marker.DELETEALL
+        marker.lifetime = rospy.Duration(0)
         self.marker_publisher.publish(marker)
 
 

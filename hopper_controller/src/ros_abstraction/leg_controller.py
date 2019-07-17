@@ -32,7 +32,8 @@ class LegController(object):
     def move_legs(self, move_legs_cmd):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
-        frame_translation_ros, frame_rotation_ros = self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform
+        ros_transform = self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform
+        frame_translation_ros, frame_rotation_ros = ros_transform.translation, ros_transform.rotation
         frame_rotation = Quaternion(frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z, frame_rotation_ros.w)
         frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
         move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd)

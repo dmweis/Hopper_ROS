@@ -8,6 +8,7 @@ from Queue import Queue, Empty
 from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision
 from hexapod.hexapod_ik_driver import LegPositions, Vector3, LegFlags
 from hopper_feet_sensors.msg import FeetSensorData
+from pyquaternion import Quaternion
 
 
 class LegController(object):
@@ -31,15 +32,17 @@ class LegController(object):
     def move_legs(self, move_legs_cmd):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
-        frame_transform = Vector3.ros_vector3_to_overload_vector(self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform.translation)
+        frame_translation_ros, frame_rotation_ros = self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform
+        frame_rotation = Quaternion(frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z, frame_rotation_ros.w)
+        frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
         move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd)
         new_positions = LegPositions(
-             (move_legs_overloaded.left_front + frame_transform) * 100.0
-            ,(move_legs_overloaded.right_front + frame_transform) * 100.0
-            ,(move_legs_overloaded.left_middle + frame_transform) * 100.0
-            ,(move_legs_overloaded.right_middle + frame_transform) * 100.0
-            ,(move_legs_overloaded.left_rear + frame_transform) * 100.0
-            ,(move_legs_overloaded.right_rear + frame_transform) * 100.0
+             (move_legs_overloaded.left_front + frame_translation).rotate(frame_rotation) * 100.0
+            ,(move_legs_overloaded.right_front + frame_translation).rotate(frame_rotation) * 100.0
+            ,(move_legs_overloaded.left_middle + frame_translation).rotate(frame_rotation) * 100.0
+            ,(move_legs_overloaded.right_middle + frame_translation).rotate(frame_rotation) * 100.0
+            ,(move_legs_overloaded.left_rear + frame_translation).rotate(frame_rotation) * 100.0
+            ,(move_legs_overloaded.right_rear + frame_translation).rotate(frame_rotation) * 100.0
         )
         current_positions = self.gait_engine.get_current_leg_positions()
         desired_position = current_positions.update_from_other(new_positions, LegFlags(move_legs_cmd.selected_legs))

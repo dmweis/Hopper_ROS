@@ -78,6 +78,7 @@ class SteamControllerRosHandler(object):
         self._right_pad_moved = 0
         self.robot_height_offset = 0
         self.single_leg_mode_on = False
+        self.high_five_enabled = False
 
         self.idle_animations_enabled = rospy.get_param("idle_enabled_startup", False)
 
@@ -95,6 +96,7 @@ class SteamControllerRosHandler(object):
         self.single_leg_publisher = rospy.Publisher('hopper/single_leg_command', SingleLegCommand, queue_size=5)
         self.toggle_face_tracking_publisher = rospy.Publisher("/hopper/face_tracking_enabled", Bool, queue_size=10)
         self.enable_idle_animations_publisher = rospy.Publisher("hopper/idle_animations/enabled", Bool, queue_size=10)
+        self.high_five_enabled_publisher = rospy.Publisher("hopper/high_five/enabled", Bool, queue_size=10)
         self.face_color_publisher = rospy.Publisher("hopper/face/mode", String, queue_size=3)
         self.fold_command_publisher = rospy.Publisher("hopper/fold_command", FoldCommand, queue_size=5)
         self.enable_laser_scanner = rospy.Publisher("hopper/laser_scanner/active", Bool, queue_size=5)
@@ -209,7 +211,9 @@ class SteamControllerRosHandler(object):
                 self.face_tracking_enabled = not self.face_tracking_enabled
                 self.toggle_face_tracking_publisher.publish(Bool(self.face_tracking_enabled))
             if buttons_pressed & SCButtons.BACK:
-                self.face_color_publisher.publish(String("random"))
+                # self.face_color_publisher.publish(String("random"))
+                self.high_five_enabled = not self.high_five_enabled
+                self.high_five_enabled_publisher.publish(self.high_five_enabled)
         
         if buttons_pressed & SCButtons.STEAM:
             self.standing = not self.standing

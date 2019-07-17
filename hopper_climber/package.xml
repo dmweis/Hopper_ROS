@@ -21,6 +21,9 @@
   <exec_depend>hopper_controller</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+  <depend>sensor_msgs</depend>
+  <depend>visualization_msgs</depend>
+
   <export>
   </export>
 </package>

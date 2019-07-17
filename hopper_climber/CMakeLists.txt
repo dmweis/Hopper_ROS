@@ -6,6 +6,8 @@ find_package(catkin REQUIRED COMPONENTS
   hopper_controller
   rospy
   std_msgs
+  sensor_msgs
+  visualization_msgs
 )
 
 catkin_package()

@@ -33,6 +33,8 @@ class Vector3(geometry_msgs.msg.Vector3):
             return Vector3(self.x * other.x, self.y * other.y, self.z * other.z)
         elif isinstance(other, Number):
             return Vector3(self.x * other, self.y * other, self.z * other)
+        elif isinstance(other, Quaternion):
+            return self.clone().rotate(other)
 
     def __truediv__(self, other):
         if isinstance(other, Vector3):

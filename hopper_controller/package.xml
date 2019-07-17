@@ -20,6 +20,7 @@
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
   <depend>hopper_feet_sensors</depend>
+  <depend>python-pyquaternion-pip</depend>
   <exec_depend>message_runtime</exec_depend>
 
 </package>

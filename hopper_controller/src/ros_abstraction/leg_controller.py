@@ -6,7 +6,7 @@ import tf2_ros
 from threading import Event
 from Queue import Queue, Empty
 from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision
-from std_srvs.srv import Empty
+from std_srvs.srv import Empty, EmptyResponse
 from visualization_msgs.msg import Marker
 from hexapod.hexapod_ik_driver import LegPositions, Vector3, LegFlags
 from hopper_feet_sensors.msg import FeetSensorData
@@ -136,6 +136,7 @@ class LegController(object):
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, relaxed_pose))
         task_finished_event.wait()
+        return EmptyResponse()
 
     def execute_motion(self):
         try:

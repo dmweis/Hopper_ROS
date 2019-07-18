@@ -8,6 +8,7 @@ import numpy as np
 from math import radians, ceil, degrees, pi, cos, sin
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Bool
+from std_srvs.srv import Empty
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Vector3
 from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest
@@ -39,7 +40,9 @@ class HighFiveController(object):
         # Subscribers
         self.marker_publisher = rospy.Publisher("hand_marker", Marker, queue_size=10)
         rospy.wait_for_service("hopper/move_limbs_individual")
+        rospy.wait_for_service("hopper/move_to_relaxed")
         self.move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
+        self.move_legs_to_relaxed = rospy.ServiceProxy("hopper/move_to_relaxed", Empty)
         rospy.Subscriber("hopper/high_five/enabled", Bool, self.on_active_msg, queue_size=10)
         rospy.Subscriber("scan", LaserScan, self.on_laser_msg, queue_size=1)
         rospy.spin()
@@ -56,7 +59,7 @@ class HighFiveController(object):
                 self.hand_touched = True
                 self.touch_point(x, y, True)
                 rospy.sleep(self.high_five_time)
-                self.return_home()
+                self.move_legs_to_relaxed()
         right_start_index = heading_to_index(self.right_min_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
         right_stop_index = heading_to_index(self.right_max_angle_limit, scan_msg.angle_min, scan_msg.angle_increment)
         right_success, x, y = self.detect_hand(right_start_index, right_stop_index, scan_msg)
@@ -66,7 +69,7 @@ class HighFiveController(object):
                 self.hand_touched = True
                 self.touch_point(x, y, False)
                 rospy.sleep(self.high_five_time)
-                self.return_home()
+                self.move_legs_to_relaxed()
         if not left_success and not right_success:
             self.delete_all_markers()
             self.hand_touched = False
@@ -110,14 +113,6 @@ class HighFiveController(object):
         point.z = 0
         request.left_front = point
         request.right_front = point
-        self.move_legs(request)
-
-    def return_home(self):
-        request = MoveLegsToPositionRequest()
-        request.header.frame_id = "base_link"
-        request.selected_legs = MoveLegsToPositionRequest.LEFT_FRONT | MoveLegsToPositionRequest.RIGHT_FRONT
-        request.left_front = Vector3(0.18, 0.15, -0.09)
-        request.right_front = Vector3(0.18, -0.15, -0.09)
         self.move_legs(request)
 
     def display_marker(self, x, y):

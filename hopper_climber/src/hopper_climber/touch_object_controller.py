@@ -6,6 +6,7 @@ from enum import IntEnum
 from geometry_msgs.msg import PointStamped, Vector3
 from std_msgs.msg import Int32
 from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest, MoveLegsUntilCollision, MoveLegsUntilCollisionRequest, MoveCoreToPosition, MoveCoreToPositionRequest
+from std_srvs.srv import Empty
 
 
 class LegFlags(IntEnum):
@@ -37,9 +38,11 @@ class TouchPointController(object):
         rospy.wait_for_service("hopper/move_limbs_individual")
         rospy.wait_for_service("hopper/move_body_core")
         rospy.wait_for_service("hopper/move_legs_until_collision")
+        rospy.wait_for_service("hopper/move_to_relaxed")
         self.move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
         self.move_legs_until_collision = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
         self.move_body_core_service = rospy.ServiceProxy("hopper/move_body_core", MoveCoreToPosition)
+        self.move_to_relaxed = rospy.ServiceProxy("hopper/move_to_relaxed", Empty)
         rospy.Subscriber("hopper/touch_point_controller/select_foot", Int32, self.on_select_foot_msg, queue_size=10)
         rospy.Subscriber("clicked_point", PointStamped, self.on_clicked_point, queue_size=1)
         rospy.spin()
@@ -60,6 +63,8 @@ class TouchPointController(object):
         request.left_rear = point
         request.right_rear = point
         self.move_legs(request)
+        rospy.sleep(1)
+        self.move_to_relaxed()
 
     def on_select_foot_msg(self, msg):
         self.selected_foot = LegFlags(msg.data)

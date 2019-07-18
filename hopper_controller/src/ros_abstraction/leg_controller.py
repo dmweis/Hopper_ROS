@@ -6,6 +6,7 @@ import tf2_ros
 from threading import Event
 from Queue import Queue, Empty
 from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision
+from std_srvs.srv import Empty
 from visualization_msgs.msg import Marker
 from hexapod.hexapod_ik_driver import LegPositions, Vector3, LegFlags
 from hopper_feet_sensors.msg import FeetSensorData
@@ -28,6 +29,7 @@ class LegController(object):
         rospy.Service('hopper/move_limbs_individual', MoveLegsToPosition, self.move_legs)
         rospy.Service('hopper/move_body_core', MoveCoreToPosition, self.move_body)
         rospy.Service('hopper/move_legs_until_collision', MoveLegsUntilCollision, self.move_until_hit)
+        rospy.Service('hopper/move_to_relaxed', Empty, self.move_to_relaxed)
 
     def on_feet_msg(self, feet_msg):
         self.last_feet_msg = feet_msg
@@ -128,6 +130,12 @@ class LegController(object):
             else:
                 move_done = True
         return int(colliding_legs), midstep_positions
+
+    def move_to_relaxed(self, srvs_request):
+        relaxed_pose = self.gait_engine.get_relaxed_pose()
+        task_finished_event = Event()
+        self.motion_queue.put((task_finished_event, relaxed_pose))
+        task_finished_event.wait()
 
     def execute_motion(self):
         try:

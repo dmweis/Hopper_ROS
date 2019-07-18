@@ -41,27 +41,30 @@ class LegController(object):
         frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
         move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd)
         new_positions = LegPositions(
-             (move_legs_overloaded.left_front * frame_rotation + frame_translation ) * 100.0
-            ,(move_legs_overloaded.right_front * frame_rotation + frame_translation ) * 100.0
-            ,(move_legs_overloaded.left_middle * frame_rotation + frame_translation ) * 100.0
-            ,(move_legs_overloaded.right_middle * frame_rotation + frame_translation ) * 100.0
-            ,(move_legs_overloaded.left_rear * frame_rotation + frame_translation ) * 100.0
-            ,(move_legs_overloaded.right_rear * frame_rotation + frame_translation ) * 100.0
+             (move_legs_overloaded.left_front * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.right_front * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.left_middle * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.right_middle * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.left_rear * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.right_rear * frame_rotation + frame_translation) * 100.0
         )
         current_positions = self.gait_engine.get_current_leg_positions()
         desired_position = current_positions.update_from_other(new_positions, LegFlags(move_legs_cmd.selected_legs))
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, desired_position))
-        task_finished_event.wait()
         # debug marker
         # self.display_marker(desired_position.left_front.x / 100, desired_position.left_front.y / 100, desired_position.left_front.z / 100)
+        task_finished_event.wait()
         return True
 
     def move_body(self, move_legs_cmd):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
-        frame_transform = Vector3.ros_vector3_to_overload_vector(self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform.translation)
-        move_vector_overload = (-Vector3.ros_vector3_to_overload_vector(move_legs_cmd.core_movement) + frame_transform) * 100.0
+        ros_transform = self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform
+        frame_translation_ros, frame_rotation_ros = ros_transform.translation, ros_transform.rotation
+        frame_rotation = Quaternion(frame_rotation_ros.w, frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z)
+        frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
+        move_vector_overload = (-Vector3.ros_vector3_to_overload_vector(move_legs_cmd.core_movement) * frame_rotation + frame_translation) * 100.0
         current_positions = self.gait_engine.get_current_leg_positions()
         new_positions = current_positions.transform(move_vector_overload, LegFlags(move_legs_cmd.used_legs))
         task_finished_event = Event()
@@ -72,15 +75,18 @@ class LegController(object):
     def move_until_hit(self, move_legs_cmd):
         local_frame = "base_link"
         command_frame = move_legs_cmd.header.frame_id
-        frame_transform = Vector3.ros_vector3_to_overload_vector(self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform.translation)
+        ros_transform = self.tf_buffer.lookup_transform(local_frame, command_frame, rospy.Time()).transform
+        frame_translation_ros, frame_rotation_ros = ros_transform.translation, ros_transform.rotation
+        frame_rotation = Quaternion(frame_rotation_ros.w, frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z)
+        frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
         move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd)
         new_positions = LegPositions(
-             (move_legs_overloaded.left_front + frame_transform) * 100.0
-            ,(move_legs_overloaded.right_front + frame_transform) * 100.0
-            ,(move_legs_overloaded.left_middle + frame_transform) * 100.0
-            ,(move_legs_overloaded.right_middle + frame_transform) * 100.0
-            ,(move_legs_overloaded.left_rear + frame_transform) * 100.0
-            ,(move_legs_overloaded.right_rear + frame_transform) * 100.0
+             (move_legs_overloaded.left_front * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.right_front * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.left_middle * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.right_middle * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.left_rear * frame_rotation + frame_translation) * 100.0
+            ,(move_legs_overloaded.right_rear * frame_rotation + frame_translation) * 100.0
         )
         current_positions = self.gait_engine.get_current_leg_positions()
         desired_position = current_positions.update_from_other(new_positions, LegFlags(move_legs_cmd.selected_legs))

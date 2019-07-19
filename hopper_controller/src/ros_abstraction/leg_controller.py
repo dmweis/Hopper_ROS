@@ -5,7 +5,7 @@ import tf2_ros
 
 from threading import Event
 from Queue import Queue, Empty
-from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision
+from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision, MoveLegsToRelativePosition
 from std_srvs.srv import Empty, EmptyResponse
 from visualization_msgs.msg import Marker
 from hexapod.hexapod_ik_driver import LegPositions, Vector3, LegFlags
@@ -30,6 +30,7 @@ class LegController(object):
         rospy.Service('hopper/move_body_core', MoveCoreToPosition, self.move_body)
         rospy.Service('hopper/move_legs_until_collision', MoveLegsUntilCollision, self.move_until_hit)
         rospy.Service('hopper/move_to_relaxed', Empty, self.move_to_relaxed)
+        rospy.Service('hopper/move_legs_to_relative_position' MoveLegsToRelativePosition, self.move_legs_relative)
 
     def on_feet_msg(self, feet_msg):
         self.last_feet_msg = feet_msg
@@ -137,6 +138,33 @@ class LegController(object):
         self.motion_queue.put((task_finished_event, relaxed_pose))
         task_finished_event.wait()
         return EmptyResponse()
+
+    def get_transform_for_link(self, frame_id):
+        local_frame = "base_link"
+        ros_transform = self.tf_buffer.lookup_transform(local_frame, frame_id, rospy.Time()).transform
+        frame_translation_ros, frame_rotation_ros = ros_transform.translation, ros_transform.rotation
+        frame_rotation = Quaternion(frame_rotation_ros.w, frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z)
+        frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
+        return frame_translation, frame_rotation
+
+    def move_legs_relative(self, srvs_request):
+        current_positions = self.gait_engine.get_current_leg_positions() / 100.0 # convert to meters
+        # for each leg
+        # left front
+        def position_for_foot(pose_stamped, current_position):
+            translation, rotation = self.get_transform_for_link(pose_stamped.header.frame_id)
+            relative_vector = Vector3.ros_vector3_to_overload_vector(pose_stamped.vector)
+            return (current_positions.left_front * frame_rotation + frame_translation + relative_vector) * 100.0
+        current_positions.left_front = position_for_foot(srvs_request.left_front, current_position.left_front)
+        current_positions.right_front = position_for_foot(srvs_request.right_front, current_position.right_front)
+        current_positions.left_middle = position_for_foot(srvs_request.left_middle, current_position.left_middle)
+        current_positions.right_middle = position_for_foot(srvs_request.right_middle, current_position.right_middle)
+        current_positions.left_rear = position_for_foot(srvs_request.left_rear, current_position.left_rear)
+        current_positions.right_rear = position_for_foot(srvs_request.right_rear, current_position.right_rear)
+        task_finished_event = Event()
+        self.motion_queue.put((task_finished_event, relaxed_pose))
+        task_finished_event.wait()
+        return True
 
     def execute_motion(self):
         try:

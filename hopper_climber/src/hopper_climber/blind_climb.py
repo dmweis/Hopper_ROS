@@ -35,9 +35,33 @@ class BlindClimbController(object):
         rospy.wait_for_service("hopper/move_limbs_individual")
         rospy.wait_for_service("hopper/move_body_core")
         rospy.wait_for_service("hopper/move_legs_until_collision")
-        self.move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
-        self.move_legs_until_collision = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
+        self.move_legs_service = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
+        self.move_legs_until_collision_service = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
         self.move_body_core_service = rospy.ServiceProxy("hopper/move_body_core", MoveCoreToPosition)
+
+    def move_leg(self, leg_id, frame_id, vector):
+        request = MoveLegsToPositionRequest()
+        request.header.frame_id = frame_id
+        request.selected_legs = leg_id
+        request.left_front = vector
+        request.left_middle = vector
+        request.left_rear = vector
+        request.right_front = vector
+        request.right_middle = vector
+        request.right_rear = vector
+        self.move_legs_service(request)
+
+    def move_leg_until_collision(self, leg_id, frame_id, vector):
+        request = MoveLegsUntilCollisionRequest()
+        request.header.frame_id = frame_id
+        request.selected_legs = leg_id
+        request.left_front = vector
+        request.left_middle = vector
+        request.left_rear = vector
+        request.right_front = vector
+        request.right_middle = vector
+        request.right_rear = vector
+        self.move_legs_until_collision_service(request)
 
     def move_body_core(self, vector):
         request = MoveCoreToPositionRequest()
@@ -46,38 +70,31 @@ class BlindClimbController(object):
         request.core_movement = vector
         self.move_body_core_service(request)
 
-    def main_climb(self, height):
-        self.move_body_core(Vector3(-0.05, 0, 0))
-
-        request = MoveLegsToPositionRequest()
-        request.header.frame_id = "body_link"
-        request.selected_legs = MoveLegsToPositionRequest.LEFT_FRONT | MoveCoreToPositionRequest.RIGHT_FRONT
-        request.left_front = Vector3(0, 0.25, 0)
-        self.move_legs(request)
-
+    def main_climb(self):
+        self.move_body_core(Vector3(0, 0, 0.05))
+        self.move_leg(MoveCoreToPositionRequest.LEFT_MIDDLE, "base_link", Vector3(0.05, 0.22, 0))
+        self.move_leg_until_collision(MoveCoreToPositionRequest.LEFT_MIDDLE, "base_link", Vector3(0.05, 0.22, -0.2))
 
 
 if __name__ == "__main__":
-    rospy.init_node("leg_move_tester")
-    rospy.wait_for_service("hopper/move_limbs_individual")
-    move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
-    move_legs_until_collision = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
-    move_core = rospy.ServiceProxy("hopper/move_body_core", MoveCoreToPosition)
+    controller = BlindClimbController()
+    controller.main_climb()
+    # rospy.init_node("leg_move_tester")
+    # rospy.wait_for_service("hopper/move_limbs_individual")
+    # move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
+    # move_legs_until_collision = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
+    # move_core = rospy.ServiceProxy("hopper/move_body_core", MoveCoreToPosition)
 
-    request = MoveLegsToPositionRequest()
-    request.header.frame_id = "body_link"
-    request.selected_legs = MoveLegsToPositionRequest.LEFT_MIDDLE
-    request.left_middle = Vector3(0, 0.25, 0)
-    move_legs(request)
-    until_request = MoveLegsUntilCollisionRequest()
-    until_request.header.frame_id = "body_link"
-    until_request.selected_legs = MoveLegsUntilCollisionRequest.LEFT_MIDDLE
-    until_request.left_middle = Vector3(0, 0.25, -0.2)
-    move_legs_until_collision(until_request)
+    
+    # until_request = MoveLegsUntilCollisionRequest()
+    # until_request.header.frame_id = "body_link"
+    # until_request.selected_legs = MoveLegsUntilCollisionRequest.LEFT_MIDDLE
+    # until_request.left_middle = Vector3(0, 0.25, -0.2)
+    # move_legs_until_collision(until_request)
 
-    # core move
-    body_request = MoveCoreToPositionRequest()
-    body_request.header.frame_id = "body_link"
-    body_request.used_legs = 63
-    body_request.core_movement = Vector3(0.05, 0, 0)
-    move_core(body_request)
+    # # core move
+    # body_request = MoveCoreToPositionRequest()
+    # body_request.header.frame_id = "body_link"
+    # body_request.used_legs = 63
+    # body_request.core_movement = Vector3(0.05, 0, 0)
+    # move_core(body_request)

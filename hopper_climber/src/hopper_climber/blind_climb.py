@@ -3,8 +3,8 @@
 import rospy
 
 from enum import IntEnum
-from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest, MoveLegsUntilCollision, MoveLegsUntilCollisionRequest, MoveCoreToPosition, MoveCoreToPositionRequest
-from geometry_msgs.msg import Vector3
+from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest, MoveLegsUntilCollision, MoveLegsUntilCollisionRequest, MoveCoreToPosition, MoveCoreToPositionRequest, MoveLegsToRelativePosition, MoveLegsToRelativePositionRequest
+from geometry_msgs.msg import Vector3, Vector3Stamped
 
 
 class LegFlags(IntEnum):
@@ -35,9 +35,11 @@ class BlindClimbController(object):
         rospy.wait_for_service("hopper/move_limbs_individual")
         rospy.wait_for_service("hopper/move_body_core")
         rospy.wait_for_service("hopper/move_legs_until_collision")
+        rospy.wait_for_service("hopper/move_legs_to_relative_position")
         self.move_legs_service = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
         self.move_legs_until_collision_service = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
         self.move_body_core_service = rospy.ServiceProxy("hopper/move_body_core", MoveCoreToPosition)
+        self.move_legs_relative = rospy.ServiceProxy("hopper/move_legs_to_relative_position", MoveLegsToRelativePosition)
 
     def move_leg(self, leg_id, frame_id, vector):
         request = MoveLegsToPositionRequest()
@@ -70,6 +72,12 @@ class BlindClimbController(object):
         request.core_movement = vector
         self.move_body_core_service(request)
 
+    def test_relative_move(self):
+        request = MoveLegsToRelativePositionRequest()
+        request.left_front.header.frame_id = "base_link"
+        request.left_front.vector.z = 1
+        self.move_legs_relative(request)
+
     def main_climb(self):
         self.move_body_core(Vector3(0, 0, 0.05))
         self.move_leg(MoveCoreToPositionRequest.LEFT_MIDDLE, "base_link", Vector3(0.05, 0.22, 0))
@@ -78,23 +86,5 @@ class BlindClimbController(object):
 
 if __name__ == "__main__":
     controller = BlindClimbController()
-    controller.main_climb()
-    # rospy.init_node("leg_move_tester")
-    # rospy.wait_for_service("hopper/move_limbs_individual")
-    # move_legs = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
-    # move_legs_until_collision = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
-    # move_core = rospy.ServiceProxy("hopper/move_body_core", MoveCoreToPosition)
-
+    controller.test_relative_move()
     
-    # until_request = MoveLegsUntilCollisionRequest()
-    # until_request.header.frame_id = "body_link"
-    # until_request.selected_legs = MoveLegsUntilCollisionRequest.LEFT_MIDDLE
-    # until_request.left_middle = Vector3(0, 0.25, -0.2)
-    # move_legs_until_collision(until_request)
-
-    # # core move
-    # body_request = MoveCoreToPositionRequest()
-    # body_request.header.frame_id = "body_link"
-    # body_request.used_legs = 63
-    # body_request.core_movement = Vector3(0.05, 0, 0)
-    # move_core(body_request)

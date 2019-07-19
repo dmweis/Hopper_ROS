@@ -152,15 +152,13 @@ class LegController(object):
         # for each leg
         # left front
         def position_for_foot(pose_stamped, current_position):
-            translation, rotation = self.get_transform_for_link(pose_stamped.header.frame_id)
-            relative_vector = Vector3.ros_vector3_to_overload_vector(pose_stamped.vector)
-            return (current_positions.left_front * frame_rotation + frame_translation + relative_vector) * 100.0
-        current_positions.left_front = position_for_foot(srvs_request.left_front, current_position.left_front)
-        current_positions.right_front = position_for_foot(srvs_request.right_front, current_position.right_front)
-        current_positions.left_middle = position_for_foot(srvs_request.left_middle, current_position.left_middle)
-        current_positions.right_middle = position_for_foot(srvs_request.right_middle, current_position.right_middle)
-        current_positions.left_rear = position_for_foot(srvs_request.left_rear, current_position.left_rear)
-        current_positions.right_rear = position_for_foot(srvs_request.right_rear, current_position.right_rear)
+            return (current_position + pose_stamped.vector) * 100.0
+        current_positions.left_front = position_for_foot(srvs_request.left_front, current_positions.left_front)
+        current_positions.right_front = position_for_foot(srvs_request.right_front, current_positions.right_front)
+        current_positions.left_middle = position_for_foot(srvs_request.left_middle, current_positions.left_middle)
+        current_positions.right_middle = position_for_foot(srvs_request.right_middle, current_positions.right_middle)
+        current_positions.left_rear = position_for_foot(srvs_request.left_rear, current_positions.left_rear)
+        current_positions.right_rear = position_for_foot(srvs_request.right_rear, current_positions.right_rear)
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, relaxed_pose))
         task_finished_event.wait()

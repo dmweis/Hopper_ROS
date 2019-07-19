@@ -4,7 +4,7 @@ import rospy
 
 from enum import IntEnum
 from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest, MoveLegsUntilCollision, MoveLegsUntilCollisionRequest, MoveCoreToPosition, MoveCoreToPositionRequest, MoveLegsToRelativePosition, MoveLegsToRelativePositionRequest
-from geometry_msgs.msg import Vector3, Vector3Stamped
+from geometry_msgs.msg import Vector3
 
 
 class LegFlags(IntEnum):
@@ -74,8 +74,7 @@ class BlindClimbController(object):
 
     def test_relative_move(self):
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.header.frame_id = "base_link"
-        request.left_front.vector.z = 1
+        request.left_front.z = 1
         self.move_legs_relative(request)
 
     def main_climb(self):

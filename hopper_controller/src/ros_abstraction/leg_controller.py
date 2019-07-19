@@ -151,8 +151,8 @@ class LegController(object):
         current_positions = self.gait_engine.get_current_leg_positions() / 100.0 # convert to meters
         # for each leg
         # left front
-        def position_for_foot(pose_stamped, current_position):
-            return (current_position + pose_stamped.vector) * 100.0
+        def position_for_foot(relative_vector, current_position):
+            return (current_position + relative_vector) * 100.0
         current_positions.left_front = position_for_foot(srvs_request.left_front, current_positions.left_front)
         current_positions.right_front = position_for_foot(srvs_request.right_front, current_positions.right_front)
         current_positions.left_middle = position_for_foot(srvs_request.left_middle, current_positions.left_middle)

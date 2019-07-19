@@ -152,7 +152,8 @@ class LegController(object):
         # for each leg
         # left front
         def position_for_foot(relative_vector, current_position):
-            return (current_position + relative_vector) * 100.0
+            relative_vector_overload = Vector3.ros_vector3_to_overload_vector(relative_vector)
+            return (current_position + relative_vector_overload) * 100.0
         current_positions.left_front = position_for_foot(srvs_request.left_front, current_positions.left_front)
         current_positions.right_front = position_for_foot(srvs_request.right_front, current_positions.right_front)
         current_positions.left_middle = position_for_foot(srvs_request.left_middle, current_positions.left_middle)

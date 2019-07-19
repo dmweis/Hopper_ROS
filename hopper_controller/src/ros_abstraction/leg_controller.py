@@ -161,7 +161,7 @@ class LegController(object):
         current_positions.left_rear = position_for_foot(srvs_request.left_rear, current_positions.left_rear)
         current_positions.right_rear = position_for_foot(srvs_request.right_rear, current_positions.right_rear)
         task_finished_event = Event()
-        self.motion_queue.put((task_finished_event, relaxed_pose))
+        self.motion_queue.put((task_finished_event, current_positions))
         task_finished_event.wait()
         return True
 

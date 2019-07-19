@@ -23,6 +23,7 @@
   <exec_depend>std_msgs</exec_depend>
   <depend>sensor_msgs</depend>
   <depend>std_srvs</depend>
+  <depend>tf2_ros</depend>
   <depend>visualization_msgs</depend>
 
   <export>

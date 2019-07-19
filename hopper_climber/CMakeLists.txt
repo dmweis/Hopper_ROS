@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_srvs
   visualization_msgs
+  tf2_ros
 )
 
 catkin_package()

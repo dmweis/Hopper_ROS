@@ -258,22 +258,36 @@ class LegPositions(hopper_controller.msg.HexapodLegPositions):
         return False
 
     def __sub__(self, other):
-        if isinstance(other, LegPositions) or isinstance(other, Vector3):
+        if isinstance(other, LegPositions):
             return LegPositions(self.left_front - other.left_front,
                                 self.right_front - other.right_front,
                                 self.left_middle - other.left_middle,
                                 self.right_middle - other.right_middle,
                                 self.left_rear - other.left_rear,
                                 self.right_rear - other.right_rear)
+        if isinstance(other, Vector3):
+            return LegPositions(self.left_front - other,
+                                self.right_front - other,
+                                self.left_middle - other,
+                                self.right_middle - other,
+                                self.left_rear - other,
+                                self.right_rear - other)
 
     def __add__(self, other):
-        if isinstance(other, LegPositions) or isinstance(other, Vector3):
+        if isinstance(other, LegPositions):
             return LegPositions(self.left_front + other.left_front,
                                 self.right_front + other.right_front,
                                 self.left_middle + other.left_middle,
                                 self.right_middle + other.right_middle,
                                 self.left_rear + other.left_rear,
                                 self.right_rear + other.right_rear)
+        if isinstance(other, Vector3):
+            return LegPositions(self.left_front + other,
+                                self.right_front + other,
+                                self.left_middle + other,
+                                self.right_middle + other,
+                                self.left_rear + other,
+                                self.right_rear + other)
 
     def __truediv__(self, other):
         if isinstance(other, Number) or isinstance(other, Vector3):

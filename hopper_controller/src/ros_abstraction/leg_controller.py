@@ -168,11 +168,9 @@ class LegController(object):
 
     def move_body_relative(self, request):
         current_positions = self.gait_engine.get_current_leg_positions()# convert to meters
-        # for each leg
-        # left front
-        corrented_rotation = Vector3.ros_vector3_to_overload_vector(request.rotation).rad_to_degree()
+        corrected_rotation = Vector3.ros_vector3_to_overload_vector(request.rotation).rad_to_degree()
         relative_vector_overload = Vector3.ros_vector3_to_overload_vector(request.translation) * 100.0
-        desired_position = (current_positions - relative_vector_overload).rotate(corrented_rotation)
+        desired_position = (current_positions - relative_vector_overload).rotate(corrected_rotation)
 
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, desired_position))

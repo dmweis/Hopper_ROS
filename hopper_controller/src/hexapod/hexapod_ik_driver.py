@@ -136,6 +136,12 @@ class Vector3(geometry_msgs.msg.Vector3):
     def __str__(self):
         return '<{:.2f} {:.2f} {:.2f}>'.format(self.x, self.y, self.z)
 
+    def rad_to_degree(self):
+        return Vector3(math.degrees(self.x), math.degrees(self.y), math.degrees(self.z))
+
+    def degree_to_rad(self):
+        return Vector3(math.radians(self.x), math.radians(self.y), math.radians(self.z))
+
     @staticmethod
     def ros_vector3_to_overload_vector(vector):
         return Vector3(vector.x, vector.y, vector.z)
@@ -252,7 +258,7 @@ class LegPositions(hopper_controller.msg.HexapodLegPositions):
         return False
 
     def __sub__(self, other):
-        if isinstance(other, LegPositions):
+        if isinstance(other, LegPositions) or isinstance(other, Vector3):
             return LegPositions(self.left_front - other.left_front,
                                 self.right_front - other.right_front,
                                 self.left_middle - other.left_middle,
@@ -261,7 +267,7 @@ class LegPositions(hopper_controller.msg.HexapodLegPositions):
                                 self.right_rear - other.right_rear)
 
     def __add__(self, other):
-        if isinstance(other, LegPositions):
+        if isinstance(other, LegPositions) or isinstance(other, Vector3):
             return LegPositions(self.left_front + other.left_front,
                                 self.right_front + other.right_front,
                                 self.left_middle + other.left_middle,
@@ -270,7 +276,7 @@ class LegPositions(hopper_controller.msg.HexapodLegPositions):
                                 self.right_rear + other.right_rear)
 
     def __truediv__(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Vector3):
             return LegPositions(self.left_front / other,
                                 self.right_front / other,
                                 self.left_middle / other,
@@ -279,7 +285,7 @@ class LegPositions(hopper_controller.msg.HexapodLegPositions):
                                 self.right_rear / other)
 
     def __mul__(self, other):
-        if isinstance(other, Number):
+        if isinstance(other, Number) or isinstance(other, Vector3):
             return LegPositions(self.left_front * other,
                                 self.right_front * other,
                                 self.left_middle * other,

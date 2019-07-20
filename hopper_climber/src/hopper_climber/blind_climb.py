@@ -74,7 +74,32 @@ class BlindClimbController(object):
 
     def test_relative_move(self):
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = 1
+        request.left_middle.z = 0.05
+        request.right_middle.z = 0.05
+        self.move_legs_relative(request)
+        request = MoveLegsToRelativePositionRequest()
+        request.left_middle.x = 0.05
+        request.right_middle.x = 0.05
+        self.move_legs_relative(request)
+        request = MoveLegsToRelativePositionRequest()
+        request.left_middle.z = -0.05
+        request.right_middle.z = -0.05
+        self.move_legs_relative(request)
+        request = MoveLegsToRelativePositionRequest()
+        request.left_front.z = 0.14
+        request.left_front.y = 0.07
+        request.right_front.z = 0.14
+        request.right_front.y = -0.07
+        self.move_legs_relative(request)
+        request = MoveLegsToRelativePositionRequest()
+        request.left_front.x = 0.1
+        request.left_front.y = -0.07
+        request.right_front.x = 0.1
+        request.right_front.y = 0.07
+        self.move_legs_relative(request)
+        request = MoveLegsToRelativePositionRequest()
+        request.left_front.z = -0.03
+        request.right_front.z = -0.03
         self.move_legs_relative(request)
 
     def main_climb(self):

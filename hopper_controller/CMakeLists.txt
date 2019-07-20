@@ -40,6 +40,7 @@ add_service_files(
   MoveCoreToPosition.srv
   MoveLegsUntilCollision.srv
   MoveLegsToRelativePosition.srv
+  MoveBodyRelative.srv
 )
 
 generate_messages(

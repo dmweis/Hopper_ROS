@@ -5,7 +5,7 @@ import tf2_ros
 
 from threading import Event
 from Queue import Queue, Empty
-from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision, MoveLegsToRelativePosition
+from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision, MoveLegsToRelativePosition, MoveBodyRelative
 from std_srvs.srv import Empty, EmptyResponse
 from visualization_msgs.msg import Marker
 from hexapod.hexapod_ik_driver import LegPositions, Vector3, LegFlags
@@ -31,6 +31,7 @@ class LegController(object):
         rospy.Service('hopper/move_legs_until_collision', MoveLegsUntilCollision, self.move_until_hit)
         rospy.Service('hopper/move_to_relaxed', Empty, self.move_to_relaxed)
         rospy.Service('hopper/move_legs_to_relative_position', MoveLegsToRelativePosition, self.move_legs_relative)
+        rospy.Service('hopper/move_body_relative', MoveBodyRelative, self.move_body_relative)
 
     def on_feet_msg(self, feet_msg):
         self.last_feet_msg = feet_msg
@@ -162,6 +163,19 @@ class LegController(object):
         current_positions.right_rear = position_for_foot(srvs_request.right_rear, current_positions.right_rear)
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, current_positions))
+        task_finished_event.wait()
+        return True
+
+    def move_body_relative(self, request):
+        current_positions = self.gait_engine.get_current_leg_positions()# convert to meters
+        # for each leg
+        # left front
+        corrented_rotation = Vector3.ros_vector3_to_overload_vector(request.rotation).rad_to_degree()
+        relative_vector_overload = Vector3.ros_vector3_to_overload_vector(request.translation) * 100.0
+        desired_position = (current_position - relative_vector_overload).rotate(corrented_rotation)
+
+        task_finished_event = Event()
+        self.motion_queue.put((task_finished_event, desired_position))
         task_finished_event.wait()
         return True
 

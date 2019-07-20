@@ -3,7 +3,10 @@
 import rospy
 
 from enum import IntEnum
-from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest, MoveLegsUntilCollision, MoveLegsUntilCollisionRequest, MoveCoreToPosition, MoveCoreToPositionRequest, MoveLegsToRelativePosition, MoveLegsToRelativePositionRequest
+from hopper_controller.srv import MoveLegsToPosition, MoveLegsToPositionRequest,\
+MoveLegsUntilCollision, MoveLegsUntilCollisionRequest, MoveCoreToPosition,\
+MoveCoreToPositionRequest, MoveLegsToRelativePosition, MoveLegsToRelativePositionRequest,\
+MoveBodyRelative, MoveBodyRelativeRequest
 from geometry_msgs.msg import Vector3
 
 
@@ -36,10 +39,12 @@ class BlindClimbController(object):
         rospy.wait_for_service("hopper/move_body_core")
         rospy.wait_for_service("hopper/move_legs_until_collision")
         rospy.wait_for_service("hopper/move_legs_to_relative_position")
+        rospy.wait_for_service("hopper/move_body_relative")
         self.move_legs_service = rospy.ServiceProxy("hopper/move_limbs_individual", MoveLegsToPosition)
         self.move_legs_until_collision_service = rospy.ServiceProxy("hopper/move_legs_until_collision", MoveLegsUntilCollision)
         self.move_body_core_service = rospy.ServiceProxy("hopper/move_body_core", MoveCoreToPosition)
         self.move_legs_relative = rospy.ServiceProxy("hopper/move_legs_to_relative_position", MoveLegsToRelativePosition)
+        self.move_body_relative = rospy.ServiceProxy("hopper/move_body_relative", MoveBodyRelative)
 
     def move_leg(self, leg_id, frame_id, vector):
         request = MoveLegsToPositionRequest()
@@ -101,6 +106,9 @@ class BlindClimbController(object):
         request.left_front.z = -0.03
         request.right_front.z = -0.03
         self.move_legs_relative(request)
+        request = MoveBodyRelativeRequest()
+        request.translation.x = 0.03
+        self.move_body_relative(request)
 
     def main_climb(self):
         self.move_body_core(Vector3(0, 0, 0.05))

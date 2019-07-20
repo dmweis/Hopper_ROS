@@ -172,7 +172,7 @@ class LegController(object):
         # left front
         corrented_rotation = Vector3.ros_vector3_to_overload_vector(request.rotation).rad_to_degree()
         relative_vector_overload = Vector3.ros_vector3_to_overload_vector(request.translation) * 100.0
-        desired_position = (current_position - relative_vector_overload).rotate(corrented_rotation)
+        desired_position = (current_positions - relative_vector_overload).rotate(corrented_rotation)
 
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, desired_position))

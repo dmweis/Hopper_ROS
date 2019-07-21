@@ -80,7 +80,7 @@ class BlindClimbController(object):
         self.move_body_core_service(request)
 
     def test_relative_move(self):
-        # rospy.sleep(10)
+        # rospy.sleep(5)
         # move middle legs forward
         request = MoveLegsToRelativePositionRequest()
         request.left_middle.z = 0.05
@@ -114,8 +114,8 @@ class BlindClimbController(object):
         request.right_front.y = 0.07
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = -0.03
-        request.right_front.z = -0.03
+        request.left_front.z = -0.04
+        request.right_front.z = -0.04
         self.move_legs_relative(request)
         # move center of mass forward
         request = MoveBodyRelativeRequest()

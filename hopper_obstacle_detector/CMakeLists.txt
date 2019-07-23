@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   tf2_ros
   visualization_msgs
+  sensor_msgs
 )
 
 catkin_package()

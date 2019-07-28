@@ -194,6 +194,9 @@ class Vector2(object):
     def __str__(self):
         return '<{:.2f} {:.2f}>'.format(self.x, self.y)
 
+    def to_vector3(self):
+        return Vector3(self.x, self.y, 0)
+
 
 class LegFlags(IntEnum):
     NONE = 0

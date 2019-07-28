@@ -177,6 +177,9 @@ class MovementController(object):
         self._relaxed_rotation = rotation
         self._pose_update_ready = True
 
+    def execute_step_to_relaxed(self):
+        self._relaxed = False
+
     def set_move_command(self, direction, rotation, cycle_time, lift_height):
         """
         :type direction: Vector2

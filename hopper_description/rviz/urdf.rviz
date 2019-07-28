@@ -26,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Lidar
+    SyncSource: ""
 Toolbars:
   toolButtonStyle: 2
 Visualization Manager:
@@ -60,178 +60,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        arrow:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        body_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        imu:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        laser:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_camera:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_front_button:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_front_coxa:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_front_femur:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_front_leg_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_front_tibia:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_middle_button:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_middle_coxa:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_middle_femur:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_middle_leg_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_middle_tibia:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_rear_button:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_rear_coxa:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_rear_femur:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_rear_leg_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_rear_tibia:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_camera:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_front_button:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_front_coxa:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_front_femur:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_front_leg_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_front_tibia:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_middle_button:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_middle_coxa:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_middle_femur:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_middle_leg_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_middle_tibia:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_rear_button:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_rear_coxa:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_rear_femur:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_rear_leg_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_rear_tibia:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        stereo_camera:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Name: Hopper
       Robot Description: robot_description
       TF Prefix: ""
@@ -243,149 +71,13 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        arrow:
-          Value: true
-        base_footprint:
-          Value: true
-        base_link:
-          Value: true
-        base_stabilized:
-          Value: true
-        body_link:
-          Value: true
-        imu:
-          Value: true
-        imu_plane:
-          Value: true
-        laser:
-          Value: true
-        left_camera:
-          Value: true
-        left_front_button:
-          Value: true
-        left_front_coxa:
-          Value: true
-        left_front_femur:
-          Value: true
-        left_front_leg_base:
-          Value: true
-        left_front_tibia:
-          Value: true
-        left_middle_button:
-          Value: true
-        left_middle_coxa:
-          Value: true
-        left_middle_femur:
-          Value: true
-        left_middle_leg_base:
-          Value: true
-        left_middle_tibia:
-          Value: true
-        left_rear_button:
-          Value: true
-        left_rear_coxa:
-          Value: true
-        left_rear_femur:
-          Value: true
-        left_rear_leg_base:
-          Value: true
-        left_rear_tibia:
-          Value: true
-        odom:
-          Value: true
-        right_camera:
-          Value: true
-        right_front_button:
-          Value: true
-        right_front_coxa:
-          Value: true
-        right_front_femur:
-          Value: true
-        right_front_leg_base:
-          Value: true
-        right_front_tibia:
-          Value: true
-        right_middle_button:
-          Value: true
-        right_middle_coxa:
-          Value: true
-        right_middle_femur:
-          Value: true
-        right_middle_leg_base:
-          Value: true
-        right_middle_tibia:
-          Value: true
-        right_rear_button:
-          Value: true
-        right_rear_coxa:
-          Value: true
-        right_rear_femur:
-          Value: true
-        right_rear_leg_base:
-          Value: true
-        right_rear_tibia:
-          Value: true
-        stereo_camera:
-          Value: true
-      Marker Scale: 1
+      Marker Scale: 0.200000003
       Name: TF
       Show Arrows: true
       Show Axes: false
       Show Names: false
       Tree:
-        odom:
-          base_footprint:
-            base_stabilized:
-              base_link:
-                arrow:
-                  {}
-                body_link:
-                  imu:
-                    imu_plane:
-                      {}
-                  laser:
-                    {}
-                  left_front_leg_base:
-                    left_front_coxa:
-                      left_front_femur:
-                        left_front_tibia:
-                          left_front_button:
-                            {}
-                  left_middle_leg_base:
-                    left_middle_coxa:
-                      left_middle_femur:
-                        left_middle_tibia:
-                          left_middle_button:
-                            {}
-                  left_rear_leg_base:
-                    left_rear_coxa:
-                      left_rear_femur:
-                        left_rear_tibia:
-                          left_rear_button:
-                            {}
-                  right_front_leg_base:
-                    right_front_coxa:
-                      right_front_femur:
-                        right_front_tibia:
-                          right_front_button:
-                            {}
-                  right_middle_leg_base:
-                    right_middle_coxa:
-                      right_middle_femur:
-                        right_middle_tibia:
-                          right_middle_button:
-                            {}
-                  right_rear_leg_base:
-                    right_rear_coxa:
-                      right_rear_femur:
-                        right_rear_tibia:
-                          right_rear_button:
-                            {}
-                  stereo_camera:
-                    left_camera:
-                      {}
-                    right_camera:
-                      {}
+        {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -463,7 +155,7 @@ Visualization Manager:
       Marker Topic: /hopper/feet/markers
       Name: Feet
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray

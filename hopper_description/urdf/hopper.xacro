@@ -15,7 +15,7 @@
     <link name="body_link">
         <visual>
             <geometry>
-                <mesh filename="package://hopper_description/meshes/hopper_body.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://hopper_description/meshes/hopper_body_full.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="white"/>
         </visual>

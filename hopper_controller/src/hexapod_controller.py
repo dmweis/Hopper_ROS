@@ -7,6 +7,7 @@ from geometry_msgs.msg import Twist
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
 from hopper_controller.msg import SingleLegCommand, StandCommand, FoldCommand
 from std_msgs.msg import String, Empty
+from std_srvs.srv import Empty
 
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
@@ -52,7 +53,7 @@ class HexapodController(object):
         rospy.Subscriber("hopper/halt", HaltCommand, self.on_halt_command)
         rospy.Subscriber("hopper/stand", StandCommand, self.on_stand_command, queue_size=10)
         rospy.Subscriber("hopper/fold_command", FoldCommand, self.on_fold_command, queue_size=10)
-        rospy.Subscriber("hopper/step_to_relaxed", Empty, self.on_step_to_relaxed)
+        rospy.Service("hopper/step_to_relaxed", Empty, self.on_step_to_relaxed)
         self.controller.spin()
         message_publisher.stop()
         orientation_publisher.stop()
@@ -123,7 +124,7 @@ class HexapodController(object):
     def schedule_move(self, move_name):
         self.controller.schedule_move(move_name.data)
 
-    def on_step_to_relaxed(self, msg):
+    def on_step_to_relaxed(self, srv):
         self.controller.execute_step_to_relaxed()
 
 

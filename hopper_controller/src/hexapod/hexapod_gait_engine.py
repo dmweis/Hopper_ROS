@@ -3,6 +3,8 @@ from __future__ import absolute_import
 from Queue import Queue
 import traceback
 import rospy
+
+from threading import Event
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 from .hexapod_choreographer import Choreographer
 from hopper_controller.msg import FoldCommand
@@ -78,6 +80,7 @@ class MovementController(object):
         self.lidar_controller = lidar_controller
 
         self._relaxed = True
+        self.relaxed_finished_event = Event()
         self._velocity = Vector2()
         self._theta = 0
         self._cycle_time = 1.0
@@ -158,6 +161,7 @@ class MovementController(object):
             if not self._should_move():
                 self._gait_engine.relax_next_leg(self._cycle_time, self._lift_height)
                 self._relaxed = True
+                self.relaxed_finished_event.set()
         elif self._pose_update_ready:
             # update pose
             self._pose_update_ready = False
@@ -178,7 +182,9 @@ class MovementController(object):
         self._pose_update_ready = True
 
     def execute_step_to_relaxed(self):
+        self.relaxed_finished_event.clear()
         self._relaxed = False
+        self.relaxed_finished_event.wait()
 
     def set_move_command(self, direction, rotation, cycle_time, lift_height):
         """

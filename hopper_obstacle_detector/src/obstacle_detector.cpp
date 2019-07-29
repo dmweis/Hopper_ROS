@@ -78,11 +78,11 @@ bool castRay(hopper_obstacle_detector::CastRay::Request &req, hopper_obstacle_de
         geometry_msgs::Vector3Stamped resultHit;
         resultHit.header.frame_id = req.origins[i].header.frame_id;
         bool hitDetected = false;
-        cout << "cating" << endl;
-        cout << frame_translation << endl;
+        // cout << "cating" << endl;
+        // cout << frame_translation << endl;
         if (last_octmap_cloud->castRay(position, direction, result, true, 10))
         {
-            cout << "cast worked" << endl;
+            // cout << "cast worked" << endl;
 
             OcTreeNode *hitNode = last_octmap_cloud->search(result);
             if (hitNode)

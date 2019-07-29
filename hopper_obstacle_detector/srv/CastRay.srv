@@ -1,0 +1,5 @@
+geometry_msgs/Vector3Stamped[] origins
+geometry_msgs/Vector3[] directions
+---
+bool[] hits
+geometry_msgs/Vector3Stamped[] targets

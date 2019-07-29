@@ -24,6 +24,7 @@
   <depend>sensor_msgs</depend>
   <depend>std_srvs</depend>
   <depend>tf2_ros</depend>
+  <depend>hopper_obstacle_detector</depend>
   <depend>visualization_msgs</depend>
 
   <export>

@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_srvs
   visualization_msgs
   tf2_ros
+  hopper_obstacle_detector
 )
 
 catkin_package()

@@ -10,6 +10,17 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   visualization_msgs
   sensor_msgs
+  message_generation
+)
+
+add_service_files(
+  FILES
+  CastRay.srv
+)
+
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
 )
 
 catkin_package()

@@ -32,6 +32,7 @@ class LegController(object):
         rospy.Service('hopper/move_to_relaxed', Empty, self.move_to_relaxed)
         rospy.Service('hopper/move_legs_to_relative_position', MoveLegsToRelativePosition, self.move_legs_relative)
         rospy.Service('hopper/move_body_relative', MoveBodyRelative, self.move_body_relative)
+        rospy.Service('hopper/move_body_relative_until_hit', MoveBodyRelative, self.move_legs_relative_until_hit)
 
     def on_feet_msg(self, feet_msg):
         self.last_feet_msg = feet_msg
@@ -164,6 +165,60 @@ class LegController(object):
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, current_positions))
         task_finished_event.wait()
+        return True
+
+    def move_legs_relative_until_hit(self, srvs_request):
+        current_positions = self.gait_engine.get_current_leg_positions() / 100.0 # convert to meters
+        desired_positions = current_positions.clone()
+        # for each leg
+        # left front
+        def position_for_foot(relative_vector, current_position):
+            relative_vector_overload = Vector3.ros_vector3_to_overload_vector(relative_vector)
+            return (current_position + relative_vector_overload) * 100.0
+        desired_positions.left_front = position_for_foot(srvs_request.left_front, desired_positions.left_front)
+        desired_positions.right_front = position_for_foot(srvs_request.right_front, desired_positions.right_front)
+        desired_positions.left_middle = position_for_foot(srvs_request.left_middle, desired_positions.left_middle)
+        desired_positions.right_middle = position_for_foot(srvs_request.right_middle, desired_positions.right_middle)
+        desired_positions.left_rear = position_for_foot(srvs_request.left_rear, desired_positions.left_rear)
+        desired_positions.right_rear = position_for_foot(srvs_request.right_rear, desired_positions.right_rear)
+
+        move_done = False
+        move_dist = 0.5 # distance to move with each step in cm
+        colliding_legs = LegFlags.NONE
+        midstep_positions = current_positions.clone()
+        
+        while not move_done:
+            still_moving = False
+            if not self.last_feet_msg.left_front:
+                still_moving = still_moving or midstep_positions.left_front.move_towards_at_speed(desired_positions.left_front, move_dist)
+            else:
+                colliding_legs |= LegFlags.LEFT_FRONT
+            if not self.last_feet_msg.right_front:
+                still_moving = still_moving or midstep_positions.right_front.move_towards_at_speed(desired_positions.right_front, move_dist)
+            else:
+                colliding_legs |= LegFlags.RIGHT_FRONT
+            if not self.last_feet_msg.left_middle:
+                still_moving = still_moving or midstep_positions.left_middle.move_towards_at_speed(desired_positions.left_middle, move_dist)
+            else:
+                colliding_legs |= LegFlags.LEFT_MIDDLE
+            if not self.last_feet_msg.right_middle:
+                still_moving = still_moving or midstep_positions.right_middle.move_towards_at_speed(desired_positions.right_middle, move_dist)
+            else:
+                colliding_legs |= LegFlags.RIGHT_MIDDLE
+            if not self.last_feet_msg.left_rear:
+                still_moving = still_moving or midstep_positions.left_rear.move_towards_at_speed(desired_positions.left_rear, move_dist)
+            else:
+                colliding_legs |= LegFlags.LEFT_REAR
+            if not self.last_feet_msg.right_rear:
+                still_moving = still_moving or midstep_positions.right_rear.move_towards_at_speed(desired_positions.right_rear, move_dist)
+            else:
+                colliding_legs |= LegFlags.RIGHT_REAR
+            if still_moving:
+                task_finished_event = Event()
+                self.motion_queue.put((task_finished_event, midstep_positions))
+                task_finished_event.wait()
+            else:
+                move_done = True
         return True
 
     def move_body_relative(self, request):

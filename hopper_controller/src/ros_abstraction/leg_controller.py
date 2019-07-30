@@ -168,13 +168,13 @@ class LegController(object):
         return True
 
     def move_legs_relative_until_hit(self, srvs_request):
-        current_positions = self.gait_engine.get_current_leg_positions() / 100.0 # convert to meters
+        current_positions = self.gait_engine.get_current_leg_positions()
         desired_positions = current_positions.clone()
         # for each leg
         # left front
         def position_for_foot(relative_vector, current_position):
-            relative_vector_overload = Vector3.ros_vector3_to_overload_vector(relative_vector)
-            return (current_position + relative_vector_overload) * 100.0
+            relative_vector_overload = Vector3.ros_vector3_to_overload_vector(relative_vector) * 100.0
+            return (current_position + relative_vector_overload)
         desired_positions.left_front = position_for_foot(srvs_request.left_front, desired_positions.left_front)
         desired_positions.right_front = position_for_foot(srvs_request.right_front, desired_positions.right_front)
         desired_positions.left_middle = position_for_foot(srvs_request.left_middle, desired_positions.left_middle)

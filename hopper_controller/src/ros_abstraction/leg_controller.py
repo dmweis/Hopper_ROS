@@ -31,8 +31,8 @@ class LegController(object):
         rospy.Service('hopper/move_legs_until_collision', MoveLegsUntilCollision, self.move_until_hit)
         rospy.Service('hopper/move_to_relaxed', Empty, self.move_to_relaxed)
         rospy.Service('hopper/move_legs_to_relative_position', MoveLegsToRelativePosition, self.move_legs_relative)
+        rospy.Service('hopper/move_legs_to_relative_position_until_hit', MoveLegsToRelativePosition, self.move_legs_relative_until_hit)
         rospy.Service('hopper/move_body_relative', MoveBodyRelative, self.move_body_relative)
-        rospy.Service('hopper/move_body_relative_until_hit', MoveBodyRelative, self.move_legs_relative_until_hit)
 
     def on_feet_msg(self, feet_msg):
         self.last_feet_msg = feet_msg

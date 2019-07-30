@@ -20,7 +20,7 @@ class RayCastTester(object):
         response = self.cast_ray(request)
         
         print response
-        self.display_marker(response.left_front.x / 10000, response.left_front.y/ 10000, response.left_front.z/ 10000)
+        self.display_marker(response.left_front.x, response.left_front.y, response.left_front.z)
         rospy.spin()
 
     def display_marker(self, x, y, z):

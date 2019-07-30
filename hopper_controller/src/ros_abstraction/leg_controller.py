@@ -234,7 +234,7 @@ class LegController(object):
 
     def read_current_leg_positions(self, request):
         current_positions = self.gait_engine.get_current_leg_positions() / 100.0
-        transform, rotation = self.get_transform_for_link(request.header.frame_id, "base_link")
+        transform, rotation = self.get_transform_for_link("base_link", request.header.frame_id)
         current_positions = current_positions * rotation + transform
         # response
         response = ReadCurrentLegPositionsResponse()

@@ -142,9 +142,8 @@ class LegController(object):
         task_finished_event.wait()
         return EmptyResponse()
 
-    def get_transform_for_link(self, frame_id):
-        local_frame = "base_link"
-        ros_transform = self.tf_buffer.lookup_transform(local_frame, frame_id, rospy.Time()).transform
+    def get_transform_for_link(self, from_frame_id, to_frame_id):
+        ros_transform = self.tf_buffer.lookup_transform(from_frame_id, to_frame_id, rospy.Time()).transform
         frame_translation_ros, frame_rotation_ros = ros_transform.translation, ros_transform.rotation
         frame_rotation = Quaternion(frame_rotation_ros.w, frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z)
         frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
@@ -234,8 +233,8 @@ class LegController(object):
         return True
 
     def read_current_leg_positions(self, request):
-        current_positions = self.gait_engine.get_current_leg_positions() * 100.0
-        transform, rotation = self.get_transform_for_link(request.header.frame_id)
+        current_positions = self.gait_engine.get_current_leg_positions() / 100.0
+        transform, rotation = self.get_transform_for_link("base_link", request.header.frame_id)
         current_positions = current_positions * rotation + transform
         # response
         response = ReadCurrentLegPositionsResponse()

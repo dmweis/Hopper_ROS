@@ -46,7 +46,6 @@ class HexapodController(object):
         self.halt_publisher = rospy.Publisher("halt", Empty, queue_size=1, latch=True)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
-        rospy.Subscriber("hopper_stance_translate", Twist, self.update_pose_centimeters)
         rospy.Subscriber("hopper/stance_translate", Twist, self.update_pose)
         rospy.Subscriber("hopper/single_leg_command", SingleLegCommand, self.update_single_leg)
         rospy.Subscriber("hopper_schedule_move", String, self.schedule_move)
@@ -115,11 +114,6 @@ class HexapodController(object):
     def update_single_leg(self, msg):
         position = Vector3(msg.position.x * 100, msg.position.y * 100, msg.position.z * 100)
         self.controller.update_single_leg_command(msg.selected_leg, position, msg.single_leg_mode_on, msg.fast_mode)
-
-    def update_pose_centimeters(self, twist):
-        transform = Vector3(twist.linear.x, twist.linear.y, twist.linear.z)
-        rotation = Vector3(twist.angular.x, twist.angular.y, twist.angular.z)
-        self.controller.set_relaxed_pose(transform, rotation)
 
     def schedule_move(self, move_name):
         self.controller.schedule_move(move_name.data)

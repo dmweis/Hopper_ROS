@@ -16,7 +16,7 @@ class RayCastTester(object):
         self.marker_publisher = rospy.Publisher("hopper/current_leg_positions/markers", Marker, queue_size=10, latch=True)
 
         request = ReadCurrentLegPositionsRequest()
-        request.header.frame_id = "map"
+        request.header.frame_id = "base_footprint"
         response = self.cast_ray(request)
         
         print response
@@ -25,13 +25,14 @@ class RayCastTester(object):
 
     def display_marker(self, x, y, z):
         marker = Marker()
-        marker.header.frame_id = "map"
+        marker.header.frame_id = "base_footprint"
         marker.header.stamp = rospy.Time()
         marker.type = Marker.CUBE
         marker.action = Marker.ADD
         marker.pose.orientation.w = 1.
         marker.pose.position.x = x
         marker.pose.position.y = y
+        marker.pose.position.z = z
         marker.scale.x = 0.1
         marker.scale.y = 0.1
         marker.scale.z = 0.1

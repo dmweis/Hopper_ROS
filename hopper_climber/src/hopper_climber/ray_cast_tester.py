@@ -39,6 +39,7 @@ class RayCastTester(object):
         marker.pose.orientation.w = 1.
         marker.pose.position.x = x
         marker.pose.position.y = y
+        marker.pose.position.z = z
         marker.scale.x = 0.1
         marker.scale.y = 0.1
         marker.scale.z = 0.1

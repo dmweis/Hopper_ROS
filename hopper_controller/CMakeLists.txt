@@ -41,6 +41,7 @@ add_service_files(
   MoveLegsUntilCollision.srv
   MoveLegsToRelativePosition.srv
   MoveBodyRelative.srv
+  ReadCurrentLegPositions.srv
 )
 
 generate_messages(

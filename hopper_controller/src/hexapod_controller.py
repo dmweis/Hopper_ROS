@@ -7,7 +7,7 @@ from geometry_msgs.msg import Twist
 from hopper_msgs.msg import HopperMoveCommand, HaltCommand
 from hopper_controller.msg import SingleLegCommand, StandCommand, FoldCommand
 from std_msgs.msg import String, Empty
-from std_srvs.srv import Empty as EmptySrv
+from std_srvs.srv import Empty as EmptySrv, EmptyResponse as EmptySrvResponse
 
 
 from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
@@ -120,6 +120,7 @@ class HexapodController(object):
 
     def on_step_to_relaxed(self, srv):
         self.controller.execute_step_to_relaxed()
+        return EmptySrvResponse()
 
 
 if __name__ == '__main__':

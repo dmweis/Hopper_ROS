@@ -302,7 +302,7 @@ class LegPositions(hopper_controller.msg.HexapodLegPositions):
                                 self.right_rear / other)
 
     def __mul__(self, other):
-        if isinstance(other, Number) or isinstance(other, Vector3):
+        if isinstance(other, Number) or isinstance(other, Vector3) or isinstance(other, Quaternion):
             return LegPositions(self.left_front * other,
                                 self.right_front * other,
                                 self.left_middle * other,

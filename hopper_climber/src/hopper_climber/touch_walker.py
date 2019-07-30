@@ -28,12 +28,12 @@ class TouchWalker(object):
         self.move_body_relative = rospy.ServiceProxy("hopper/move_body_relative", MoveBodyRelative)
         self.move_to_relaxed = rospy.ServiceProxy("/hopper/step_to_relaxed", Empty)
 
-    def step_left(self, vector):
+    def step_left(self, vector, lift_height=0.05):
         # lift left
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = 0.05
-        request.right_middle.z = 0.05
-        request.left_rear.z = 0.05
+        request.left_front.z = lift_height
+        request.right_middle.z = lift_height
+        request.left_rear.z = lift_height
         self.move_legs_relative(request)
         # move all
         request = MoveLegsToRelativePositionRequest()
@@ -45,17 +45,17 @@ class TouchWalker(object):
         request.right_rear = -vector.to_vector3()
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = -0.05
-        request.right_middle.z = -0.05
-        request.left_rear.z = -0.05
+        request.left_front.z = -lift_height
+        request.right_middle.z = -lift_height
+        request.left_rear.z = -lift_height
         self.move_legs_relative_until_hit(request)
 
-    def step_right(self, vector):
+    def step_right(self, vector, lift_height):
         # lift left
         request = MoveLegsToRelativePositionRequest()
-        request.right_front.z = 0.05
-        request.left_middle.z = 0.05
-        request.right_rear.z = 0.05
+        request.right_front.z = lift_height
+        request.left_middle.z = lift_height
+        request.right_rear.z = lift_height
         self.move_legs_relative(request)
         # move all
         request = MoveLegsToRelativePositionRequest()
@@ -67,9 +67,9 @@ class TouchWalker(object):
         request.right_rear = vector.to_vector3()
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.right_front.z = -0.05
-        request.left_middle.z = -0.05
-        request.right_rear.z = -0.05
+        request.right_front.z = -lift_height
+        request.left_middle.z = -lift_height
+        request.right_rear.z = -lift_height
         self.move_legs_relative_until_hit(request)
 
     def relax_legs(self):
@@ -78,6 +78,5 @@ class TouchWalker(object):
 
 if __name__ == "__main__":
     controller = TouchWalker()
-    controller.step_left(Vector2(0.02, 0))
-    controller.step_right(Vector2(-0.02, 0))
-    controller.relax_legs()
+    controller.step_left(Vector2(0.03, 0), 0.08)
+    controller.step_right(Vector2(0.03, 0), 0.08)

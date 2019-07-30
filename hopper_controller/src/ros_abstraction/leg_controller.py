@@ -5,7 +5,7 @@ import tf2_ros
 
 from threading import Event
 from Queue import Queue, Empty
-from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision, MoveLegsToRelativePosition, MoveBodyRelative
+from hopper_controller.srv import MoveLegsToPosition, MoveCoreToPosition, MoveLegsUntilCollision, MoveLegsToRelativePosition, MoveBodyRelative, ReadCurrentLegPositions, ReadCurrentLegPositionsResponse
 from std_srvs.srv import Empty, EmptyResponse
 from visualization_msgs.msg import Marker
 from hexapod.hexapod_ik_driver import LegPositions, Vector3, LegFlags
@@ -33,6 +33,7 @@ class LegController(object):
         rospy.Service('hopper/move_legs_to_relative_position', MoveLegsToRelativePosition, self.move_legs_relative)
         rospy.Service('hopper/move_legs_to_relative_position_until_hit', MoveLegsToRelativePosition, self.move_legs_relative_until_hit)
         rospy.Service('hopper/move_body_relative', MoveBodyRelative, self.move_body_relative)
+        rospy.Service('hopper/read_current_leg_positions', ReadCurrentLegPositions, self.read_current_leg_positions)
 
     def on_feet_msg(self, feet_msg):
         self.last_feet_msg = feet_msg
@@ -222,7 +223,7 @@ class LegController(object):
         return True
 
     def move_body_relative(self, request):
-        current_positions = self.gait_engine.get_current_leg_positions()# convert to meters
+        current_positions = self.gait_engine.get_current_leg_positions()
         corrected_rotation = Vector3.ros_vector3_to_overload_vector(request.rotation).rad_to_degree()
         relative_vector_overload = Vector3.ros_vector3_to_overload_vector(request.translation) * 100.0
         desired_position = (current_positions - relative_vector_overload).rotate(corrected_rotation)
@@ -231,6 +232,21 @@ class LegController(object):
         self.motion_queue.put((task_finished_event, desired_position))
         task_finished_event.wait()
         return True
+
+    def read_current_leg_positions(self, request):
+        current_positions = self.gait_engine.get_current_leg_positions() * 100.0
+        transform, rotation = self.get_transform_for_link(request.header.frame_id)
+        current_positions = current_positions * rotation + transform
+        # response
+        response = ReadCurrentLegPositionsResponse()
+        response.left_front = current_positions.left_front
+        response.right_front = current_positions.right_front
+        response.left_middle = current_positions.left_middle
+        response.right_middle = current_positions.right_middle
+        response.left_rear = current_positions.left_rear
+        response.right_rear = current_positions.right_rear
+        return response
+
 
     def execute_motion(self):
         try:

@@ -2,14 +2,14 @@
 <launch>
     <node ns="local" name="octomap_server" pkg="octomap_server" type="octomap_server_node">
         <param name="resolution" value="0.02" />
-        <param name="frame_id" type="string" value="odom" />
+        <param name="frame_id" type="string" value="map" />
         <param name="base_frame_id" type="string" value="laser" />
         <param name="sensor_model/max_range" value="3.0" />
         <remap from="cloud_in" to="/hopper/assembled_scan" />
     </node>
     <node ns="global" name="octomap_server" pkg="octomap_server" type="octomap_server_node">
         <param name="resolution" value="0.05" />
-        <param name="frame_id" type="string" value="odom" />
+        <param name="frame_id" type="string" value="map" />
         <param name="base_frame_id" type="string" value="laser" />
         <param name="sensor_model/max_range" value="20.0" />
         <remap from="cloud_in" to="/hopper/assembled_scan" />

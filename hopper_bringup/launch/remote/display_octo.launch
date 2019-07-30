@@ -3,5 +3,6 @@
     <include file="$(find hopper_bringup)/launch/remote/octo_mapping.launch" />
     <node name="hopper_feet_visualizer" pkg="hopper_feet_sensors" type="feet_sensor_visualizer.py"/>
     <node name="hopper_rviz_touch" pkg="hopper_climber" type="touch_object_controller.py"/>
+    <node pkg="tf" type="static_transform_publisher" name="map_publisher" args="0 0 0 0 0 0 1 map odom 100" />
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find hopper_description)/rviz/urdf.rviz" required="true" />
 </launch>

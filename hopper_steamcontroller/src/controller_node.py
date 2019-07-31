@@ -272,7 +272,7 @@ class SteamControllerRosHandler(object):
             cycle_time -= 0.75 * scale_trigger(controller_data.ltrig)
             # print "Left trigger at {0:.2f}".format(scale_trigger(controller_data.ltrig))
         if controller_data.rtrig != 0:
-            lift_height += 2 * scale_trigger(controller_data.rtrig)
+            lift_height += 3 * scale_trigger(controller_data.rtrig)
             # print "Right trigger at {0:.2f}".format(scale_trigger(controller_data.rtrig))
         self.update_robot_command(robot_x, robot_y, robot_rot, cycle_time, stance_pose, single_leg_command, lift_height=lift_height)
 

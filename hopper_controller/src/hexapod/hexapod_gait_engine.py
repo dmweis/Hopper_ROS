@@ -573,11 +573,11 @@ class HeightAdjustTripodGait(object):
                                                                   target_position.get_legs_as_list(lifted_legs),
                                                                   LegFlags.get_legs_as_list(lifted_legs)):
                 foot_in_air = True
-                if self.is_touching_ground(leg_flag):
+                if step_portion < 0.9:
+                    new_leg_pos.z = start_leg_pos.z + leg_lift_height
+                elif self.is_touching_ground(leg_flag):
                     new_leg_pos.z = self.last_written_position.get_legs_as_list(leg_flag)[0].z
                     foot_on_ground = False
-                elif step_portion < 0.9:
-                    new_leg_pos.z = start_leg_pos.z + leg_lift_height
                 else:
                     # slowly lower leg at the end of motion
                     

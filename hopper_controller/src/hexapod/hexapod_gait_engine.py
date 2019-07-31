@@ -564,7 +564,7 @@ class HeightAdjustTripodGait(object):
                     new_leg_pos.z = start_leg_pos.z + leg_lift_height
                 else:
                     # slowly lower leg at the end of motion
-                    new_leg_pos.z = start_leg_pos.z + leg_lift_height * ((1 - 0.9) * 10)
+                    new_leg_pos.z = start_leg_pos.z + leg_lift_height * ((1 - step_portion) * 10)
                 new_leg_pos.z = max(new_leg_pos.z, max_foot_lift)
             self.last_written_position = new_position
             self._ik_driver.move_legs_synced(self.last_written_position)

@@ -38,17 +38,18 @@ class HexapodController(object):
         controller_telemetry = ros_abstraction.ControllerTelemetryPublisher()
         lidar_controller = ros_abstraction.LidarController()
         orientation_publisher = ros_abstraction.BodyOrientationPublisher()
-        tripod_gait = None
+        gait_sequencers = []
+        tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
+                                ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
+        gait_sequencers.append(tripod_gait)
         if not self.use_height_adjust:
-            tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
+            height_adjust_tripod_gait = HeightAdjustTripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
                                     ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
-        else:
-            tripod_gait = HeightAdjustTripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
-                                    ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
-        gait_engine = GaitEngine(tripod_gait)
-        leg_controller = ros_abstraction.LegController(gait_engine)
+            gait_sequencers.append(height_adjust_tripod_gait)
+        self.gait_engine = GaitEngine(gait_sequencers)
+        leg_controller = ros_abstraction.LegController(self.gait_engine)
         folding_manager = FoldingManager(body_controller)
-        self.controller = MovementController(gait_engine, ros_abstraction.SoundPlayer(self.sound_on), folding_manager, controller_telemetry, leg_controller, lidar_controller)
+        self.controller = MovementController(self.gait_engine, ros_abstraction.SoundPlayer(self.sound_on), folding_manager, controller_telemetry, leg_controller, lidar_controller)
         self.halt_publisher = rospy.Publisher("halt", Empty, queue_size=1, latch=True)
         rospy.Subscriber("hopper/cmd_vel", Twist, self.on_nav_system_move_command)
         rospy.Subscriber("hopper/move_command", HopperMoveCommand, self.on_move_command)
@@ -59,10 +60,15 @@ class HexapodController(object):
         rospy.Subscriber("hopper/stand", StandCommand, self.on_stand_command, queue_size=10)
         rospy.Subscriber("hopper/fold_command", FoldCommand, self.on_fold_command, queue_size=10)
         rospy.Service("hopper/step_to_relaxed", EmptySrv, self.on_step_to_relaxed)
+        rospy.Service("hopper/controller/gait_engine_switch", EmptySrv, self.on_switch_gait_engine)
         self.controller.spin()
         message_publisher.stop()
         orientation_publisher.stop()
         self.halt_publisher.publish(Empty())
+
+    def on_switch_gait_engine(self, _):
+        self.gait_engine.switch_gait_sequencer()
+        return EmptySrvResponse()
 
     def on_halt_command(self, _):
         self.controller.keep_running = False

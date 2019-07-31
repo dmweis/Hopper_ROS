@@ -277,16 +277,24 @@ class MovementController(object):
 
 
 class GaitEngine(object):
-    def __init__(self, gait_sequencer):
+    def __init__(self, gait_sequencer_list):
         """
         :type gait_sequencer: TripodGait
         """
         super(GaitEngine, self).__init__()
-        self.gait_sequencer = gait_sequencer
+        self.gait_sequencer_list = gait_sequencer_list
+        self.gait_sequencer_index = 0
+        self.gait_sequencer = self.gait_sequencer_list[self.gait_sequencer_index]
         self._last_used_lifted_legs = LegFlags.LEFT_TRIPOD
         self.stand_up_leg_order = [LegFlags.MIDDLE, LegFlags.FRONT | LegFlags.REAR]
         # time each step takes in seconds
         self._default_cycle_time = 1.0
+
+    def switch_gait_sequencer(self):
+        self.gait_sequencer_index+=1
+        if self.gait_sequencer_index >= len(self.gait_sequencer_list):
+            self.gait_sequencer_index = 0
+        self.gait_sequencer = self.gait_sequencer_list[self.gait_sequencer_index]
 
     def stand_up(self, speed=11):
         rospy.loginfo("Hexapod gait engine started")

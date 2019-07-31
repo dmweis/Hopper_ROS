@@ -25,7 +25,7 @@ class RayCastTester(object):
 
     def display_marker(self, x, y, z):
         marker = Marker()
-        marker.header.frame_id = "base_footprint"
+        marker.header.frame_id = "map"
         marker.header.stamp = rospy.Time()
         marker.type = Marker.CUBE
         marker.action = Marker.ADD

@@ -479,12 +479,12 @@ class HeightAdjustTripodGait(object):
 
     def is_touching_ground(self, leg_flag):
         mapping = {
-            leg_flag.left_front: self.last_feet_sensors.left_front,
-            leg_flag.left_middle: self.last_feet_sensors.left_middle,
-            leg_flag.left_rear: self.last_feet_sensors.left_rear,
-            leg_flag.right_front: self.last_feet_sensors.right_front,
-            leg_flag.right_middle: self.last_feet_sensors.right_middle,
-            leg_flag.right_rear: self.last_feet_sensors.right_rear
+            LegFlags.LEFT_FRONT: self.last_feet_sensors.left_front,
+            LegFlags.LEFT_MIDDLE: self.last_feet_sensors.left_middle,
+            LegFlags.LEFT_REAR: self.last_feet_sensors.left_rear,
+            LegFlags.RIGHT_FRONT: self.last_feet_sensors.right_front,
+            LegFlags.RIGHT_MIDDLE: self.last_feet_sensors.right_middle,
+            LegFlags.RIGHT_REAR: self.last_feet_sensors.right_rear
         }
         return mapping[leg_flag]
 

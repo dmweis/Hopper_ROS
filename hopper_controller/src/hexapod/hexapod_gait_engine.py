@@ -581,7 +581,7 @@ class HeightAdjustTripodGait(object):
                 else:
                     # slowly lower leg at the end of motion
                     
-                    foot_in_air, new_leg_pos.z = move_number_towards(start_leg_pos.z + leg_lift_height, start_leg_pos.z, cycle_length * 12)
+                    foot_in_air, new_leg_pos.z = move_number_towards(self.last_written_position.get_legs_as_list(leg_flag)[0].z, start_leg_pos.z, cycle_length * 2)
                 new_leg_pos.z = min(new_leg_pos.z, max_foot_lift)
                 all_feet_lowered = all_feet_lowered and not foot_in_air
             self.last_written_position = new_position

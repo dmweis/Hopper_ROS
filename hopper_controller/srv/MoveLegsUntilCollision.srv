@@ -8,12 +8,7 @@ int32 RIGHT_MIDDLE = 32
 
 std_msgs/Header header
 int32 selected_legs
-geometry_msgs/Vector3 left_front
-geometry_msgs/Vector3 right_front
-geometry_msgs/Vector3 left_middle
-geometry_msgs/Vector3 right_middle
-geometry_msgs/Vector3 left_rear
-geometry_msgs/Vector3 right_rear
+hopper_controller/HexapodLegPositions leg_positions
 ---
 int32 collisions_achieved
 hopper_controller/HexapodLegPositions leg_positions

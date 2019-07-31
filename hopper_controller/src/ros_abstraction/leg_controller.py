@@ -45,7 +45,7 @@ class LegController(object):
         frame_translation_ros, frame_rotation_ros = ros_transform.translation, ros_transform.rotation
         frame_rotation = Quaternion(frame_rotation_ros.w, frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z)
         frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
-        move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd)
+        move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd.leg_positions)
         new_positions = LegPositions(
              (move_legs_overloaded.left_front * frame_rotation + frame_translation) * 100.0
             ,(move_legs_overloaded.right_front * frame_rotation + frame_translation) * 100.0
@@ -85,7 +85,7 @@ class LegController(object):
         frame_translation_ros, frame_rotation_ros = ros_transform.translation, ros_transform.rotation
         frame_rotation = Quaternion(frame_rotation_ros.w, frame_rotation_ros.x, frame_rotation_ros.y, frame_rotation_ros.z)
         frame_translation = Vector3.ros_vector3_to_overload_vector(frame_translation_ros)
-        move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd)
+        move_legs_overloaded = LegPositions.ros_leg_positions_to_leg_positions(move_legs_cmd.leg_positions)
         new_positions = LegPositions(
              (move_legs_overloaded.left_front * frame_rotation + frame_translation) * 100.0
             ,(move_legs_overloaded.right_front * frame_rotation + frame_translation) * 100.0
@@ -151,17 +151,18 @@ class LegController(object):
 
     def move_legs_relative(self, srvs_request):
         current_positions = self.gait_engine.get_current_leg_positions() / 100.0 # convert to meters
+        target_positions = srvs_request.leg_positions
         # for each leg
         # left front
         def position_for_foot(relative_vector, current_position):
             relative_vector_overload = Vector3.ros_vector3_to_overload_vector(relative_vector)
             return (current_position + relative_vector_overload) * 100.0
-        current_positions.left_front = position_for_foot(srvs_request.left_front, current_positions.left_front)
-        current_positions.right_front = position_for_foot(srvs_request.right_front, current_positions.right_front)
-        current_positions.left_middle = position_for_foot(srvs_request.left_middle, current_positions.left_middle)
-        current_positions.right_middle = position_for_foot(srvs_request.right_middle, current_positions.right_middle)
-        current_positions.left_rear = position_for_foot(srvs_request.left_rear, current_positions.left_rear)
-        current_positions.right_rear = position_for_foot(srvs_request.right_rear, current_positions.right_rear)
+        current_positions.left_front = position_for_foot(target_positions.left_front, current_positions.left_front)
+        current_positions.right_front = position_for_foot(target_positions.right_front, current_positions.right_front)
+        current_positions.left_middle = position_for_foot(target_positions.left_middle, current_positions.left_middle)
+        current_positions.right_middle = position_for_foot(target_positions.right_middle, current_positions.right_middle)
+        current_positions.left_rear = position_for_foot(target_positions.left_rear, current_positions.left_rear)
+        current_positions.right_rear = position_for_foot(target_positions.right_rear, current_positions.right_rear)
         task_finished_event = Event()
         self.motion_queue.put((task_finished_event, current_positions))
         task_finished_event.wait()
@@ -175,12 +176,12 @@ class LegController(object):
         def position_for_foot(relative_vector, current_position):
             relative_vector_overload = Vector3.ros_vector3_to_overload_vector(relative_vector) * 100.0
             return (current_position + relative_vector_overload)
-        desired_positions.left_front = position_for_foot(srvs_request.left_front, desired_positions.left_front)
-        desired_positions.right_front = position_for_foot(srvs_request.right_front, desired_positions.right_front)
-        desired_positions.left_middle = position_for_foot(srvs_request.left_middle, desired_positions.left_middle)
-        desired_positions.right_middle = position_for_foot(srvs_request.right_middle, desired_positions.right_middle)
-        desired_positions.left_rear = position_for_foot(srvs_request.left_rear, desired_positions.left_rear)
-        desired_positions.right_rear = position_for_foot(srvs_request.right_rear, desired_positions.right_rear)
+        desired_positions.left_front = position_for_foot(srvs_request.leg_positions.left_front, desired_positions.left_front)
+        desired_positions.right_front = position_for_foot(srvs_request.leg_positions.right_front, desired_positions.right_front)
+        desired_positions.left_middle = position_for_foot(srvs_request.leg_positions.left_middle, desired_positions.left_middle)
+        desired_positions.right_middle = position_for_foot(srvs_request.leg_positions.right_middle, desired_positions.right_middle)
+        desired_positions.left_rear = position_for_foot(srvs_request.leg_positions.left_rear, desired_positions.left_rear)
+        desired_positions.right_rear = position_for_foot(srvs_request.leg_positions.right_rear, desired_positions.right_rear)
 
         move_done = False
         move_dist = 0.5 # distance to move with each step in cm
@@ -238,14 +239,8 @@ class LegController(object):
         current_positions = current_positions * rotation + transform
         # response
         response = ReadCurrentLegPositionsResponse()
-        response.left_front = current_positions.left_front
-        response.right_front = current_positions.right_front
-        response.left_middle = current_positions.left_middle
-        response.right_middle = current_positions.right_middle
-        response.left_rear = current_positions.left_rear
-        response.right_rear = current_positions.right_rear
+        response.leg_positions = current_positions
         return response
-
 
     def execute_motion(self):
         try:

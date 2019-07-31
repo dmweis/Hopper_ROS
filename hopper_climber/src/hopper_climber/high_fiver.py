@@ -111,8 +111,8 @@ class HighFiveController(object):
         point.x = x
         point.y = y
         point.z = 0
-        request.left_front = point
-        request.right_front = point
+        request.move_legs.left_front = point
+        request.move_legs.right_front = point
         self.move_legs(request)
 
     def display_marker(self, x, y):

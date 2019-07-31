@@ -52,24 +52,24 @@ class BlindClimbController(object):
         request = MoveLegsToPositionRequest()
         request.header.frame_id = frame_id
         request.selected_legs = leg_id
-        request.left_front = vector
-        request.left_middle = vector
-        request.left_rear = vector
-        request.right_front = vector
-        request.right_middle = vector
-        request.right_rear = vector
+        request.leg_positions.left_front = vector
+        request.leg_positions.left_middle = vector
+        request.leg_positions.left_rear = vector
+        request.leg_positions.right_front = vector
+        request.leg_positions.right_middle = vector
+        request.leg_positions.right_rear = vector
         self.move_legs_service(request)
 
     def move_leg_until_collision(self, leg_id, frame_id, vector):
         request = MoveLegsUntilCollisionRequest()
         request.header.frame_id = frame_id
         request.selected_legs = leg_id
-        request.left_front = vector
-        request.left_middle = vector
-        request.left_rear = vector
-        request.right_front = vector
-        request.right_middle = vector
-        request.right_rear = vector
+        request.leg_positions.left_front = vector
+        request.leg_positions.left_middle = vector
+        request.leg_positions.left_rear = vector
+        request.leg_positions.right_front = vector
+        request.leg_positions.right_middle = vector
+        request.leg_positions.right_rear = vector
         self.move_legs_until_collision_service(request)
 
     def move_body_core(self, vector):
@@ -83,16 +83,16 @@ class BlindClimbController(object):
         # rospy.sleep(5)
         # move middle legs forward
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.z = 0.05
-        request.right_middle.z = 0.05
+        request.leg_positions.left_middle.z = 0.05
+        request.leg_positions.right_middle.z = 0.05
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.x = 0.05
-        request.right_middle.x = 0.05
+        request.leg_positions.left_middle.x = 0.05
+        request.leg_positions.right_middle.x = 0.05
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.z = -0.05
-        request.right_middle.z = -0.05
+        request.leg_positions.left_middle.z = -0.05
+        request.leg_positions.right_middle.z = -0.05
         self.move_legs_relative(request)
         # raise body
         request = MoveBodyRelativeRequest()
@@ -101,21 +101,21 @@ class BlindClimbController(object):
         self.move_body_relative(request)
         # raise front legs
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = 0.14
-        request.left_front.y = 0.07
-        request.right_front.z = 0.14
-        request.right_front.y = -0.07
+        request.leg_positions.left_front.z = 0.14
+        request.leg_positions.left_front.y = 0.07
+        request.leg_positions.right_front.z = 0.14
+        request.leg_positions.right_front.y = -0.07
         self.move_legs_relative(request)
         # move front legs forward
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.x = 0.12
-        request.left_front.y = -0.07
-        request.right_front.x = 0.12
-        request.right_front.y = 0.07
+        request.leg_positions.left_front.x = 0.12
+        request.leg_positions.left_front.y = -0.07
+        request.leg_positions.right_front.x = 0.12
+        request.leg_positions.right_front.y = 0.07
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = -0.04
-        request.right_front.z = -0.04
+        request.leg_positions.left_front.z = -0.04
+        request.leg_positions.right_front.z = -0.04
         self.move_legs_relative(request)
         # move center of mass forward
         request = MoveBodyRelativeRequest()
@@ -123,23 +123,23 @@ class BlindClimbController(object):
         self.move_body_relative(request)
         # move hind legs
         request = MoveLegsToRelativePositionRequest()
-        request.left_rear.z = 0.03
-        request.left_rear.x = 0.08
-        request.right_rear.z = 0.03
-        request.right_rear.x = 0.08
+        request.leg_positions.left_rear.z = 0.03
+        request.leg_positions.left_rear.x = 0.08
+        request.leg_positions.right_rear.z = 0.03
+        request.leg_positions.right_rear.x = 0.08
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_rear.z = -0.03
-        request.left_rear.x = 0.08
-        request.right_rear.z = -0.03
-        request.right_rear.x = 0.08
+        request.leg_positions.left_rear.z = -0.03
+        request.leg_positions.left_rear.x = 0.08
+        request.leg_positions.right_rear.z = -0.03
+        request.leg_positions.right_rear.x = 0.08
         self.move_legs_relative(request)
         # move middle legs
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.z = 0.15
-        request.left_middle.x = 0.12
-        request.right_middle.z = 0.15
-        request.right_middle.x = 0.12
+        request.leg_positions.left_middle.z = 0.15
+        request.leg_positions.left_middle.x = 0.12
+        request.leg_positions.right_middle.z = 0.15
+        request.leg_positions.right_middle.x = 0.12
         self.move_legs_relative(request)
         request = MoveBodyRelativeRequest()
         request.translation.x = 0.08
@@ -147,25 +147,25 @@ class BlindClimbController(object):
         request.rotation.y = radians(10)
         self.move_body_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.x = 0.06
-        request.right_middle.x = 0.06
+        request.leg_positions.left_middle.x = 0.06
+        request.leg_positions.right_middle.x = 0.06
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.z = -0.06
-        request.right_middle.z = -0.06
+        request.leg_positions.left_middle.z = -0.06
+        request.leg_positions.right_middle.z = -0.06
         self.move_legs_relative(request)
         # move front legs
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = 0.03
-        request.left_front.x = 0.08
-        request.right_front.z = 0.03
-        request.right_front.x = 0.08
+        request.leg_positions.left_front.z = 0.03
+        request.leg_positions.left_front.x = 0.08
+        request.leg_positions.right_front.z = 0.03
+        request.leg_positions.right_front.x = 0.08
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = -0.03
-        request.left_front.x = 0.08
-        request.right_front.z = -0.03
-        request.right_front.x = 0.08
+        request.leg_positions.left_front.z = -0.03
+        request.leg_positions.left_front.x = 0.08
+        request.leg_positions.right_front.z = -0.03
+        request.leg_positions.right_front.x = 0.08
         self.move_legs_relative(request)
         # try lift hind legs
         request = MoveBodyRelativeRequest()
@@ -173,71 +173,71 @@ class BlindClimbController(object):
         self.move_body_relative(request)
         # left rear leg
         request = MoveLegsToRelativePositionRequest()
-        request.left_rear.z = 0.03
-        request.left_rear.x = 0.05
+        request.leg_positions.left_rear.z = 0.03
+        request.leg_positions.left_rear.x = 0.05
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_rear.z = -0.03
-        request.left_rear.x = 0.05
+        request.leg_positions.left_rear.z = -0.03
+        request.leg_positions.left_rear.x = 0.05
         self.move_legs_relative(request)
         # right rear leg
         request = MoveLegsToRelativePositionRequest()
-        request.right_rear.z = 0.03
-        request.right_rear.x = 0.05
+        request.leg_positions.right_rear.z = 0.03
+        request.leg_positions.right_rear.x = 0.05
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.right_rear.z = -0.03
-        request.right_rear.x = 0.05
+        request.leg_positions.right_rear.z = -0.03
+        request.leg_positions.right_rear.x = 0.05
         self.move_legs_relative(request)
         # move middle legs
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.z = 0.03
-        request.left_middle.x = 0.03
-        request.right_middle.z = 0.03
-        request.right_middle.x = 0.03
+        request.leg_positions.left_middle.z = 0.03
+        request.leg_positions.left_middle.x = 0.03
+        request.leg_positions.right_middle.z = 0.03
+        request.leg_positions.right_middle.x = 0.03
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.z = -0.03
-        request.left_middle.x = 0.03
-        request.right_middle.z = -0.03
-        request.right_middle.x = 0.03
+        request.leg_positions.left_middle.z = -0.03
+        request.leg_positions.left_middle.x = 0.03
+        request.leg_positions.right_middle.z = -0.03
+        request.leg_positions.right_middle.x = 0.03
         self.move_legs_relative(request)
         # lift hind legs on platform
         request = MoveBodyRelativeRequest()
         request.translation.x = 0.1
         self.move_body_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_rear.z = 0.14
-        request.left_rear.x = 0.06
-        request.right_rear.z = 0.14
-        request.right_rear.x = 0.06
+        request.leg_positions.left_rear.z = 0.14
+        request.leg_positions.left_rear.x = 0.06
+        request.leg_positions.right_rear.z = 0.14
+        request.leg_positions.right_rear.x = 0.06
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_rear.x = 0.06
-        request.right_rear.x = 0.06
+        request.leg_positions.left_rear.x = 0.06
+        request.leg_positions.right_rear.x = 0.06
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_rear.z = -0.05
-        request.right_rear.z = -0.05
+        request.leg_positions.left_rear.z = -0.05
+        request.leg_positions.right_rear.z = -0.05
         self.move_legs_relative(request)
         # realign middle legs
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.z = 0.03
-        request.left_middle.x = 0.03
-        request.right_middle.z = 0.03
-        request.right_middle.x = 0.03
+        request.leg_positions.left_middle.z = 0.03
+        request.leg_positions.left_middle.x = 0.03
+        request.leg_positions.right_middle.z = 0.03
+        request.leg_positions.right_middle.x = 0.03
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_middle.z = -0.03
-        request.left_middle.x = 0.03
-        request.right_middle.z = -0.03
-        request.right_middle.x = 0.03
+        request.leg_positions.left_middle.z = -0.03
+        request.leg_positions.left_middle.x = 0.03
+        request.leg_positions.right_middle.z = -0.03
+        request.leg_positions.right_middle.x = 0.03
         self.move_legs_relative(request)
 
     def main_climb(self):
         self.move_body_core(Vector3(0, 0, 0.05))
-        self.move_leg(MoveCoreToPositionRequest.LEFT_MIDDLE, "base_link", Vector3(0.05, 0.22, 0))
-        self.move_leg_until_collision(MoveCoreToPositionRequest.LEFT_MIDDLE, "base_link", Vector3(0.05, 0.22, -0.2))
+        self.move_leg(MoveCoreToPositionrequest.leg_positions.left_MIDDLE, "base_link", Vector3(0.05, 0.22, 0))
+        self.move_leg_until_collision(MoveCoreToPositionrequest.leg_positions.left_MIDDLE, "base_link", Vector3(0.05, 0.22, -0.2))
 
 
 if __name__ == "__main__":

@@ -40,46 +40,46 @@ class TouchWalker(object):
         current_positions = self.read_legs("base_footprint")
         # lift left
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = lift_height - current_positions.left_front.z
-        request.right_middle.z = lift_height - current_positions.right_middle.z
-        request.left_rear.z = lift_height - current_positions.left_rear.z
+        request.leg_positions.left_front.z = lift_height - current_positions.left_front.z
+        request.leg_positions.right_middle.z = lift_height - current_positions.right_middle.z
+        request.leg_positions.left_rear.z = lift_height - current_positions.left_rear.z
         self.move_legs_relative(request)
         # move all
         request = MoveLegsToRelativePositionRequest()
-        request.left_front = vector.to_vector3()
-        request.right_front = -vector.to_vector3()
-        request.left_middle = -vector.to_vector3()
-        request.right_middle = vector.to_vector3()
-        request.left_rear = vector.to_vector3()
-        request.right_rear = -vector.to_vector3()
+        request.leg_positions.left_front = vector.to_vector3()
+        request.leg_positions.right_front = -vector.to_vector3()
+        request.leg_positions.left_middle = -vector.to_vector3()
+        request.leg_positions.right_middle = vector.to_vector3()
+        request.leg_positions.left_rear = vector.to_vector3()
+        request.leg_positions.right_rear = -vector.to_vector3()
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.left_front.z = -lift_height
-        request.right_middle.z = -lift_height
-        request.left_rear.z = -lift_height
+        request.leg_positions.left_front.z = -lift_height
+        request.leg_positions.right_middle.z = -lift_height
+        request.leg_positions.left_rear.z = -lift_height
         self.move_legs_relative_until_hit(request)
 
     def step_right(self, vector, lift_height):
         current_positions = self.read_legs("base_footprint")
         # lift left
         request = MoveLegsToRelativePositionRequest()
-        request.right_front.z = lift_height - current_positions.right_front.z
-        request.left_middle.z = lift_height - current_positions.left_middle.z
-        request.right_rear.z = lift_height - current_positions.right_rear.z
+        request.leg_positions.right_front.z = lift_height - current_positions.right_front.z
+        request.leg_positions.left_middle.z = lift_height - current_positions.left_middle.z
+        request.leg_positions.right_rear.z = lift_height - current_positions.right_rear.z
         self.move_legs_relative(request)
         # move all
         request = MoveLegsToRelativePositionRequest()
-        request.left_front = -vector.to_vector3()
-        request.right_front = vector.to_vector3()
-        request.left_middle = vector.to_vector3()
-        request.right_middle = -vector.to_vector3()
-        request.left_rear = -vector.to_vector3()
-        request.right_rear = vector.to_vector3()
+        request.leg_positions.left_front = -vector.to_vector3()
+        request.leg_positions.right_front = vector.to_vector3()
+        request.leg_positions.left_middle = vector.to_vector3()
+        request.leg_positions.right_middle = -vector.to_vector3()
+        request.leg_positions.left_rear = -vector.to_vector3()
+        request.leg_positions.right_rear = vector.to_vector3()
         self.move_legs_relative(request)
         request = MoveLegsToRelativePositionRequest()
-        request.right_front.z = -lift_height
-        request.left_middle.z = -lift_height
-        request.right_rear.z = -lift_height
+        request.leg_positions.right_front.z = -lift_height
+        request.leg_positions.left_middle.z = -lift_height
+        request.leg_positions.right_rear.z = -lift_height
         self.move_legs_relative_until_hit(request)
 
     def relax_legs(self):

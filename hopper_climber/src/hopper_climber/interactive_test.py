@@ -122,12 +122,12 @@ class InteractiveLegMove(object):
         point.x = position.x
         point.y = position.y
         point.z = position.z
-        request.left_front = point
-        request.right_front = point
-        request.left_middle = point
-        request.right_middle = point
-        request.left_rear = point
-        request.right_rear = point
+        request.leg_positions.left_front = point
+        request.leg_positions.right_front = point
+        request.leg_positions.left_middle = point
+        request.leg_positions.right_middle = point
+        request.leg_positions.left_rear = point
+        request.leg_positions.right_rear = point
         self.move_legs(request)
 
     def get_position_for(self, link):

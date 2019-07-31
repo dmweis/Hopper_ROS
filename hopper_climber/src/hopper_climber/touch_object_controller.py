@@ -56,12 +56,12 @@ class TouchPointController(object):
         point.x = point_msg.point.x
         point.y = point_msg.point.y
         point.z = point_msg.point.z
-        request.left_front = point
-        request.right_front = point
-        request.left_middle = point
-        request.right_middle = point
-        request.left_rear = point
-        request.right_rear = point
+        request.leg_positions.left_front = point
+        request.leg_positions.right_front = point
+        request.leg_positions.left_middle = point
+        request.leg_positions.right_middle = point
+        request.leg_positions.left_rear = point
+        request.leg_positions.right_rear = point
         self.move_legs(request)
         rospy.sleep(1)
         self.move_to_relaxed()

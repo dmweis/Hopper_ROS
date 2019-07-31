@@ -9,6 +9,7 @@
     <node name="hopper_controller" pkg="hopper_controller" type="hexapod_controller.py" respawn="true" >
         <param name="publish_odometry_to_tf" value="true"/>
         <param name="sound_on" value="false"/>
+        <param name="use_height_adjust" value="true"/>
     </node>
     <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />
     <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py" unless="$(arg r2d2)"/>

@@ -8,6 +8,7 @@ from threading import Event
 from .hexapod_ik_driver import LegPositions, Vector3, Vector2, LegFlags
 from .hexapod_choreographer import Choreographer
 from hopper_controller.msg import FoldCommand
+from hopper_feet_sensors.msg import FeetSensorData
 import math
 
 INTERPOLATION_FREQUENCY = 60
@@ -453,3 +454,136 @@ class TripodGait(object):
         tallest = sorted(heights, reverse=True)[:3]
         average_height = sum(tallest) / len(tallest)
         self._height_publisher.update_height(average_height)
+
+
+class HeightAdjustTripodGait(object):
+    def __init__(self, ik_driver, height_publisher, velocity_publisher):
+        super(HeightAdjustTripodGait, self).__init__()
+        self._ik_driver = ik_driver
+        self._height_publisher = height_publisher
+        self._velocity_publisher = velocity_publisher
+        self._ros_rate = rospy.Rate(INTERPOLATION_FREQUENCY)
+        self._update_delay = 1000 / INTERPOLATION_FREQUENCY
+        self.current_relaxed_position = RELAXED_POSITION.clone()
+        self.last_written_position = self._ik_driver.read_current_leg_positions()
+        # leg sensor subscriber
+        self.last_feet_sensors = FeetSensorData()
+        rospy.Subscriber("hopper/feet", FeetSensorData, self.on_feet_data, queue_size=10)
+
+    def stop(self, disable_motors=True):
+        if disable_motors:
+            self._ik_driver.disable_motors()
+
+    def on_feet_data(self, msg):
+        self.last_feet_sensors = msg
+
+    def is_touching_ground(self, leg_flag):
+        mapping = {
+            leg_flag.left_front: self.last_feet_sensors.left_front,
+            leg_flag.left_middle: self.last_feet_sensors.left_middle,
+            leg_flag.left_rear: self.last_feet_sensors.left_rear,
+            leg_flag.right_front: self.last_feet_sensors.right_front,
+            leg_flag.right_middle: self.last_feet_sensors.right_middle,
+            leg_flag.right_rear: self.last_feet_sensors.right_rear
+        }
+        return mapping[leg_flag]
+
+    def update_relaxed_body_pose(self, transform, rotation, speed, legs=LegFlags.ALL):
+        """
+        :type transform: Vector3
+        :type rotation: Vector3
+        :type speed: float
+        :type legs: LegFlags
+        """
+        self.current_relaxed_position = RELAXED_POSITION.clone() \
+            .transform(transform * -1, legs) \
+            .rotate(rotation, legs)
+        self.execute_move(self.current_relaxed_position, speed)
+
+    def reset_relaxed_body_pose(self, speed_override=None):
+        self.current_relaxed_position = RELAXED_POSITION.clone()
+        self.execute_move(self.current_relaxed_position, speed_override)
+
+    def read_current_position(self):
+        self.last_written_position = self._ik_driver.read_current_leg_positions()
+
+    def execute_step(self, velocity, theta, lifted_legs, cycle_length, leg_lift_height=2.0):
+        """
+        :param velocity: Velocities in X and Y in cm/s
+        :param theta: rotation speed in degrees per second
+        :param lifted_legs: combination of legs to lift
+        :param cycle_length: length of this step cycle in seconds
+        :param leg_lift_height: height to which legs should be lifted from ground
+        """
+        # calculate traveled distance based on speed and velocity
+        distance = Vector2()
+        distance.x = velocity.x * cycle_length
+        distance.y = velocity.y * cycle_length
+        angle = theta * cycle_length
+        self._velocity_publisher.update_velocity(velocity, theta)
+        grounded_legs = LegFlags.RIGHT_TRIPOD if lifted_legs == LegFlags.LEFT_TRIPOD else LegFlags.LEFT_TRIPOD
+        start_position = self.last_written_position.clone()
+        # calculate target position
+        grounded_legs_vector_to_relaxed = self.current_relaxed_position.get_center_point(grounded_legs)\
+                                              - start_position.get_center_point(grounded_legs)
+        target_position = self.current_relaxed_position.clone() \
+            .transform(Vector3(distance.x / 2, distance.y / 2, 0), lifted_legs) \
+            .turn(angle / 2, lifted_legs) \
+            .update_from_other(start_position, grounded_legs) \
+            .transform(grounded_legs_vector_to_relaxed, grounded_legs) \
+            .transform(Vector3(-distance.x / 2, -distance.y / 2, 0), grounded_legs) \
+            .turn(-angle / 2, grounded_legs)
+        self._step_to_position(lifted_legs, target_position, cycle_length, leg_lift_height, velocity)
+        self._velocity_publisher.update_move(velocity * cycle_length)
+        self._velocity_publisher.update_velocity(Vector2(), 0)
+
+    def go_to_relaxed(self, lifted_legs, target_stance, cycle_length, leg_lift_height=2):
+        start_position = self.last_written_position.clone()
+        target_position = start_position.update_from_other(target_stance, lifted_legs)
+        self._step_to_position(lifted_legs, target_position, cycle_length, leg_lift_height)
+
+    def _step_to_position(self, lifted_legs, target_position, cycle_length, leg_lift_height, velocity=Vector2()):
+        start_position = self.last_written_position.clone()
+        start_time = rospy.get_time()
+        step_time = 0.0
+
+        lowest_foot_height = min([pos.z for pos in self.last_written_position.get_legs_as_list()])
+        max_foot_lift = lowest_foot_height + leg_lift_height
+        while step_time <= cycle_length:
+            step_time = rospy.get_time() - start_time
+            step_portion = step_time / cycle_length
+            current_position_on_ground = start_position.get_moved_towards_by_portion(target_position, step_portion)
+            new_position = current_position_on_ground.clone()
+            for new_leg_pos, start_leg_pos, target_leg_pos, leg_flag in zip(new_position.get_legs_as_list(lifted_legs),
+                                                                  start_position.get_legs_as_list(lifted_legs),
+                                                                  target_position.get_legs_as_list(lifted_legs),
+                                                                  LegFlags.get_legs_as_list(lifted_legs)):
+                if self.is_touching_ground(leg_flag):
+                    new_leg_pos.z = self.last_written_position.get_legs_as_list(leg_flag)[0].z
+                elif step_portion < 0.9:
+                    new_leg_pos.z = start_leg_pos.z + leg_lift_height
+                else:
+                    # slowly lower leg at the end of motion
+                    new_leg_pos.z = start_leg_pos.z + leg_lift_height * ((1 - 0.9) * 10)
+                new_leg_pos.z = max(new_leg_pos.z, max_foot_lift)
+            self.last_written_position = new_position
+            self._ik_driver.move_legs_synced(self.last_written_position)
+            self._velocity_publisher.temporary_update_move(velocity * cycle_length * step_portion)
+            self.publish_height()
+            self._ros_rate.sleep()
+
+    def execute_move(self, target_position, speed):
+        while self.last_written_position.move_towards_at_speed(target_position, speed * 0.001 * self._update_delay):
+            self._ik_driver.move_legs_synced(self.last_written_position)
+            self.publish_height()
+            self._ros_rate.sleep()
+        self._ik_driver.move_legs_synced(self.last_written_position)
+        self.publish_height()
+        self._ros_rate.sleep()
+
+    def publish_height(self):
+        heights = [-x.z for x in self.last_written_position.get_legs_as_list(LegFlags.ALL)]
+        tallest = sorted(heights, reverse=True)[:3]
+        average_height = sum(tallest) / len(tallest)
+        self._height_publisher.update_height(average_height)
+

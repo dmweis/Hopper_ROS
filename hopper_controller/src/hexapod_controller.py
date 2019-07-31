@@ -10,7 +10,7 @@ from std_msgs.msg import String, Empty
 from std_srvs.srv import Empty as EmptySrv, EmptyResponse as EmptySrvResponse
 
 
-from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait
+from hexapod.hexapod_gait_engine import GaitEngine, MovementController, TripodGait, HeightAdjustTripodGait
 from hexapod.hexapod_ik_driver import Vector2, Vector3
 from hexapod.folding_manager import FoldingManager
 import ros_abstraction
@@ -31,14 +31,20 @@ class HexapodController(object):
         rospy.init_node('hopper_controller')
         # build controller
         self.sound_on = rospy.get_param("~sound_on", True)
+        self.use_height_adjust = rospy.get_param("~use_height_adjust", False)
         ik_driver = ros_abstraction.IkController()
         body_controller = ros_abstraction.HexapodBodyController()
         message_publisher = ros_abstraction.MessagePublisher()
         controller_telemetry = ros_abstraction.ControllerTelemetryPublisher()
         lidar_controller = ros_abstraction.LidarController()
         orientation_publisher = ros_abstraction.BodyOrientationPublisher()
-        tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
-                                 ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
+        tripod_gait = None
+        if not self.use_height_adjust:
+            tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
+                                    ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
+        else:
+            tripod_gait = HeightAdjustTripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
+                                    ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
         gait_engine = GaitEngine(tripod_gait)
         leg_controller = ros_abstraction.LegController(gait_engine)
         folding_manager = FoldingManager(body_controller)

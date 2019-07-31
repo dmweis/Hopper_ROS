@@ -42,7 +42,7 @@ class HexapodController(object):
         tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
                                 ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
         gait_sequencers.append(tripod_gait)
-        if not self.use_height_adjust:
+        if self.use_height_adjust:
             height_adjust_tripod_gait = HeightAdjustTripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
                                     ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
             gait_sequencers.append(height_adjust_tripod_gait)

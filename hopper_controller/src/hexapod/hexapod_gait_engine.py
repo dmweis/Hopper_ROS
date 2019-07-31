@@ -561,7 +561,7 @@ class HeightAdjustTripodGait(object):
         max_foot_lift = lowest_foot_height + leg_lift_height
 
         all_feet_lowered = False
-        while step_time <= cycle_length and not feet_lowered:
+        while step_time <= cycle_length and not all_feet_lowered:
             step_time = rospy.get_time() - start_time
             step_portion = step_time / cycle_length
             step_portion = min(step_portion, 1.0)

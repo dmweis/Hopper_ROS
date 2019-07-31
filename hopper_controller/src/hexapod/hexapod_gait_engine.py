@@ -561,7 +561,7 @@ class HeightAdjustTripodGait(object):
         max_foot_lift = lowest_foot_height + leg_lift_height
 
         all_feet_lowered = False
-        while step_time <= cycle_length and not all_feet_lowered:
+        while step_time <= cycle_length or not all_feet_lowered:
             step_time = rospy.get_time() - start_time
             step_portion = step_time / cycle_length
             step_portion = min(step_portion, 1.0)
@@ -572,18 +572,19 @@ class HeightAdjustTripodGait(object):
                                                                   start_position.get_legs_as_list(lifted_legs),
                                                                   target_position.get_legs_as_list(lifted_legs),
                                                                   LegFlags.get_legs_as_list(lifted_legs)):
-                foot_in_air = True
+                foot_lowered = False
                 if step_portion < 0.9:
                     new_leg_pos.z = start_leg_pos.z + leg_lift_height
                 elif self.is_touching_ground(leg_flag):
                     new_leg_pos.z = self.last_written_position.get_legs_as_list(leg_flag)[0].z
-                    foot_in_air = False
+                    foot_lowered = True
                 else:
                     # slowly lower leg at the end of motion
                     
-                    foot_in_air, new_leg_pos.z = move_number_towards(self.last_written_position.get_legs_as_list(leg_flag)[0].z, start_leg_pos.z, 2 / INTERPOLATION_FREQUENCY)
+                    moved, new_leg_pos.z = move_number_towards(self.last_written_position.get_legs_as_list(leg_flag)[0].z, start_leg_pos.z, 2 / INTERPOLATION_FREQUENCY)
+                    foot_lowered = not moved
                 new_leg_pos.z = min(new_leg_pos.z, max_foot_lift)
-                all_feet_lowered = all_feet_lowered and not foot_in_air
+                all_feet_lowered = all_feet_lowered and foot_lowered
             self.last_written_position = new_position
             self._ik_driver.move_legs_synced(self.last_written_position)
             self._velocity_publisher.temporary_update_move(velocity * cycle_length * step_portion)

@@ -39,12 +39,15 @@ class HexapodController(object):
         lidar_controller = ros_abstraction.LidarController()
         orientation_publisher = ros_abstraction.BodyOrientationPublisher()
         gait_sequencers = []
-        tripod_gait = TripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
-                                ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
+        # gait sequencer dependencies
+        height_publisher = ros_abstraction.HeightPublisher(message_publisher)
+        odom_publisher = ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader())
+        # tripod
+        tripod_gait = TripodGait(ik_driver, height_publisher, odom_publisher)
         gait_sequencers.append(tripod_gait)
         if self.use_height_adjust:
-            height_adjust_tripod_gait = HeightAdjustTripodGait(ik_driver, ros_abstraction.HeightPublisher(message_publisher),
-                                    ros_abstraction.OdomPublisher(message_publisher, ros_abstraction.ImuReader()))
+            # height adjust
+            height_adjust_tripod_gait = HeightAdjustTripodGait(ik_driver, height_publisher, odom_publisher)
             gait_sequencers.append(height_adjust_tripod_gait)
         self.gait_engine = GaitEngine(gait_sequencers)
         leg_controller = ros_abstraction.LegController(self.gait_engine)

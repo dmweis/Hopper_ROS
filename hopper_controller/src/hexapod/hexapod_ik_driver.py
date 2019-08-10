@@ -9,6 +9,7 @@ import hopper_controller.msg
 from hopper_controller.msg import HexapodMotorPositions, LegMotorPositions
 from pyquaternion import Quaternion
 
+
 class Vector3(geometry_msgs.msg.Vector3):
     def __init__(self, x=0., y=0., z=0.):
         super(Vector3, self).__init__(x, y, z)

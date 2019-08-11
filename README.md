@@ -1,6 +1,6 @@
 # ROS stack for a hexapod robot
 
-![Hopper](images/last_1.jpg)
+![Hopper](images/ucreate_pretty.JPG)
 
 Hopper (Named after Grace Hopper) is a 3D printed hexapod robot running on ROS.
 It's brain is a Raspberry Pi 3 running Ubunut Xenial with ROS Kinetic.

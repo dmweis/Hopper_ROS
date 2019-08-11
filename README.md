@@ -2,7 +2,8 @@
 
 ![Hopper](images/ucreate_pretty.JPG)
 
-<iframe src="https://myhub.autodesk360.com/ue280e3f5/shares/public/SHabee1QT1a327cf2b7a5bb708b659591a23?mode=embed" width="640" height="480" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"  frameborder="0"></iframe>  
+[Cad model can be viewed here](https://davidmakesrobots.com/robotics/2019/05/14/HopperModels.html)
+
 
 Hopper (Named after Grace Hopper) is a 3D printed hexapod robot running on ROS.
 It's brain is a Raspberry Pi 3 running Ubunut Xenial with ROS Kinetic.

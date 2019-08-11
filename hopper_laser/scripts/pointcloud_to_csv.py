@@ -16,6 +16,7 @@ class LaserScanner(object):
         super(LaserScanner, self).__init__()
 
         self.message_counter = 0
+        self.biggest_point_count = 0
         self.last_cloud = None
 
         rospy.init_node("pointcloud_to_csv")
@@ -28,9 +29,13 @@ class LaserScanner(object):
         print "Saved last message"
 
     def on_point_cloud(self, msg):
-        self.message_counter+=1
-        self.last_cloud = msg
-        progress(self.message_counter)
+        # self.message_counter+=1
+        count = sum(1 for _ in pc2.read_points(msg, skip_nans=True, field_names=("x", "y", "z")))
+        if count > self.biggest_point_count:
+            self.biggest_point_count = count
+            self.last_cloud = msg
+            print "Found biggest", count
+        # progress(self.message_counter)
 
 
 if __name__ == "__main__":

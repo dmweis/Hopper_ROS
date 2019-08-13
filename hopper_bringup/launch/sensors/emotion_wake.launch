@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
     <rosparam command="load" file="$(env HOME)/keys.yaml" />
-    <include file="$(find freenect_launch)/launch/freenect.launch" />
-    <param name="face_api_refresh_rate" type="int" value="3"/>
-    <node name="hopper_emotion_core" pkg="hopper_emotion_core" type="EmotionController.py"/>
-    <node name="hopper_emotion_identificator" pkg="hopper_emotion_core" type="FaceIdentificator.py"/>
-    <node name="hopper_emotion_tracker" pkg="hopper_emotion_core" type="EmotionSwitchDetector.py"/>
-    <node name="hopper_emotion_reaction_controller" pkg="hopper_emotion_core" type="EmotionalReactionController.py"/>
-    <node name="hopper_emotion_web" pkg="hopper_emotion_web" type="app.js" />
-    <node name="hopper_emotion_tracker_database" pkg="hopper_emotion_core" type="FaceApiUsersDatabase.py"/>
+    <param name="face_api_refresh_rate" type="int" value="7"/>
+    <node name="hopper_emotion_core" pkg="hopper_emotion" type="EmotionController.py"/>
+    <node name="hopper_emotion_identificator" pkg="hopper_emotion" type="FaceIdentificator.py"/>
+    <!-- <node name="hopper_emotion_tracker" pkg="hopper_emotion" type="EmotionSwitchDetector.py"/> -->
+    <!-- <node name="hopper_emotion_reaction_controller" pkg="hopper_emotion" type="EmotionalReactionController.py"/> -->
+    <node name="hopper_emotion_web" pkg="hopper_emotion" type="app.js" />
+    <node name="hopper_emotion_tracker_database" pkg="hopper_emotion" type="FaceApiUsersDatabase.py"/>
 </launch>

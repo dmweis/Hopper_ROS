@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from hopper_emotion_core.msg import EmotionChange
+from hopper_emotion.msg import EmotionChange
 from std_msgs.msg import String
 
 

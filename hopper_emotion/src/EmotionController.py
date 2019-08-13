@@ -6,7 +6,7 @@ import rospy
 import cognitive_face
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
-from hopper_emotion_core.msg import DetectedFace, FaceRectangle, FaceAttributes, Emotions, FaceDetectionImage
+from hopper_emotion.msg import DetectedFace, FaceRectangle, FaceAttributes, Emotions, FaceDetectionImage
 
 # disable warnings on unsecure requests done by the MS face api library
 import requests

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from hopper_emotion_core.msg import FaceDetectionImage, EmotionChange
+from hopper_emotion.msg import FaceDetectionImage, EmotionChange
 
 def get_strongest_emotion(detected_face):
     emotions = detected_face.face_attributes.emotions

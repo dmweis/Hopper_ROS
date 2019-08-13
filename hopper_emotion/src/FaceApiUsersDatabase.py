@@ -3,8 +3,8 @@
 import os
 import sqlite3
 import rospy
-from hopper_emotion_core.msg import NameAndPersonId
-from hopper_emotion_core.srv import GetNameByPersonId, GetPersonIdByName, GetPersonIdByNameResponse, GetNameByPersonIdResponse
+from hopper_emotion.msg import NameAndPersonId
+from hopper_emotion.srv import GetNameByPersonId, GetPersonIdByName, GetPersonIdByNameResponse, GetNameByPersonIdResponse
 
 class FaceDatabaseAccessor(object):
     def __init__(self):

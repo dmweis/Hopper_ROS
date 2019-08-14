@@ -5,6 +5,7 @@
     <node name="hopper_emotion_core" pkg="hopper_emotion" type="EmotionController.py"/>
     <node name="hopper_emotion_identificator" pkg="hopper_emotion" type="FaceIdentificator.py"/>
     <!-- <node name="hopper_emotion_tracker" pkg="hopper_emotion" type="EmotionSwitchDetector.py"/> -->
+    <node name="hopper_new_face_detector" pkg="hopper_emotion" type="NewFaceDetector.py"/>
     <!-- <node name="hopper_emotion_reaction_controller" pkg="hopper_emotion" type="EmotionalReactionController.py"/> -->
     <node name="hopper_emotion_web" pkg="hopper_emotion" type="app.js" />
     <node name="hopper_emotion_tracker_database" pkg="hopper_emotion" type="FaceApiUsersDatabase.py"/>

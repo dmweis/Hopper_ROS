@@ -55,8 +55,9 @@ class HopperCloudSpeech(object):
 
         if exists(filename):
             self.play_file(filename)
-        self.cloud_client.synthesize(text, filename)
-        self.play_file(filename)
+        else:
+            self.cloud_client.synthesize(text, filename)
+            self.play_file(filename)
 
     def play_file(self, path):
         file = sound.Sound(path)

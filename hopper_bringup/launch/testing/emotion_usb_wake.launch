@@ -9,11 +9,5 @@
         <param name="io_method" value="mmap"/>
         <remap from="/usb_cam/image_raw" to="/camera/rgb/image_color"/>
     </node>
-    <rosparam command="load" file="$(env HOME)/keys.yaml" />
-    <param name="face_api_refresh_rate" type="int" value="7"/>
-    <node name="hopper_emotion_core" pkg="hopper_emotion" type="EmotionController.py"/>
-    <node name="hopper_emotion_identificator" pkg="hopper_emotion" type="FaceIdentificator.py"/>
-    <!-- <node name="hopper_emotion_tracker" pkg="hopper_emotion" type="EmotionSwitchDetector.py"/> -->
-    <node name="hopper_emotion_tracker_database" pkg="hopper_emotion" type="FaceApiUsersDatabase.py"/>
-    <node name="hopper_emotion_web" pkg="hopper_emotion" type="app.js" />
+        <include file="$(find hopper_bringup)/launch/sensors/emotion_wake.launch" />
 </launch>

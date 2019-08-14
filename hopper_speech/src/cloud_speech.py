@@ -43,7 +43,7 @@ class HopperCloudSpeech(object):
         if not exists(self.caching_folder_path):
             makedirs(self.caching_folder_path)
         self.cloud_client = SpeechClient()
-        rospy.Subscriber("hopper/cloud_say", String, self.on_play_sound, queue_size=1)
+        rospy.Subscriber("hopper/cloud_say", String, self.on_play_sound, queue_size=3)
         rospy.spin()
 
     def on_play_sound(self, string):

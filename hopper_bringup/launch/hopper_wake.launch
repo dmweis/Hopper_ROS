@@ -15,7 +15,6 @@
     <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py" unless="$(arg r2d2)"/>
     <node name="hopper_speech" pkg="hopper_speech" type="r2d2_speak.py" if="$(arg r2d2)"/>
 
-    <env name="GOOGLE_APPLICATION_CREDENTIALS" value="/home/dweis/ros/hopper/keys/HopperServices-cd151711c7c0.json"/>
     <node name="hopper_cloud_speech" pkg="hopper_speech" type="cloud_speech.py"/>
     <node name="hopper_feet_sensors" pkg="hopper_feet_sensors" type="feet_sensor_controller.py" respawn="true"/>
     <node name="hopper_system_telemetry" pkg="hopper_system_telemetry" type="hopper_system_telemetry.py"/>

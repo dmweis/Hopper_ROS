@@ -29,10 +29,10 @@ class FaceGroupCreator(object):
         # init person group
         self.person_group_id = "primary_user_group"
         # cognitive_face.person_group.delete(self.person_group_id)
-        cognitive_face.person_group.create(self.person_group_id)
-        print("Created person group")
+        # cognitive_face.person_group.create(self.person_group_id)
+        # print("Created person group")
         # init first user
-        person_name = "David"
+        person_name = "Cameron"
         rospy.wait_for_service("get_name_by_person_id")
         self.get_person_id_by_name_database = rospy.ServiceProxy("get_person_id_by_name", GetPersonIdByName)
         person_id = self.get_person_id_by_name_database(person_name).person_id

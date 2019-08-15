@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
     <rosparam command="load" file="$(env HOME)/keys.yaml" />
-    <param name="face_api_refresh_rate" type="int" value="7"/>
+    <param name="face_api_refresh_rate" type="int" value="1"/>
     <node name="hopper_emotion_core" pkg="hopper_emotion" type="EmotionController.py"/>
     <node name="hopper_emotion_identificator" pkg="hopper_emotion" type="FaceIdentificator.py"/>
     <!-- <node name="hopper_emotion_tracker" pkg="hopper_emotion" type="EmotionSwitchDetector.py"/> -->

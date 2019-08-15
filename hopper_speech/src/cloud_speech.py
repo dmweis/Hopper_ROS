@@ -47,6 +47,7 @@ class HopperCloudSpeech(object):
         rospy.spin()
 
     def on_play_sound(self, string):
+        # text = string.data.replace("r", "w").replace("R", "W").replace("l", "w").replace("L", "W")
         text = string.data
 
         hashed_text = str(abs(hash(text)))

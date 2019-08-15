@@ -23,7 +23,7 @@ def get_strongest_emotion(detected_face):
 
 
 class KnownPersonStorage():
-    def __init__(self, name):
+    def __init__(self):
         self.data = {}
 
     def is_known(self, name):

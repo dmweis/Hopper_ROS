@@ -2,7 +2,7 @@
 
 ![Hopper](images/ucreate_pretty.JPG)
 
-[Cad model can be viewed here](https://davidmakesrobots.com/robotics/2019/06/22/HopperModels.html)
+[Cad model can be viewed here](https://davidweis.dev/robotics/2019/06/22/HopperModels.html)
 
 
 Hopper (Named after Grace Hopper) is a 3D printed hexapod robot running on ROS.

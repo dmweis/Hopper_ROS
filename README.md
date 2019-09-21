@@ -12,9 +12,3 @@ The platform is modeled and 3D printed by me and is still a work in progress. It
 This project is still far from finished and I will update this documentation as it progresses
 
 
-
-## ROS packages used
-
-ros-kinetic-urdf  
-ros-kinetic-move-base  
-ros-kinetic-rplidar-ros  

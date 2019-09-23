@@ -29,7 +29,7 @@ class Choreographer(object):
         }
         child_safe = rospy.get_param("child_safe_mode", True)
         if not child_safe:
-            self.dance_lookup["hump"] = self.hump
+            pass
 
     def execute_choreography(self, choreography_name):
         original_pose = self.gait_engine.get_relaxed_pose()
@@ -225,32 +225,6 @@ class Choreographer(object):
         self.gait_engine.move_to_new_pose(grounded_middle_front, slow_speed - 5)
         self.gait_engine.move_to_new_pose(lifted_middle, slow_speed)
         self.gait_engine.move_to_new_pose(normal_pose, slow_speed)
-
-    def hump(self):
-        speed = 13
-        hacklab_speaker = rospy.Publisher("hacklab/play", String, queue_size=1)
-        normal_pose = self.gait_engine.get_relaxed_pose()
-        forward_hump = normal_pose \
-            .transform(Vector3(x=-3)) \
-            .rotate(Vector3(y=-10))
-        backwards_hump = normal_pose \
-            .transform(Vector3(x=3))
-        for i in range(10):
-            self.gait_engine.move_to_new_pose(forward_hump, speed)
-            speed = speed + 1
-            self.check_cancel()
-            self.gait_engine.move_to_new_pose(backwards_hump, speed)
-            speed = speed + 1
-            self.check_cancel()
-        self.speak_publisher.publish("Turret_turret_active_3")
-        hacklab_speaker.publish("portal/Turret_turret_active_3.wav")
-        self.gait_engine.move_to_new_pose(forward_hump, speed)
-        for i in range(5):
-            self.gait_engine.move_to_new_pose(forward_hump.transform(Vector3(z=-1)), speed)
-            self.gait_engine.move_to_new_pose(forward_hump.transform(Vector3(z=1)), speed)
-            self.check_cancel()
-        self.gait_engine.move_to_new_pose(backwards_hump, 9)
-        self.gait_engine.move_to_new_pose(normal_pose, speed)
 
     def combat_cry(self):
         use_right = random.choice([True, False])

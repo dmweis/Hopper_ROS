@@ -1,0 +1,6 @@
+Environment="web_username=******"
+Environment="web_password=******"
+Environment="GOOGLE_APPLICATION_CREDENTIALS=/home/dweis/HopperServices.json"
+Environment="AUDIODEV=hw:2,0"
+Environment="ROS_HOSTNAME=hopper"
+Environment="ROS_MASTER_URI=http://hopper:11311"

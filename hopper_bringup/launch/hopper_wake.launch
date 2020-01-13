@@ -16,7 +16,7 @@
     <node name="hopper_speech" pkg="hopper_speech" type="r2d2_speak.py" if="$(arg r2d2)"/>
 
     <node name="hopper_cloud_speech" pkg="hopper_speech" type="cloud_speech.py"/>
-    <node name="hopper_feet_sensors" pkg="hopper_feet_sensors" type="feet_sensor_controller.py" respawn="true"/>
+    <!-- <node name="hopper_feet_sensors" pkg="hopper_feet_sensors" type="feet_sensor_controller.py" respawn="true"/> -->
     <node name="hopper_system_telemetry" pkg="hopper_system_telemetry" type="hopper_system_telemetry.py"/>
     <!-- <node name="hacklab_speech" pkg="hopper_speech" type="hacklab_speak.py"/> -->
     <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>

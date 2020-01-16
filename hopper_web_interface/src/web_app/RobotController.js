@@ -47,4 +47,4 @@ const rotationJoystick = createJoystick({
     socket: socket
 });
 
-setGamepadWatchdog(socket, 0.2);
+setGamepadWatchdog(socket, 0);

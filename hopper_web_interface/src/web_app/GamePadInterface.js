@@ -17,7 +17,11 @@ function setGamepadWatchdog(socket, deadzone) {
         ly: 0,
         rx: 0,
         ry: 0,
-        id: 0
+        id: 0,
+    };
+    let state = {
+        fullscreen: false,
+        fullscreenButtonDown: false,
     };
     function processGamepadData(gamepadData) {
         applyDeadzone(gamepadData);
@@ -32,6 +36,17 @@ function setGamepadWatchdog(socket, deadzone) {
                 y: -gamepadData.ry
             });
         }
+        if (!state.fullscreenButtonDown && gamepadData.buttons[9].pressed && !state.fullscreen) {
+            document.body.requestFullscreen();
+            state.fullscreen = true;
+            state.fullscreenButtonDown = true;
+        } else if (!state.fullscreenButtonDown && gamepadData.buttons[9].pressed && state.fullscreen) {
+            document.exitFullscreen()
+            state.fullscreen = false;
+            state.fullscreenButtonDown = true;
+        } else if (!gamepadData.buttons[9].pressed) {
+            state.fullscreenButtonDown = false;
+        }
     };
 
     function queryGamepads() {
@@ -44,7 +59,8 @@ function setGamepadWatchdog(socket, deadzone) {
                     ly: gamepad.axes[0],
                     rx: 0,
                     ry: gamepad.axes[2],
-                    id: gamepad.index
+                    id: gamepad.index,
+                    buttons: gamepad.buttons,
                 };
                 processGamepadData(gamepadData);
                 return;

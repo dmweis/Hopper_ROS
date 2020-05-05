@@ -18,7 +18,7 @@ class HexapodBodyController(object):
             }
         }
         payload = json.dumps(message)
-        self.sock.sendto(payload, ("127.0.0.1", 6666))
+        self.udp_socket.sendto(payload, ("127.0.0.1", 6666))
 
     def set_motor_speed(self, speed):
         message = {
@@ -27,7 +27,7 @@ class HexapodBodyController(object):
             }
         }
         payload = json.dumps(message)
-        self.sock.sendto(payload, ("127.0.0.1", 6666))
+        self.udp_socket.sendto(payload, ("127.0.0.1", 6666))
 
     def set_torque(self, torque):
         message = {
@@ -36,7 +36,7 @@ class HexapodBodyController(object):
             }
         }
         payload = json.dumps(message)
-        self.sock.sendto(payload, ("127.0.0.1", 6666))
+        self.udp_socket.sendto(payload, ("127.0.0.1", 6666))
 
     def set_motors(self, positions):
         message = {
@@ -76,15 +76,15 @@ class HexapodBodyController(object):
                 }
             }
         payload = json.dumps(message)
-        self.sock.sendto(payload, ("127.0.0.1", 6666))
+        self.udp_socket.sendto(payload, ("127.0.0.1", 6666))
 
     def read_hexapod_motor_positions(self):
         message = {
             "command": "ReadPosition",
         }
         payload = json.dumps(message)
-        self.sock.sendto(payload, ("127.0.0.1", 6666))
-        json, addr = sock.recvfrom(1024)
+        self.udp_socket.sendto(payload, ("127.0.0.1", 6666))
+        json, addr = self.udp_socket.recvfrom(1024)
         data = json.loads(json)
         def make_leg(data):
             return LegMotorPositions(degrees(data["coxa"]), degrees(data["femur"]), degrees(data["tibia"]))

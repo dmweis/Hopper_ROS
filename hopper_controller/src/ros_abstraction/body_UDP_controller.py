@@ -23,7 +23,7 @@ class HexapodBodyController(object):
     def set_motor_speed(self, speed):
         message = {
             "command": {
-                "SetSpeed": compliance
+                "SetSpeed": speed
             }
         }
         payload = json.dumps(message)

@@ -84,8 +84,8 @@ class HexapodBodyController(object):
         }
         payload = json.dumps(message)
         self.udp_socket.sendto(payload, ("127.0.0.1", 6666))
-        json, addr = self.udp_socket.recvfrom(1024)
-        data = json.loads(json)
+        json_data, addr = self.udp_socket.recvfrom(1024)
+        data = json.loads(json_data)
         def make_leg(data):
             return LegMotorPositions(degrees(data["coxa"]), degrees(data["femur"]), degrees(data["tibia"]))
         return HexapodMotorPositions(

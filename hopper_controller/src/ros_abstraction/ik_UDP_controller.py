@@ -68,7 +68,7 @@ class IkController(object):
         json_data, addr = self.udp_socket.recvfrom(1024)
         data = json.loads(json_data)
         def make_leg(data):
-            return Vector3(data[0], data[1], data[2])
+            return Vector3(data[0] * 100, data[1] * 100, data[2] * 100)
         return LegPositions(
             make_leg(data["left_front"]),
             make_leg(data["right_front"]),

@@ -24,34 +24,34 @@ class IkController(object):
             "command": {
                 "MoveLegsTo": {
                 "left_front": [
-                    (leg_positions.left_front.x / 1000),
-                    (leg_positions.left_front.y / 1000),
-                    (leg_positions.left_front.z / 1000),
+                    (leg_positions.left_front.x / 100),
+                    (leg_positions.left_front.y / 100),
+                    (leg_positions.left_front.z / 100),
                 ],
                 "left_middle": [
-                    (leg_positions.left_middle.x / 1000),
-                    (leg_positions.left_middle.y / 1000),
-                    (leg_positions.left_middle.z / 1000),
+                    (leg_positions.left_middle.x / 100),
+                    (leg_positions.left_middle.y / 100),
+                    (leg_positions.left_middle.z / 100),
                 ],
                 "left_rear": [
-                    (leg_positions.left_rear.x / 1000),
-                    (leg_positions.left_rear.y / 1000),
-                    (leg_positions.left_rear.z / 1000),
+                    (leg_positions.left_rear.x / 100),
+                    (leg_positions.left_rear.y / 100),
+                    (leg_positions.left_rear.z / 100),
                 ],
                 "right_front": [
-                    (leg_positions.right_front.x / 1000),
-                    (leg_positions.right_front.y / 1000),
-                    (leg_positions.right_front.z / 1000),
+                    (leg_positions.right_front.x / 100),
+                    (leg_positions.right_front.y / 100),
+                    (leg_positions.right_front.z / 100),
                 ],
                 "right_middle": [
-                    (leg_positions.right_middle.x / 1000),
-                    (leg_positions.right_middle.y / 1000),
-                    (leg_positions.right_middle.z / 1000),
+                    (leg_positions.right_middle.x / 100),
+                    (leg_positions.right_middle.y / 100),
+                    (leg_positions.right_middle.z / 100),
                 ],
                 "right_rear": [
-                    (leg_positions.right_rear.x / 1000),
-                    (leg_positions.right_rear.y / 1000),
-                    (leg_positions.right_rear.z / 1000),
+                    (leg_positions.right_rear.x / 100),
+                    (leg_positions.right_rear.y / 100),
+                    (leg_positions.right_rear.z / 100),
                 ]
                 }
                 }

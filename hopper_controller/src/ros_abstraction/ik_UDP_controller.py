@@ -1,4 +1,4 @@
-from future import __division__
+from __future__ import division
 import rospy
 from hopper_controller.msg import HexapodLegPositions, MotorTorque
 from hopper_controller.srv import ReadHexapodLegPositions

@@ -9,7 +9,7 @@
     <node name="hopper_controller" pkg="hopper_controller" type="hexapod_controller.py" respawn="true" >
         <param name="publish_odometry_to_tf" value="true"/>
         <param name="sound_on" value="false"/>
-        <param name="use_height_adjust" value="true"/>
+        <param name="use_height_adjust" value="false"/>
     </node>
     <node name="hopper_web_interface" pkg="hopper_web_interface" type="app.js" />
     <node name="hopper_speech" pkg="hopper_speech" type="hopper_speech_node.py" unless="$(arg r2d2)"/>
@@ -21,11 +21,11 @@
     <!-- <node name="hacklab_speech" pkg="hopper_speech" type="hacklab_speak.py"/> -->
     <node name="hopper_battery_monitor" pkg="hopper_speech" type="battery_status_monitor.py"/>
     <node name="hopper_idle_animation" pkg="hopper_idle_animation" type="idle_animation_controller.py"/>
-    <node name="hopper_high_five_controller" pkg="hopper_climber" type="high_fiver.py"/>
+    <!-- <node name="hopper_high_five_controller" pkg="hopper_climber" type="high_fiver.py"/> -->
     <node name="hopper_abudction_detector" pkg="hopper_idle_animation" type="robot_abudction_detector.py"/>
-    <include file="$(find hopper_bringup)/launch/sensors/face_tracking.launch"/>
-    <include file="$(find hopper_bringup)/launch/sensors/laser_wake.launch" />
+    <!-- <include file="$(find hopper_bringup)/launch/sensors/face_tracking.launch"/> -->
+    <!-- <include file="$(find hopper_bringup)/launch/sensors/laser_wake.launch" /> -->
     <include file="$(find hopper_bringup)/launch/description/description.launch" />
-    <include file="$(find hopper_bringup)/launch/sensors/laser_assemble.launch" />
+    <!-- <include file="$(find hopper_bringup)/launch/sensors/laser_assemble.launch" /> -->
 </launch>
 

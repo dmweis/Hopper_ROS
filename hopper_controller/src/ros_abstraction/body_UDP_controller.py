@@ -41,7 +41,7 @@ class HexapodBodyController(object):
     def set_motors(self, positions):
         message = {
             "command": {
-                "MoveTo": {
+                "MoveMotorsTo": {
                 "left_front": {
                     "coxa": radians(positions.left_front.coxa),
                     "femur": radians(positions.left_front.femur),
@@ -80,7 +80,7 @@ class HexapodBodyController(object):
 
     def read_hexapod_motor_positions(self):
         message = {
-            "command": "ReadPosition",
+            "command": "ReadMotorPosition",
         }
         payload = json.dumps(message)
         self.udp_socket.sendto(payload, ("127.0.0.1", 6666))

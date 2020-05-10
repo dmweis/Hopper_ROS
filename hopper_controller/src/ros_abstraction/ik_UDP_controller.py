@@ -22,7 +22,7 @@ class IkController(object):
     def move_legs_synced(self, leg_positions):
         message = {
             "command": {
-                "MoveTo": {
+                "MoveLegsTo": {
                 "left_front": [
                     (leg_positions.left_front.x / 1000),
                     (leg_positions.left_front.y / 1000),
@@ -61,7 +61,7 @@ class IkController(object):
 
     def read_current_leg_positions(self):
         message = {
-            "command": "ReadPosition",
+            "command": "ReadLegPosition",
         }
         payload = json.dumps(message)
         self.udp_socket.sendto(payload, ("127.0.0.1", 6666))
